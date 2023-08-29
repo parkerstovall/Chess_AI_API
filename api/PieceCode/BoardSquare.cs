@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.Serialization;
+using api.pieces;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class BoardSquare
     {

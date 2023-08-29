@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class King : Piece
     {
         bool hasMoved = false;
+
         public King(string color, int[] coords, bool hasMoved)
         {
             this.color = color;
@@ -15,6 +16,7 @@ namespace TrainingWeb.ChessFiles
             this.coords = coords;
             this.hasMoved = hasMoved;
         }
+
         public override List<int[]> GetPaths(BoardSquare[,] board, bool check)
         {
             List<int[]> moves = new List<int[]>();
@@ -33,45 +35,80 @@ namespace TrainingWeb.ChessFiles
                 {
                     if (board[col, row].piece == null || board[col, row].piece.color != this.color)
                     {
-                        if((this.color == "white" && board[col, row].blackPressure == 0)
-                            || (this.color == "black" && board[col, row].whitePressure == 0))
-                        moves.Add(new int[] { col, row });
+                        if (
+                            (this.color == "white" && board[col, row].blackPressure == 0)
+                            || (this.color == "black" && board[col, row].whitePressure == 0)
+                        )
+                            moves.Add(new int[] { col, row });
                     }
                 }
             }
 
             col = coords[0];
             row = coords[1];
-            if(!this.hasMoved)
+            if (!this.hasMoved)
             {
-                if(board[col, row - 1].piece == null && board[col, row - 2].piece == null && board[col, row - 3].piece == null && board[col, row - 4].piece != null && board[col, row - 4].piece.type == "Rook" && !board[col, row - 4].hasMoved)
+                if (
+                    board[col, row - 1].piece == null
+                    && board[col, row - 2].piece == null
+                    && board[col, row - 3].piece == null
+                    && board[col, row - 4].piece != null
+                    && board[col, row - 4].piece.type == "Rook"
+                    && !board[col, row - 4].hasMoved
+                )
                 {
-                    if(this.color == "white")
+                    if (this.color == "white")
                     {
-                        if(board[col, row].blackPressure == 0 && board[col, row - 1].blackPressure == 0 && board[col, row - 2].blackPressure == 0 && board[col, row - 3].blackPressure == 0) {
-                            moves.Add(new int[] { col, row - 2});
+                        if (
+                            board[col, row].blackPressure == 0
+                            && board[col, row - 1].blackPressure == 0
+                            && board[col, row - 2].blackPressure == 0
+                            && board[col, row - 3].blackPressure == 0
+                        )
+                        {
+                            moves.Add(new int[] { col, row - 2 });
                         }
                     }
                     else
                     {
-                        if (board[col, row].whitePressure == 0 && board[col, row - 1].whitePressure == 0 && board[col, row - 2].whitePressure == 0 && board[col, row - 3].whitePressure == 0) {
-                            moves.Add(new int[] { col, row  - 2});
+                        if (
+                            board[col, row].whitePressure == 0
+                            && board[col, row - 1].whitePressure == 0
+                            && board[col, row - 2].whitePressure == 0
+                            && board[col, row - 3].whitePressure == 0
+                        )
+                        {
+                            moves.Add(new int[] { col, row - 2 });
                         }
                     }
                 }
 
-                if (board[col, row + 1].piece == null && board[col, row + 2].piece == null && board[col, row + 3].piece != null && board[col, row + 3].piece.type == "Rook" && !board[col, row + 3].hasMoved)
+                if (
+                    board[col, row + 1].piece == null
+                    && board[col, row + 2].piece == null
+                    && board[col, row + 3].piece != null
+                    && board[col, row + 3].piece.type == "Rook"
+                    && !board[col, row + 3].hasMoved
+                )
                 {
                     if (this.color == "white")
                     {
-                        if (board[col, row].blackPressure == 0 && board[col, row + 1].blackPressure == 0 && board[col, row + 2].blackPressure == 0)
+                        if (
+                            board[col, row].blackPressure == 0
+                            && board[col, row + 1].blackPressure == 0
+                            && board[col, row + 2].blackPressure == 0
+                        )
                         {
                             moves.Add(new int[] { col, row + 2 });
                         }
                     }
                     else
                     {
-                        if (board[col, row].whitePressure == 0 && board[col, row + 1].whitePressure == 0 && board[col, row + 2].whitePressure == 0)
+                        if (
+                            board[col, row].whitePressure == 0
+                            && board[col, row + 1].whitePressure == 0
+                            && board[col, row + 2].whitePressure == 0
+                        )
                         {
                             moves.Add(new int[] { col, row + 2 });
                         }
@@ -81,6 +118,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override List<int[]> GetPressure(BoardSquare[,] board)
         {
             List<int[]> moves = new List<int[]>();
@@ -102,6 +140,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override string ToString(bool pipeSeparated)
         {
             if (pipeSeparated)

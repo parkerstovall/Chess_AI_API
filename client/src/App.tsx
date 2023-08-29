@@ -7,15 +7,22 @@ function App() {
   const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
   const [blackDisplay, setBlackDisplay] = useState<boolean>(false);
   const [boardArgs, setBoardArgs] = useState<BoardDisplay>();
+  const [gameID, setGameID] = useState<number>(-1);
 
   function LoadInitialBoard() {
     const api = new GeneratedAPI("http://localhost:4000");
     
-    api.getBoard(0).then((board) => {
-      setBoardArgs(board);
-      setWhiteDisplay(false);
-      setBlackDisplay(false);
+    api.startGame().then((lGameID) => {
+      setGameID(lGameID);
+
+      api.getBoard(lGameID).then((board) => {
+        setBoardArgs(board);
+        setWhiteDisplay(false);
+        setBlackDisplay(false);
+      });
+      
     });
+
   }
 
   function BoardSquareClick(col: number, row: number) {

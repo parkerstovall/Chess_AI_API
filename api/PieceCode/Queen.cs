@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
-    public class Queen: Piece
+    public class Queen : Piece
     {
         public Queen(string color, int[] coords)
         {
@@ -13,6 +13,7 @@ namespace TrainingWeb.ChessFiles
             this.type = "Queen";
             this.coords = coords;
         }
+
         public override List<int[]> GetPaths(BoardSquare[,] board, bool check)
         {
             List<int[]> moves = new List<int[]>();
@@ -70,6 +71,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override List<int[]> GetPressure(BoardSquare[,] board)
         {
             List<int[]> moves = new List<int[]>();
@@ -96,7 +98,7 @@ namespace TrainingWeb.ChessFiles
 
                     if (board[col, row].piece != null)
                     {
-                        if(board[col, row].piece.type == "King")
+                        if (board[col, row].piece.type == "King")
                         {
                             col += colInc[i];
                             row += rowInc[i];
@@ -115,6 +117,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override string ToString(bool pipeSeparated)
         {
             if (pipeSeparated)

@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class Piece
     {
         public string color = "";
         public string type = "";
         public int[] coords = { -1, -1 };
-        public Piece()
+
+        public Piece() { }
+
+        public virtual string ToString(bool pipeSeparated)
         {
-
-        }
-
-        public virtual string ToString(bool pipeSeparated) {
             return "";
         }
 

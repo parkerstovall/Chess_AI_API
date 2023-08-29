@@ -1,5 +1,7 @@
-using api.models;
+using api.models.client;
+using api.models.api;
 using Microsoft.Extensions.Caching.Memory;
+using System.Xml;
 
 namespace api.repository
 {
@@ -12,24 +14,39 @@ namespace api.repository
             _cache = cache;
         }
 
-        public async Task<BoardDisplay> GetBoard(int gameID)
+        public int StartGame()
         {
-            if (_cache.TryGetValue($"Board:{gameID}", out BoardDisplay? board) && board != null)
+            int gameID = 0;
+
+            if (_cache.TryGetValue("OpenGames", out Dictionary<int, Board>? openGames))
             {
-                return board;
+                gameID = openGames == null ? 0 : openGames.Count;
+            }
+            else
+            {
+                openGames = new();
             }
 
-            return await _cache.GetOrCreateAsync<BoardDisplay>(
-                    $"Board:{gameID}",
-                    entry =>
-                    {
-                        entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
-                        return Task.FromResult(GetNewBoard());
-                    }
-                ) ?? GetNewBoard();
+            openGames?.Add(gameID, GetNewBoard());
+
+            _cache.Set("OpenGames", openGames);
+
+            return gameID;
         }
 
-        private BoardDisplay GetNewBoard()
+        public BoardDisplay GetBoard(int gameID)
+        {
+            Board board = _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID] ?? GetNewBoard();
+
+            return GetBoardForDisplay(board);
+        }
+
+        public BoardDisplay GetMoves(int gameID, int row, int col)
+        {
+            return new();
+        }
+
+        private Board GetNewBoard()
         {
             string[] pieceOrder =
             {
@@ -45,7 +62,7 @@ namespace api.repository
 
             bool whiteSquare = true;
             bool whitePiece = false;
-            BoardDisplay board = new();
+            Board board = new();
 
             for (int i = 0; i < 8; i++)
             {
@@ -63,14 +80,17 @@ namespace api.repository
                         piece += whitePiece ? "whitePawn" : "blackPawn";
                     }
 
-                    board.Rows[i].Squares.Add(new());
-                    BoardDisplaySquare square = board.Rows[i].Squares[j];
-
                     string color = whiteSquare ? "white" : "black";
-                    square.Col = i;
-                    square.Row = j;
-                    square.BackColor = color;
-                    square.CssClass += $"{piece} {color} boardBtn".Trim();
+
+                    board.Rows[i].Squares.Add(
+                        new()
+                        {
+                            Col = i,
+                            Row = j,
+                            BackColor = color,
+                            CssClass = $"{piece} {color} boardBtn".Trim()
+                        }
+                    );
 
                     whiteSquare = !whiteSquare;
                 }
@@ -84,6 +104,33 @@ namespace api.repository
             }
 
             return board;
+        }
+
+        //Don't want to expose the full board class to the client
+        private BoardDisplay GetBoardForDisplay(Board board)
+        {
+            BoardDisplay boardDisplay = new();
+
+            foreach (BoardRow row in board.Rows)
+            {
+                BoardDisplayRow displayRow = new();
+                foreach (BoardSquare square in row.Squares)
+                {
+                    displayRow.Squares.Add(
+                        new()
+                        {
+                            Col = square.Col,
+                            Row = square.Row,
+                            BackColor = square.BackColor,
+                            CssClass = square.CssClass
+                        }
+                    );
+                }
+
+                boardDisplay.Rows.Add(displayRow);
+            }
+
+            return boardDisplay;
         }
     }
 }

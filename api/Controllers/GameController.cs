@@ -1,5 +1,4 @@
-using System.Data;
-using api.models;
+using api.models.client;
 using api.repository;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,10 +18,30 @@ public class BoardController : ControllerBase
         _repo = repo;
     }
 
+    [HttpGet("startGame")]
+    [SwaggerOperation(
+        Summary = "Start new game",
+        Description = "Builds new board and returns game ID"
+    )]
+    public int StartGame()
+    {
+        return _repo.StartGame();
+    }
+
     [HttpGet("{gameID}/getBoard")]
     [SwaggerOperation(Summary = "Get new board", Description = "Get new board")]
-    public async Task<BoardDisplay> GetBoard(int gameID)
+    public BoardDisplay GetBoard(int gameID)
     {
-        return await _repo.GetBoard(gameID);
+        return _repo.GetBoard(gameID);
+    }
+
+    [HttpGet("{gameID}/moves")]
+    [SwaggerOperation(
+        Summary = "Gets moves for click",
+        Description = "Uses gameID and supplied col / row"
+    )]
+    public BoardDisplay GetMoves(int gameID, [FromQuery] int row, [FromQuery] int col)
+    {
+        return _repo.GetMoves(gameID, row, col);
     }
 }

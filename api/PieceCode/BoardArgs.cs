@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using api.pieces;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     [Serializable]
     public class BoardArgs
@@ -43,6 +44,7 @@ namespace TrainingWeb.ChessFiles
             this.inCheck = square.inCheck;
             this.checkmate = square.checkmate;
         }
+
         public BoardArgs(int[] coords)
         {
             this.coords = coords;
@@ -60,37 +62,65 @@ namespace TrainingWeb.ChessFiles
             int row = 0;
             int col = 0;
 
-            if (args.ContainsKey("isSelected") && !string.IsNullOrEmpty(args["isSelected"].ToString()) && Boolean.TryParse(args["isSelected"].ToString(), out isSelected))
+            if (
+                args.ContainsKey("isSelected")
+                && !string.IsNullOrEmpty(args["isSelected"].ToString())
+                && Boolean.TryParse(args["isSelected"].ToString(), out isSelected)
+            )
             {
                 this.isSelected = isSelected;
             }
 
-            if (args.ContainsKey("isHighlighted") && !string.IsNullOrEmpty(args["isHighlighted"].ToString()) && Boolean.TryParse(args["isHighlighted"].ToString(), out isHighlighted))
+            if (
+                args.ContainsKey("isHighlighted")
+                && !string.IsNullOrEmpty(args["isHighlighted"].ToString())
+                && Boolean.TryParse(args["isHighlighted"].ToString(), out isHighlighted)
+            )
             {
                 this.isHighlighted = isHighlighted;
             }
 
-            if (args.ContainsKey("hasMoved") && !string.IsNullOrEmpty(args["hasMoved"].ToString()) && Boolean.TryParse(args["hasMoved"].ToString(), out hasMoved))
+            if (
+                args.ContainsKey("hasMoved")
+                && !string.IsNullOrEmpty(args["hasMoved"].ToString())
+                && Boolean.TryParse(args["hasMoved"].ToString(), out hasMoved)
+            )
             {
                 this.hasMoved = hasMoved;
             }
 
-            if (args.ContainsKey("inCheck") && !string.IsNullOrEmpty(args["inCheck"].ToString()) && Boolean.TryParse(args["inCheck"].ToString(), out inCheck))
+            if (
+                args.ContainsKey("inCheck")
+                && !string.IsNullOrEmpty(args["inCheck"].ToString())
+                && Boolean.TryParse(args["inCheck"].ToString(), out inCheck)
+            )
             {
                 this.inCheck = inCheck;
             }
 
-            if (args.ContainsKey("checkmate") && !string.IsNullOrEmpty(args["checkmate"].ToString()) && Boolean.TryParse(args["checkmate"].ToString(), out checkmate))
+            if (
+                args.ContainsKey("checkmate")
+                && !string.IsNullOrEmpty(args["checkmate"].ToString())
+                && Boolean.TryParse(args["checkmate"].ToString(), out checkmate)
+            )
             {
                 this.checkmate = checkmate;
             }
 
-            if (args.ContainsKey("blackPressure") && !string.IsNullOrEmpty(args["blackPressure"].ToString()) && Int32.TryParse(args["blackPressure"].ToString(), out blackPressure))
+            if (
+                args.ContainsKey("blackPressure")
+                && !string.IsNullOrEmpty(args["blackPressure"].ToString())
+                && Int32.TryParse(args["blackPressure"].ToString(), out blackPressure)
+            )
             {
                 this.blackPressure = blackPressure;
             }
 
-            if (args.ContainsKey("whitePressure") && !string.IsNullOrEmpty(args["whitePressure"].ToString()) && Int32.TryParse(args["whitePressure"].ToString(), out whitePressure))
+            if (
+                args.ContainsKey("whitePressure")
+                && !string.IsNullOrEmpty(args["whitePressure"].ToString())
+                && Int32.TryParse(args["whitePressure"].ToString(), out whitePressure)
+            )
             {
                 this.whitePressure = whitePressure;
             }
@@ -107,19 +137,28 @@ namespace TrainingWeb.ChessFiles
 
             this.coords = new int[] { col, row };
 
-            if (args.ContainsKey("enPassantColor") && !string.IsNullOrEmpty(args["enPassantColor"].ToString()))
+            if (
+                args.ContainsKey("enPassantColor")
+                && !string.IsNullOrEmpty(args["enPassantColor"].ToString())
+            )
             {
                 this.enPassantColor = args["enPassantColor"].ToString();
 
                 int enPassantCol = 0;
                 int enPassantRow = 0;
 
-                if (args.ContainsKey("enPassantVictim") && !string.IsNullOrEmpty(args["enPassantVictim"][0].ToString()))
+                if (
+                    args.ContainsKey("enPassantVictim")
+                    && !string.IsNullOrEmpty(args["enPassantVictim"][0].ToString())
+                )
                 {
                     Int32.TryParse(args["enPassantVictim"][0].ToString(), out enPassantCol);
                 }
 
-                if (args.ContainsKey("enPassantVictim") && !string.IsNullOrEmpty(args["enPassantVictim"][1].ToString()))
+                if (
+                    args.ContainsKey("enPassantVictim")
+                    && !string.IsNullOrEmpty(args["enPassantVictim"][1].ToString())
+                )
                 {
                     Int32.TryParse(args["enPassantVictim"][1].ToString(), out enPassantRow);
                 }
@@ -127,17 +166,26 @@ namespace TrainingWeb.ChessFiles
                 this.enPassantVictim = new int[] { enPassantCol, enPassantRow };
             }
 
-            if (args.ContainsKey("blockCheckColor") && !string.IsNullOrEmpty(args["blockCheckColor"].ToString()))
+            if (
+                args.ContainsKey("blockCheckColor")
+                && !string.IsNullOrEmpty(args["blockCheckColor"].ToString())
+            )
             {
                 this.blockCheckColor = args["blockCheckColor"].ToString();
             }
 
-            if (args.ContainsKey("blackPressureSource") && !string.IsNullOrEmpty(args["blackPressureSource"].ToString()))
+            if (
+                args.ContainsKey("blackPressureSource")
+                && !string.IsNullOrEmpty(args["blackPressureSource"].ToString())
+            )
             {
                 this.blackPressureSource = args["blackPressureSource"].ToString();
             }
 
-            if (args.ContainsKey("whitePressureSource") && !string.IsNullOrEmpty(args["whitePressureSource"].ToString()))
+            if (
+                args.ContainsKey("whitePressureSource")
+                && !string.IsNullOrEmpty(args["whitePressureSource"].ToString())
+            )
             {
                 this.whitePressureSource = args["whitePressureSource"].ToString();
             }

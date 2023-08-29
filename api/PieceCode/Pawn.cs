@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class Pawn : Piece
     {
         private bool hasMoved = false;
+
         public Pawn(string color, int[] coords, bool hasMoved)
         {
             this.color = color;
@@ -15,6 +16,7 @@ namespace TrainingWeb.ChessFiles
             this.coords = coords;
             this.hasMoved = hasMoved;
         }
+
         public override List<int[]> GetPaths(BoardSquare[,] board, bool check)
         {
             List<int[]> moves = new List<int[]>();
@@ -26,7 +28,10 @@ namespace TrainingWeb.ChessFiles
             if (col > -1 && col < board.GetLength(0))
             {
                 //Moving
-                if (board[col, row].piece == null && (board[coords[0], row].pinDir == "" ||  board[coords[0], row].pinDir == "tb"))
+                if (
+                    board[col, row].piece == null
+                    && (board[coords[0], row].pinDir == "" || board[coords[0], row].pinDir == "tb")
+                )
                 {
                     if (check)
                     {
@@ -42,7 +47,12 @@ namespace TrainingWeb.ChessFiles
 
                     col += dir;
 
-                    if (col > -1 && col < board.GetLength(0) && !this.hasMoved && board[col, row].piece == null)
+                    if (
+                        col > -1
+                        && col < board.GetLength(0)
+                        && !this.hasMoved
+                        && board[col, row].piece == null
+                    )
                     {
                         if (check)
                         {
@@ -64,10 +74,24 @@ namespace TrainingWeb.ChessFiles
                 //Attacking
                 if (row > -1)
                 {
-                    if(this.color == "black" ? (board[coords[0], row].pinDir == "" || board[coords[0], row].pinDir == "bltr") : (board[coords[0], row].pinDir == "" || board[coords[0], row].pinDir == "tlbr")) {
+                    if (
+                        this.color == "black"
+                            ? (
+                                board[coords[0], row].pinDir == ""
+                                || board[coords[0], row].pinDir == "bltr"
+                            )
+                            : (
+                                board[coords[0], row].pinDir == ""
+                                || board[coords[0], row].pinDir == "tlbr"
+                            )
+                    )
+                    {
                         BoardSquare left = board[col, row];
 
-                        if ((left.piece != null && left.piece.color != this.color) || (left.enPassantColor != "" && left.enPassantColor != this.color))
+                        if (
+                            (left.piece != null && left.piece.color != this.color)
+                            || (left.enPassantColor != "" && left.enPassantColor != this.color)
+                        )
                         {
                             if (check)
                             {
@@ -88,11 +112,24 @@ namespace TrainingWeb.ChessFiles
 
                 if (row < board.GetLength(1))
                 {
-                    if (this.color == "white" ? (board[coords[0], row].pinDir == "" || board[coords[0], row].pinDir == "bltr") : (board[coords[0] - dir, row].pinDir == "" || board[coords[0], row].pinDir == "tlbr"))
+                    if (
+                        this.color == "white"
+                            ? (
+                                board[coords[0], row].pinDir == ""
+                                || board[coords[0], row].pinDir == "bltr"
+                            )
+                            : (
+                                board[coords[0] - dir, row].pinDir == ""
+                                || board[coords[0], row].pinDir == "tlbr"
+                            )
+                    )
                     {
                         BoardSquare right = board[col, row];
 
-                        if ((right.piece != null && right.piece.color != this.color) || (right.enPassantColor != "" && right.enPassantColor != this.color))
+                        if (
+                            (right.piece != null && right.piece.color != this.color)
+                            || (right.enPassantColor != "" && right.enPassantColor != this.color)
+                        )
                         {
                             if (check)
                             {
@@ -112,6 +149,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override List<int[]> GetPressure(BoardSquare[,] board)
         {
             List<int[]> moves = new List<int[]>();
@@ -138,10 +176,10 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override string ToString(bool pipeSeparated)
         {
-
-            if(pipeSeparated)
+            if (pipeSeparated)
             {
                 return color + "|Pawn";
             }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class Knight : Piece
     {
@@ -13,6 +13,7 @@ namespace TrainingWeb.ChessFiles
             this.type = "Knight";
             this.coords = coords;
         }
+
         public override List<int[]> GetPaths(BoardSquare[,] board, bool check)
         {
             List<int[]> moves = new List<int[]>();
@@ -37,7 +38,7 @@ namespace TrainingWeb.ChessFiles
                     {
                         if (check)
                         {
-                            if(board[col, row].blockCheckColor == this.color)
+                            if (board[col, row].blockCheckColor == this.color)
                             {
                                 moves.Add(new int[] { col, row });
                             }
@@ -51,6 +52,7 @@ namespace TrainingWeb.ChessFiles
             }
             return moves;
         }
+
         public override List<int[]> GetPressure(BoardSquare[,] board)
         {
             List<int[]> moves = new List<int[]>();
@@ -71,6 +73,7 @@ namespace TrainingWeb.ChessFiles
             }
             return moves;
         }
+
         public override string ToString(bool pipeSeparated)
         {
             if (pipeSeparated)

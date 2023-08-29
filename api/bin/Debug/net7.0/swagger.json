@@ -5,6 +5,38 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/v1/game/startGame": {
+      "get": {
+        "tags": [
+          "Board"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/game/{gameID}/getBoard": {
       "get": {
         "tags": [

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TrainingWeb.ChessFiles
+namespace api.pieces
 {
     public class Bishop : Piece
     {
@@ -13,6 +13,7 @@ namespace TrainingWeb.ChessFiles
             this.type = "Bishop";
             this.coords = coords;
         }
+
         public override List<int[]> GetPaths(BoardSquare[,] board, bool check)
         {
             List<int[]> moves = new List<int[]>();
@@ -23,9 +24,8 @@ namespace TrainingWeb.ChessFiles
             int[] rowInc = { 1, -1, -1, 1 };
             string[] dir = { "bltr", "tlbr", "bltr", "tlbr" };
 
-
-            for (int i = 0; i < 4; i++, col = coords[0], row = coords[1]) {
-
+            for (int i = 0; i < 4; i++, col = coords[0], row = coords[1])
+            {
                 if (board[col, row].pinDir != "" && board[col, row].pinDir != dir[i])
                 {
                     continue;
@@ -50,7 +50,8 @@ namespace TrainingWeb.ChessFiles
                             moves.Add(new int[] { col, row });
                         }
                     }
-                    else if (board[col, row].piece.color != this.color) {
+                    else if (board[col, row].piece.color != this.color)
+                    {
                         if (check)
                         {
                             if (board[col, row].blockCheckColor == this.color)
@@ -76,6 +77,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override List<int[]> GetPressure(BoardSquare[,] board)
         {
             List<int[]> moves = new List<int[]>();
@@ -116,6 +118,7 @@ namespace TrainingWeb.ChessFiles
 
             return moves;
         }
+
         public override string ToString(bool pipeSeparated)
         {
             if (pipeSeparated)
