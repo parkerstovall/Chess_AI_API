@@ -1,28 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import { BoardDisplay, GeneratedAPI } from './GeneratedAPI.ts';
+import Board from './components/Board.tsx';
 import './App.css';
 
 function App() {
+  const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
+  const [blackDisplay, setBlackDisplay] = useState<boolean>(false);
+  const [boardArgs, setBoardArgs] = useState<BoardDisplay>();
 
-  fetch('http://localhost:4000/api/v1/moves/').catch((err) => {console.log(err);});
+  function LoadInitialBoard() {
+    const api = new GeneratedAPI("http://localhost:4000");
+    
+    api.getBoard(0).then((board) => {
+      setBoardArgs(board);
+    });
+  }
+
+  function BoardSquareClick(col: number, row: number) {
+    console.log(col, row);
+  }
+
+  useEffect(() => {
+    LoadInitialBoard();
+  }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="pieceDisplay" style={{display: whiteDisplay ? "block" : "none"}} id="WhiteDisplay"></div>
+      <Board board={boardArgs} clickFunc={BoardSquareClick} />
+      <div className="pieceDisplay" style={{display: blackDisplay ? "block" : "none"}} id="BlackDisplay"></div>
+    </>
   );
 }
 

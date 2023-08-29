@@ -66,3 +66,10 @@
 /Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/obj/Debug/net7.0/ChessAPI.genruntimeconfig.cache
 /Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/obj/Debug/net7.0/ref/ChessAPI.dll
 /Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/appsettings.Development.json
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Swashbuckle.AspNetCore.Annotations.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Microsoft.AspNetCore.JsonPatch.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Newtonsoft.Json.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Newtonsoft.Json.Bson.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/Swashbuckle.AspNetCore.Newtonsoft.dll
+/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/bin/Debug/net7.0/swagger.json

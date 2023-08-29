@@ -1,13 +1,21 @@
 {
   "version": 2,
-  "dgSpecHash": "V2Uzzrzuh0ORdG2Jb5zq1UCBEjoWtzpNiikai/23AI8E5up2G0Dmlbsr8jjuhgBW8SdeWXHOWBlf5YRZVbmyUg==",
+  "dgSpecHash": "03YtS3YRExTXni6kIxZ3vDqg2A/fp9aoHfrMdKY+DRYl97sdEZ4Up89Ewz3o3PBt+pQDHg64quHQSohNajTRdg==",
   "success": true,
   "projectFilePath": "/Users/parkerstovall/Desktop/WorkStuff/ChessAI_WebAPI/api/ChessAPI.csproj",
   "expectedPackageFiles": [
+    "/Users/parkerstovall/.nuget/packages/microsoft.aspnetcore.jsonpatch/7.0.0/microsoft.aspnetcore.jsonpatch.7.0.0.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/microsoft.aspnetcore.mvc.newtonsoftjson/7.0.0/microsoft.aspnetcore.mvc.newtonsoftjson.7.0.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/microsoft.aspnetcore.openapi/7.0.10/microsoft.aspnetcore.openapi.7.0.10.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/newtonsoft.json.bson/1.0.2/newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/nswag.msbuild/13.20.0/nswag.msbuild.13.20.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore/6.5.0/swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore.annotations/6.5.0/swashbuckle.aspnetcore.annotations.6.5.0.nupkg.sha512",
+    "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore.newtonsoft/6.5.0/swashbuckle.aspnetcore.newtonsoft.6.5.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore.swagger/6.5.0/swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.5.0/swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
     "/Users/parkerstovall/.nuget/packages/swashbuckle.aspnetcore.swaggerui/6.5.0/swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512"

@@ -1,38 +1,121 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+#root {
+  height: 100vh;
+  width: 100vw;
   display: flex;
-  flex-direction: column;
+  justify-content: space-evenly;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+}
+.GameBoard {
+  display: grid;
+  width: min(80vh, 800px);
+  display: grid;
+  grid-template: repeat(8, min(10vh, 100px)) / repeat(8, min(10vh, 100px));
+  border: .2vh solid black;
 }
 
-.App-link {
-  color: #61dafb;
+.boardBtn {
+  grid-column: span 1;
+  background: url("") transparent no-repeat center center / 80%;
+  border: .2vh solid gray;
+  transition: .3s ease background-color;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.black {
+  background-color: #75A3D1;
+}
+
+.black:hover {
+  background-color: #6699CC;
+}
+
+.white {
+  background-color: #C2D6EB;
+}
+
+.white:hover {
+  background-color: #B3CCE6;
+}
+
+.selected {
+  background-color: #527AA3;
+}
+
+.inCheck {
+  background-color: pink;
+}
+
+.highlighted::after {
+  content: '';
+  background-color: darkcyan;
+  position: relative;
+  top: 40%;
+  left: 35%;
+  padding: 5px 15px;
+  border-radius: 32px;
+  opacity: .75;
+}
+
+.pieceDisplay {
+  width: 200px;
+  display: flex;
+  flex-wrap: wrap;
+  background-color: lightgray;
+  padding: 10px 0;
+}
+
+.pieceImg {
+  height: 75px;
+  flex-grow: 1;
+  margin: 5px;
+  flex-basis: 40%;
+  max-width: 50%;
+  background: url("") transparent no-repeat center center / contain;
+}
+
+.blackKing {
+  background-image: url("Images/BlackKing.png");
+}
+
+.whiteKing {
+  background-image: url("Images/WhiteKing.png");
+}
+
+.blackQueen {
+  background-image: url("Images/BlackQueen.png");
+}
+
+.whiteQueen {
+  background-image: url("Images/WhiteQueen.png");
+}
+
+.blackKnight {
+  background-image: url("Images/BlackKnight.png");
+}
+
+.whiteKnight {
+  background-image: url("Images/WhiteKnight.png");
+}
+
+.blackBishop {
+  background-image: url("Images/BlackBishop.png");
+}
+
+.whiteBishop {
+  background-image: url("Images/WhiteBishop.png");
+}
+
+.blackRook {
+  background-image: url("Images/BlackRook.png");
+}
+
+.whiteRook {
+  background-image: url("Images/WhiteRook.png");
+}
+
+.blackPawn {
+  background-image: url("Images/BlackPawn.png");
+}
+
+.whitePawn {
+  background-image: url("Images/WhitePawn.png");
 }
