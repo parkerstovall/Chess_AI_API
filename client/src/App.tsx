@@ -13,6 +13,8 @@ function App() {
     
     api.getBoard(0).then((board) => {
       setBoardArgs(board);
+      setWhiteDisplay(false);
+      setBlackDisplay(false);
     });
   }
 

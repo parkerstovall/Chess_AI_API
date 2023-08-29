@@ -15,7 +15,7 @@
 
 .boardBtn {
   grid-column: span 1;
-  background: url("") transparent no-repeat center center / 80%;
+  background: transparent no-repeat center center / 80%;
   border: .2vh solid gray;
   transition: .3s ease background-color;
 }
@@ -69,7 +69,7 @@
   margin: 5px;
   flex-basis: 40%;
   max-width: 50%;
-  background: url("") transparent no-repeat center center / contain;
+  background: transparent no-repeat center center / contain;
 }
 
 .blackKing {
