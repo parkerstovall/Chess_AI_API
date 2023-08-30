@@ -98,8 +98,8 @@ export class GeneratedAPI {
      * @param col (optional) 
      * @return Success
      */
-    moves(gameID: number, row: number | undefined, col: number | undefined): Promise<BoardDisplay> {
-        let url_ = this.baseUrl + "/api/v1/game/{gameID}/moves?";
+    getMoves(gameID: number, row: number | undefined, col: number | undefined): Promise<number[][]> {
+        let url_ = this.baseUrl + "/api/v1/game/{gameID}/getMoves?";
         if (gameID === undefined || gameID === null)
             throw new Error("The parameter 'gameID' must be defined.");
         url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
@@ -121,17 +121,17 @@ export class GeneratedAPI {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processMoves(_response);
+            return this.processGetMoves(_response);
         });
     }
 
-    protected processMoves(response: Response): Promise<BoardDisplay> {
+    protected processGetMoves(response: Response): Promise<number[][]> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardDisplay;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number[][];
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -139,7 +139,56 @@ export class GeneratedAPI {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<BoardDisplay>(null as any);
+        return Promise.resolve<number[][]>(null as any);
+    }
+
+    /**
+     * @param row (optional) 
+     * @param col (optional) 
+     * @return Success
+     */
+    movePiece(gameID: number, row: number | undefined, col: number | undefined): Promise<string> {
+        let url_ = this.baseUrl + "/api/v1/game/{gameID}/movePiece?";
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined.");
+        url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
+        if (row === null)
+            throw new Error("The parameter 'row' cannot be null.");
+        else if (row !== undefined)
+            url_ += "row=" + encodeURIComponent("" + row) + "&";
+        if (col === null)
+            throw new Error("The parameter 'col' cannot be null.");
+        else if (col !== undefined)
+            url_ += "col=" + encodeURIComponent("" + col) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processMovePiece(_response);
+        });
+    }
+
+    protected processMovePiece(response: Response): Promise<string> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as string;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<string>(null as any);
     }
 }
 
@@ -154,7 +203,6 @@ export interface BoardDisplayRow {
 export interface BoardDisplaySquare {
     col?: number;
     row?: number;
-    backColor?: string | undefined;
     cssClass?: string | undefined;
 }
 

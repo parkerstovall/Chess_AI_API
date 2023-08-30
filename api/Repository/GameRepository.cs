@@ -1,7 +1,8 @@
 using api.models.client;
 using api.models.api;
 using Microsoft.Extensions.Caching.Memory;
-using System.Xml;
+using api.helperclasses;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace api.repository
 {
@@ -27,7 +28,7 @@ namespace api.repository
                 openGames = new();
             }
 
-            openGames?.Add(gameID, GetNewBoard());
+            openGames?.Add(gameID, BoardHelper.GetNewBoard());
 
             _cache.Set("OpenGames", openGames);
 
@@ -36,101 +37,38 @@ namespace api.repository
 
         public BoardDisplay GetBoard(int gameID)
         {
-            Board board = _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID] ?? GetNewBoard();
+            Board board =
+                _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID]
+                ?? BoardHelper.GetNewBoard();
 
-            return GetBoardForDisplay(board);
+            return BoardHelper.GetBoardForDisplay(board);
         }
 
-        public BoardDisplay GetMoves(int gameID, int row, int col)
+        public List<int[]> GetMoves(int gameID, int row, int col)
         {
-            return new();
+            Board board =
+                _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID]
+                ?? BoardHelper.GetNewBoard();
+
+            List<int[]> moves = board.Rows[row].Squares[col].Piece?.GetPaths(board, false) ?? new();
+
+            _cache.Set($"Moves:{gameID}", moves);
+            return moves;
         }
 
-        private Board GetNewBoard()
+        public string MovePiece(int gameID, int row, int col)
         {
-            string[] pieceOrder =
+            List<int[]> moves = _cache.Get<List<int[]>>($"Moves:{gameID}") ?? new();
+
+            foreach (int[] move in moves)
             {
-                "Rook",
-                "Knight",
-                "Bishop",
-                "Queen",
-                "King",
-                "Bishop",
-                "Knight",
-                "Rook"
-            };
-
-            bool whiteSquare = true;
-            bool whitePiece = false;
-            Board board = new();
-
-            for (int i = 0; i < 8; i++)
-            {
-                board.Rows.Add(new());
-                for (var j = 0; j < 8; j++)
+                if (move[0] == row && move[1] == col)
                 {
-                    string piece = "";
-
-                    if (i == 0 || i == 7)
-                    {
-                        piece = (whitePiece ? "white" : "black") + pieceOrder[j];
-                    }
-                    else if (i == 1 || i == 6)
-                    {
-                        piece += whitePiece ? "whitePawn" : "blackPawn";
-                    }
-
-                    string color = whiteSquare ? "white" : "black";
-
-                    board.Rows[i].Squares.Add(
-                        new()
-                        {
-                            Col = i,
-                            Row = j,
-                            BackColor = color,
-                            CssClass = $"{piece} {color} boardBtn".Trim()
-                        }
-                    );
-
-                    whiteSquare = !whiteSquare;
+                    return "{\"Response\": \"Valid\"}";
                 }
-
-                if (i == 1)
-                {
-                    whitePiece = !whitePiece;
-                }
-
-                whiteSquare = !whiteSquare;
             }
 
-            return board;
-        }
-
-        //Don't want to expose the full board class to the client
-        private BoardDisplay GetBoardForDisplay(Board board)
-        {
-            BoardDisplay boardDisplay = new();
-
-            foreach (BoardRow row in board.Rows)
-            {
-                BoardDisplayRow displayRow = new();
-                foreach (BoardSquare square in row.Squares)
-                {
-                    displayRow.Squares.Add(
-                        new()
-                        {
-                            Col = square.Col,
-                            Row = square.Row,
-                            BackColor = square.BackColor,
-                            CssClass = square.CssClass
-                        }
-                    );
-                }
-
-                boardDisplay.Rows.Add(displayRow);
-            }
-
-            return boardDisplay;
+            return "{\"Response\": \"Invalid\"}";
         }
     }
 }

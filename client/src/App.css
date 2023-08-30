@@ -46,13 +46,16 @@
 
 .highlighted::after {
   content: '';
+  display: block;
   background-color: darkcyan;
   position: relative;
-  top: 40%;
-  left: 35%;
-  padding: 5px 15px;
-  border-radius: 32px;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
   opacity: .75;
+  transform: translate(-50%, -50%);
+  height: 50%;
+  width: 50%;
 }
 
 .pieceDisplay {

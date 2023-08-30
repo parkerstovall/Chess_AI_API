@@ -9,12 +9,10 @@ namespace api.Controllers;
 [Route("api/v1/game")]
 public class BoardController : ControllerBase
 {
-    private readonly ILogger<BoardController> _logger;
     private readonly GameRepository _repo;
 
-    public BoardController(ILogger<BoardController> logger, GameRepository repo)
+    public BoardController(GameRepository repo)
     {
-        _logger = logger;
         _repo = repo;
     }
 
@@ -35,13 +33,23 @@ public class BoardController : ControllerBase
         return _repo.GetBoard(gameID);
     }
 
-    [HttpGet("{gameID}/moves")]
+    [HttpGet("{gameID}/getMoves")]
     [SwaggerOperation(
         Summary = "Gets moves for click",
         Description = "Uses gameID and supplied col / row"
     )]
-    public BoardDisplay GetMoves(int gameID, [FromQuery] int row, [FromQuery] int col)
+    public List<int[]> GetMoves(int gameID, [FromQuery] int row, [FromQuery] int col)
     {
         return _repo.GetMoves(gameID, row, col);
+    }
+
+    [HttpPost("{gameID}/movePiece")]
+    [SwaggerOperation(
+        Summary = "Moves Piece",
+        Description = "Moves Piece using gameID and supplied col / row and Cached moves"
+    )]
+    public string MovePiece(int gameID, [FromQuery] int row, [FromQuery] int col)
+    {
+        return _repo.MovePiece(gameID, row, col);
     }
 }
