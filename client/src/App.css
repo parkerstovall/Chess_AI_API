@@ -122,3 +122,7 @@
 .whitePawn {
   background-image: url("Images/WhitePawn.png");
 }
+
+.loading, .loading * {
+  pointer-events: none !important;
+}

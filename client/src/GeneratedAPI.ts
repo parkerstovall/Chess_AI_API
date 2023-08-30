@@ -21,7 +21,7 @@ export class GeneratedAPI {
     /**
      * @return Success
      */
-    startGame(): Promise<number> {
+    startGame(): Promise<GameStart> {
         let url_ = this.baseUrl + "/api/v1/game/startGame";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -37,13 +37,13 @@ export class GeneratedAPI {
         });
     }
 
-    protected processStartGame(response: Response): Promise<number> {
+    protected processStartGame(response: Response): Promise<GameStart> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GameStart;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -51,46 +51,7 @@ export class GeneratedAPI {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<number>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    getBoard(gameID: number): Promise<BoardDisplay> {
-        let url_ = this.baseUrl + "/api/v1/game/{gameID}/getBoard";
-        if (gameID === undefined || gameID === null)
-            throw new Error("The parameter 'gameID' must be defined.");
-        url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "text/plain"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetBoard(_response);
-        });
-    }
-
-    protected processGetBoard(response: Response): Promise<BoardDisplay> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardDisplay;
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<BoardDisplay>(null as any);
+        return Promise.resolve<GameStart>(null as any);
     }
 
     /**
@@ -98,57 +59,8 @@ export class GeneratedAPI {
      * @param col (optional) 
      * @return Success
      */
-    getMoves(gameID: number, row: number | undefined, col: number | undefined): Promise<number[][]> {
-        let url_ = this.baseUrl + "/api/v1/game/{gameID}/getMoves?";
-        if (gameID === undefined || gameID === null)
-            throw new Error("The parameter 'gameID' must be defined.");
-        url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
-        if (row === null)
-            throw new Error("The parameter 'row' cannot be null.");
-        else if (row !== undefined)
-            url_ += "row=" + encodeURIComponent("" + row) + "&";
-        if (col === null)
-            throw new Error("The parameter 'col' cannot be null.");
-        else if (col !== undefined)
-            url_ += "col=" + encodeURIComponent("" + col) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "text/plain"
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetMoves(_response);
-        });
-    }
-
-    protected processGetMoves(response: Response): Promise<number[][]> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number[][];
-            return result200;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<number[][]>(null as any);
-    }
-
-    /**
-     * @param row (optional) 
-     * @param col (optional) 
-     * @return Success
-     */
-    movePiece(gameID: number, row: number | undefined, col: number | undefined): Promise<string> {
-        let url_ = this.baseUrl + "/api/v1/game/{gameID}/movePiece?";
+    click(gameID: number, row: number | undefined, col: number | undefined): Promise<BoardDisplay> {
+        let url_ = this.baseUrl + "/api/v1/game/{gameID}/click?";
         if (gameID === undefined || gameID === null)
             throw new Error("The parameter 'gameID' must be defined.");
         url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
@@ -170,17 +82,17 @@ export class GeneratedAPI {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processMovePiece(_response);
+            return this.processClick(_response);
         });
     }
 
-    protected processMovePiece(response: Response): Promise<string> {
+    protected processClick(response: Response): Promise<BoardDisplay> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as string;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardDisplay;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -188,7 +100,7 @@ export class GeneratedAPI {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<BoardDisplay>(null as any);
     }
 }
 
@@ -204,6 +116,11 @@ export interface BoardDisplaySquare {
     col?: number;
     row?: number;
     cssClass?: string | undefined;
+}
+
+export interface GameStart {
+    board: BoardDisplay;
+    gameID: number;
 }
 
 export class ApiException extends Error {

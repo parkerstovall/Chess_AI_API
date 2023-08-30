@@ -5,9 +5,9 @@ using api.pieces;
 
 namespace api.helperclasses
 {
-    public static class BoardHelper
+    internal static class BoardHelper
     {
-        public static Board GetNewBoard()
+        internal static Board GetNewBoard()
         {
             string[] pieceOrder =
             {
@@ -60,7 +60,7 @@ namespace api.helperclasses
         }
 
         //Don't want to expose the full board class to the client
-        public static BoardDisplay GetBoardForDisplay(Board board)
+        internal static BoardDisplay GetBoardForDisplay(Board board, List<int[]>? moves)
         {
             BoardDisplay boardDisplay = new();
             bool whiteSquare = true;
@@ -68,25 +68,10 @@ namespace api.helperclasses
             foreach (BoardRow row in board.Rows)
             {
                 BoardDisplayRow displayRow = new();
+
                 foreach (BoardSquare square in row.Squares)
                 {
-                    string backColor = whiteSquare ? "white" : "black";
-                    string cssClass = $"boardBtn {backColor}";
-
-                    if (square.Piece != null)
-                    {
-                        cssClass += " " + square.Piece.ToString(false);
-                    }
-
-                    displayRow.Squares.Add(
-                        new()
-                        {
-                            Col = square.Coords[0],
-                            Row = square.Coords[1],
-                            CssClass = cssClass
-                        }
-                    );
-
+                    displayRow.Squares.Add(CreateBoardSquare(whiteSquare, square, moves));
                     whiteSquare = !whiteSquare;
                 }
 
@@ -95,6 +80,46 @@ namespace api.helperclasses
             }
 
             return boardDisplay;
+        }
+
+        internal static BoardDisplaySquare CreateBoardSquare(
+            bool whiteSquare,
+            BoardSquare square,
+            List<int[]>? moves
+        )
+        {
+            string backColor = whiteSquare ? "white" : "black";
+            string cssClass = $"boardBtn {backColor}";
+
+            if (square.Piece != null)
+            {
+                cssClass += " " + square.Piece.ToString(false);
+            }
+
+            if (moves != null && CheckSquareInMoves(square, moves))
+            {
+                cssClass += " highlighted";
+            }
+
+            return new()
+            {
+                Col = square.Coords[0],
+                Row = square.Coords[1],
+                CssClass = cssClass
+            };
+        }
+
+        internal static bool CheckSquareInMoves(BoardSquare square, List<int[]> moves)
+        {
+            foreach (int[] move in moves)
+            {
+                if (move[0] == square.Coords[0] && move[1] == square.Coords[1])
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

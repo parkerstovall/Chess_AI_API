@@ -11,58 +11,22 @@ function App() {
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameID, setGameID] = useState<number>(-1);
 
-  function GetMoves(col: number, row: number) {
-    api.getMoves(gameID, col, row).then((moves) => {
-      moves.forEach((move) => {
-        let square = document.getElementById(`square-${move[0]}-${move[1]}`);
-
-        if (square !== null) {
-          square.classList.add("highlighted");
-        }
-      });
-    });
-  }
-  
-  function MovePiece(col: number, row: number) {
-    api.movePiece(gameID, col, row).then((message) => {
-      alert(message);
-    });
-  }
-
   function BoardSquareClick(col: number, row: number) {
-
-    const square = document.getElementById(`square-${col}-${row}`);
-    let action: Function | null = null;
-
-    if (square !== null) {
-      if(square.classList.contains("highlighted")) {
-        action = MovePiece;
-      }
-      else {
-        action = GetMoves;
-      }
-    }
-
-    document.querySelectorAll('.highlighted').forEach((el) => {
-      el.classList.remove('highlighted');
+    document.getElementById("Root")?.classList.add("loading");
+    
+    api.click(gameID, col, row).then((board) => {
+      document.getElementById("Root")?.classList.remove("loading");
+      setBoard(board);
     });
-
-    if (action !== null) {
-      action(col, row);
-    }
   }
 
   function LoadInitialBoard() {
-    
-    api.startGame().then((lGameID) => {
-      setGameID(lGameID);
+    setWhiteDisplay(false);
+    setBlackDisplay(false);
 
-      api.getBoard(lGameID).then((board) => {
-        setBoard(board);
-        setWhiteDisplay(false);
-        setBlackDisplay(false);
-      });
-      
+    api.startGame().then((gameStart) => {
+      setGameID(gameStart.gameID);
+      setBoard(gameStart.board);
     });
 
   }

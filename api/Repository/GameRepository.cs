@@ -2,7 +2,6 @@ using api.models.client;
 using api.models.api;
 using Microsoft.Extensions.Caching.Memory;
 using api.helperclasses;
-using Microsoft.AspNetCore.Components.Web;
 
 namespace api.repository
 {
@@ -15,11 +14,11 @@ namespace api.repository
             _cache = cache;
         }
 
-        public int StartGame()
+        public GameStart StartGame()
         {
-            int gameID = 0;
+            int gameID = -1;
 
-            if (_cache.TryGetValue("OpenGames", out Dictionary<int, Board>? openGames))
+            if (_cache.TryGetValue("OpenGames", out List<int>? openGames))
             {
                 gameID = openGames == null ? 0 : openGames.Count;
             }
@@ -28,47 +27,42 @@ namespace api.repository
                 openGames = new();
             }
 
-            openGames?.Add(gameID, BoardHelper.GetNewBoard());
+            openGames?.Add(gameID);
 
             _cache.Set("OpenGames", openGames);
 
-            return gameID;
-        }
-
-        public BoardDisplay GetBoard(int gameID)
-        {
-            Board board =
-                _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID]
-                ?? BoardHelper.GetNewBoard();
-
-            return BoardHelper.GetBoardForDisplay(board);
-        }
-
-        public List<int[]> GetMoves(int gameID, int row, int col)
-        {
-            Board board =
-                _cache.Get<Dictionary<int, Board>>("OpenGames")?[gameID]
-                ?? BoardHelper.GetNewBoard();
-
-            List<int[]> moves = board.Rows[row].Squares[col].Piece?.GetPaths(board, false) ?? new();
-
-            _cache.Set($"Moves:{gameID}", moves);
-            return moves;
-        }
-
-        public string MovePiece(int gameID, int row, int col)
-        {
-            List<int[]> moves = _cache.Get<List<int[]>>($"Moves:{gameID}") ?? new();
-
-            foreach (int[] move in moves)
+            Board board = BoardHelper.GetNewBoard();
+            _cache.Set($"Board:{gameID}", board);
+            return new GameStart
             {
-                if (move[0] == row && move[1] == col)
-                {
-                    return "{\"Response\": \"Valid\"}";
-                }
+                Board = BoardHelper.GetBoardForDisplay(board, null),
+                GameID = gameID
+            };
+        }
+
+        public BoardDisplay HandleClick(int gameID, int row, int col)
+        {
+            Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
+            List<int[]> moves = _cache.Get<List<int[]>>($"Moves:{gameID}") ?? new();
+            int[] start = _cache.Get<int[]>($"SelectedSquare:{gameID}") ?? Array.Empty<int>();
+
+            if (
+                moves.Any()
+                && start.Any()
+                && MoveHelpers.TryMovePiece(row, col, start, ref moves, ref board)
+            )
+            {
+                _cache.Remove($"Moves:{gameID}");
+                _cache.Remove($"SelectedSquare:{gameID}");
+            }
+            else
+            {
+                moves = MoveHelpers.GetMovesFromPiece(board, row, col);
+                _cache.Set($"Moves:{gameID}", moves);
+                _cache.Set($"SelectedSquare:{gameID}", new[] { row, col });
             }
 
-            return "{\"Response\": \"Invalid\"}";
+            return BoardHelper.GetBoardForDisplay(board, moves);
         }
     }
 }

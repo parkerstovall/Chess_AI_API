@@ -21,35 +21,18 @@ public class BoardController : ControllerBase
         Summary = "Start new game",
         Description = "Builds new board and returns game ID"
     )]
-    public int StartGame()
+    public GameStart StartGame()
     {
         return _repo.StartGame();
     }
 
-    [HttpGet("{gameID}/getBoard")]
-    [SwaggerOperation(Summary = "Get new board", Description = "Get new board")]
-    public BoardDisplay GetBoard(int gameID)
-    {
-        return _repo.GetBoard(gameID);
-    }
-
-    [HttpGet("{gameID}/getMoves")]
+    [HttpPost("{gameID}/click")]
     [SwaggerOperation(
-        Summary = "Gets moves for click",
-        Description = "Uses gameID and supplied col / row"
+        Summary = "HandlesClick",
+        Description = "Handles board click and moves piece if applicable, returns board."
     )]
-    public List<int[]> GetMoves(int gameID, [FromQuery] int row, [FromQuery] int col)
+    public BoardDisplay HandleClick(int gameID, [FromQuery] int row, [FromQuery] int col)
     {
-        return _repo.GetMoves(gameID, row, col);
-    }
-
-    [HttpPost("{gameID}/movePiece")]
-    [SwaggerOperation(
-        Summary = "Moves Piece",
-        Description = "Moves Piece using gameID and supplied col / row and Cached moves"
-    )]
-    public string MovePiece(int gameID, [FromQuery] int row, [FromQuery] int col)
-    {
-        return _repo.MovePiece(gameID, row, col);
+        return _repo.HandleClick(gameID, row, col);
     }
 }
