@@ -3,31 +3,17 @@ import { BoardDisplay, GeneratedAPI } from './GeneratedAPI.ts';
 import Board from './components/Board.tsx';
 import './App.css';
 
+const api = new GeneratedAPI("http://localhost:4000");
+
 function App() {
   const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
   const [blackDisplay, setBlackDisplay] = useState<boolean>(false);
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameID, setGameID] = useState<number>(-1);
-  const api = new GeneratedAPI("http://localhost:4000");
-
-  function LoadInitialBoard() {
-    
-    api.startGame().then((lGameID) => {
-      setGameID(lGameID);
-
-      api.getBoard(lGameID).then((board) => {
-        setBoard(board);
-        setWhiteDisplay(false);
-        setBlackDisplay(false);
-      });
-      
-    });
-
-  }
 
   function GetMoves(col: number, row: number) {
     api.getMoves(gameID, col, row).then((moves) => {
-      moves.map((move) => {
+      moves.forEach((move) => {
         let square = document.getElementById(`square-${move[0]}-${move[1]}`);
 
         if (square !== null) {
@@ -64,6 +50,21 @@ function App() {
     if (action !== null) {
       action(col, row);
     }
+  }
+
+  function LoadInitialBoard() {
+    
+    api.startGame().then((lGameID) => {
+      setGameID(lGameID);
+
+      api.getBoard(lGameID).then((board) => {
+        setBoard(board);
+        setWhiteDisplay(false);
+        setBlackDisplay(false);
+      });
+      
+    });
+
   }
 
   useEffect(() => {
