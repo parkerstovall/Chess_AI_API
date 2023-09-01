@@ -40,7 +40,7 @@
   background-color: #527AA3;
 }
 
-.inCheck {
+.inCheck, .inCheck:hover, .inCheck:active, .inCheck:focus {
   background-color: pink;
 }
 

@@ -110,16 +110,16 @@ namespace api.helperclasses
                 {
                     cssClass += " selected";
                 }
+
+                if (square.Piece is King king && king.InCheck)
+                {
+                    cssClass += " inCheck";
+                }
             }
 
             if (moves != null && CheckSquareInMoves(square, moves))
             {
                 cssClass += " highlighted";
-            }
-
-            if (square.Piece is King king && king.InCheck)
-            {
-                cssClass += " inCheck";
             }
 
             return new()

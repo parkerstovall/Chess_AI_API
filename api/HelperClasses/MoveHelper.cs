@@ -137,27 +137,34 @@ namespace api.helperclasses
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    if (square.Piece != null)
-                    {
-                        foreach (int[] pMove in square.Piece.GetPressure(board))
-                        {
-                            BoardSquare pressureSquare = board.Rows[pMove[0]].Squares[pMove[1]];
+                    AddBoardPressure(square, ref board);
+                }
+            }
+        }
 
-                            if (square.Piece is King king && square.Piece.Color != king.Color)
-                            {
-                                king.InCheck = true;
-                            }
+        private static void AddBoardPressure(BoardSquare square, ref Board board)
+        {
+            if (square.Piece == null)
+            {
+                return;
+            }
 
-                            if (square.Piece.Color == "white")
-                            {
-                                pressureSquare.WhitePressure++;
-                            }
-                            else
-                            {
-                                pressureSquare.BlackPressure++;
-                            }
-                        }
-                    }
+            foreach (int[] pMove in square.Piece.GetPressure(board))
+            {
+                BoardSquare pSquare = board.Rows[pMove[0]].Squares[pMove[1]];
+
+                if (pSquare.Piece is King king && square.Piece.Color != king.Color)
+                {
+                    king.InCheck = true;
+                }
+
+                if (square.Piece.Color == "white")
+                {
+                    pSquare.WhitePressure++;
+                }
+                else
+                {
+                    pSquare.BlackPressure++;
                 }
             }
         }
