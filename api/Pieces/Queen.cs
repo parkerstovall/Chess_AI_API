@@ -1,4 +1,6 @@
-﻿using api.models.api;
+﻿using api.helperclasses;
+using api.models.api;
+using api.pieces.interfaces;
 
 namespace api.pieces
 {
@@ -21,18 +23,32 @@ namespace api.pieces
             int row = Coords[1];
             int[] colInc = { 0, 0, 1, -1, -1, -1, 1, 1 };
             int[] rowInc = { 1, -1, 0, 0, 1, -1, -1, 1 };
+            Direction[] dir =
+            {
+                Direction.FromLeftToRight,
+                Direction.FromLeftToRight,
+                Direction.FromTopToBottom,
+                Direction.FromTopToBottom,
+                Direction.FromTopRightToBottomLeft,
+                Direction.FromTopLeftToBottomRight,
+                Direction.FromTopRightToBottomLeft,
+                Direction.FromTopLeftToBottomRight,
+            };
 
             for (int i = 0; i < 8; i++, col = Coords[0], row = Coords[1])
             {
+                if (
+                    board.Rows[col].Squares[row].PinnedDirection != Direction.None
+                    && board.Rows[col].Squares[row].PinnedDirection != dir[i]
+                )
+                {
+                    continue;
+                }
+
                 col += colInc[i];
                 row += rowInc[i];
 
-                while (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                while (PieceHelper.IsInBoard(col, row))
                 {
                     if (board.Rows[col].Squares[row].Piece == null)
                     {
@@ -84,32 +100,13 @@ namespace api.pieces
             int row = Coords[1];
             int[] colInc = { 0, 0, 1, -1, -1, -1, 1, 1 };
             int[] rowInc = { 1, -1, 0, 0, 1, -1, -1, 1 };
-            Vector[] dir =
-            {
-                Vector.FromLeftToRight,
-                Vector.FromRightToLeft,
-                Vector.FromTopToBottom,
-                Vector.FromBottomToTop,
-                Vector.FromBottomLeftToTopRight,
-                Vector.FromTopLeftToBottomRight,
-                Vector.FromBottomLeftToTopRight,
-                Vector.FromTopLeftToBottomRight,
-            };
 
             for (int i = 0; i < 8; i++, col = Coords[0], row = Coords[1])
             {
-                if (
-                    board.Rows[col].Squares[row].PinnedDirection != Vector.None
-                    && board.Rows[col].Squares[row].PinnedDirection != dir[i]
-                )
-                {
-                    continue;
-                }
-
                 col += colInc[i];
                 row += rowInc[i];
 
-                while (col >= 0 && row >= 0 && col < 8 && row < 8)
+                while (PieceHelper.IsInBoard(col, row))
                 {
                     moves.Add(new int[] { col, row });
 

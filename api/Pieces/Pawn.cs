@@ -1,8 +1,9 @@
 ﻿using api.models.api;
+using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Pawn : IPiece
+    public class Pawn : IPiece, IPieceHasMoved
     {
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }
@@ -28,11 +29,9 @@ namespace api.pieces
                 if (
                     board.Rows[col].Squares[row].Piece == null
                     && (
-                        board.Rows[Coords[0]].Squares[row].PinnedDirection == Vector.None
+                        board.Rows[Coords[0]].Squares[row].PinnedDirection == Direction.None
                         || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                            == Vector.FromTopToBottom
-                        || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                            == Vector.FromBottomToTop
+                            == Direction.FromTopToBottom
                     )
                 )
                 {
@@ -78,17 +77,9 @@ namespace api.pieces
                 if (row > -1)
                 {
                     if (
-                        this.Color == "black"
-                            ? (
-                                board.Rows[Coords[0]].Squares[row].PinnedDirection == Vector.None
-                                || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                                    == Vector.FromBottomLeftToTopRight
-                            )
-                            : (
-                                board.Rows[Coords[0]].Squares[row].PinnedDirection == Vector.None
-                                || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                                    == Vector.FromTopLeftToBottomRight
-                            )
+                        board.Rows[Coords[0]].Squares[row].PinnedDirection == Direction.None
+                        || board.Rows[Coords[0]].Squares[row].PinnedDirection
+                            == Direction.FromTopLeftToBottomRight
                     )
                     {
                         BoardSquare left = board.Rows[col].Squares[row];
@@ -118,17 +109,9 @@ namespace api.pieces
                 if (row < board.Rows[col].Squares.Count)
                 {
                     if (
-                        this.Color == "white"
-                            ? (
-                                board.Rows[Coords[0]].Squares[row].PinnedDirection == Vector.None
-                                || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                                    == Vector.FromBottomLeftToTopRight
-                            )
-                            : (
-                                board.Rows[Coords[0]].Squares[row].PinnedDirection == Vector.None
-                                || board.Rows[Coords[0]].Squares[row].PinnedDirection
-                                    == Vector.FromTopLeftToBottomRight
-                            )
+                        board.Rows[Coords[0]].Squares[row].PinnedDirection == Direction.None
+                        || board.Rows[Coords[0]].Squares[row].PinnedDirection
+                            == Direction.FromTopLeftToBottomRight
                     )
                     {
                         BoardSquare right = board.Rows[col].Squares[row];

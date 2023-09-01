@@ -1,4 +1,4 @@
-using System.Text;
+using api.pieces.interfaces;
 using api.models.api;
 using api.models.client;
 using api.pieces;
@@ -60,7 +60,11 @@ namespace api.helperclasses
         }
 
         //Don't want to expose the full board class to the client
-        internal static BoardDisplay GetBoardForDisplay(Board board, List<int[]>? moves)
+        internal static BoardDisplay GetBoardForDisplay(
+            Board board,
+            List<int[]>? moves,
+            int[]? selectedSquare
+        )
         {
             BoardDisplay boardDisplay = new();
             bool whiteSquare = true;
@@ -71,7 +75,9 @@ namespace api.helperclasses
 
                 foreach (BoardSquare square in row.Squares)
                 {
-                    displayRow.Squares.Add(CreateBoardSquare(whiteSquare, square, moves));
+                    displayRow.Squares.Add(
+                        CreateBoardSquare(whiteSquare, square, moves, selectedSquare)
+                    );
                     whiteSquare = !whiteSquare;
                 }
 
@@ -85,7 +91,8 @@ namespace api.helperclasses
         internal static BoardDisplaySquare CreateBoardSquare(
             bool whiteSquare,
             BoardSquare square,
-            List<int[]>? moves
+            List<int[]>? moves,
+            int[]? selectedSquare
         )
         {
             string backColor = whiteSquare ? "white" : "black";
@@ -94,11 +101,25 @@ namespace api.helperclasses
             if (square.Piece != null)
             {
                 cssClass += " " + square.Piece.ToString(false);
+
+                if (
+                    selectedSquare != null
+                    && selectedSquare[0] == square.Coords[0]
+                    && selectedSquare[1] == square.Coords[1]
+                )
+                {
+                    cssClass += " selected";
+                }
             }
 
             if (moves != null && CheckSquareInMoves(square, moves))
             {
                 cssClass += " highlighted";
+            }
+
+            if (square.Piece is King king && king.InCheck)
+            {
+                cssClass += " inCheck";
             }
 
             return new()

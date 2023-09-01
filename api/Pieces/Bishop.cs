@@ -1,4 +1,5 @@
 ﻿using api.models.api;
+using api.pieces.interfaces;
 
 namespace api.pieces
 {
@@ -21,19 +22,19 @@ namespace api.pieces
             int row = Coords[1];
             int[] colInc = { -1, -1, 1, 1 };
             int[] rowInc = { 1, -1, -1, 1 };
-            Vector[] vectors =
+            Direction[] Directions =
             {
-                Vector.FromBottomLeftToTopRight,
-                Vector.FromTopLeftToBottomRight,
-                Vector.FromBottomLeftToTopRight,
-                Vector.FromTopLeftToBottomRight,
+                Direction.FromTopRightToBottomLeft,
+                Direction.FromTopLeftToBottomRight,
+                Direction.FromTopRightToBottomLeft,
+                Direction.FromTopLeftToBottomRight,
             };
 
             for (int i = 0; i < 4; i++, col = Coords[0], row = Coords[1])
             {
                 if (
-                    board.Rows[col].Squares[row].PinnedDirection != Vector.None
-                    && board.Rows[col].Squares[row].PinnedDirection != vectors[i]
+                    board.Rows[col].Squares[row].PinnedDirection != Direction.None
+                    && board.Rows[col].Squares[row].PinnedDirection != Directions[i]
                 )
                 {
                     continue;
@@ -42,12 +43,7 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                while (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                while (col >= 0 && row >= 0 && col < 8 && row < 8)
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
                     if (square.Piece == null || square.Piece.Color != this.Color)

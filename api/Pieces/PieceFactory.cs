@@ -1,3 +1,5 @@
+using api.pieces.interfaces;
+
 namespace api.pieces
 {
     public static class PieceFactory

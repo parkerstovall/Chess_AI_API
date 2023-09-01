@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using api.models.api;
+﻿using api.models.api;
+using api.pieces.interfaces;
 
 namespace api.pieces
 {
@@ -27,7 +24,7 @@ namespace api.pieces
             int[] colInc = { -2, -2, 2, 2, 1, -1, 1, -1 };
             int[] rowInc = { 1, -1, 1, -1, 2, 2, -2, -2 };
 
-            if (board.Rows[col].Squares[row].PinnedDirection != Vector.None)
+            if (board.Rows[col].Squares[row].PinnedDirection != Direction.None)
             {
                 return moves;
             }

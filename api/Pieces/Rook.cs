@@ -1,8 +1,10 @@
-﻿using api.models.api;
+﻿using api.helperclasses;
+using api.models.api;
+using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Rook : IPiece
+    public class Rook : IPiece, IPieceHasMoved
     {
         public string Color { get; set; }
         public int[] Coords { get; set; }
@@ -23,17 +25,28 @@ namespace api.pieces
             int[] colInc = { 0, 0, 1, -1 };
             int[] rowInc = { 1, -1, 0, 0 };
 
+            Direction[] dir =
+            {
+                Direction.FromLeftToRight,
+                Direction.FromLeftToRight,
+                Direction.FromTopToBottom,
+                Direction.FromTopToBottom
+            };
+
             for (int i = 0; i < 4; i++, col = Coords[0], row = Coords[1])
             {
+                if (
+                    board.Rows[col].Squares[row].PinnedDirection != Direction.None
+                    && board.Rows[col].Squares[row].PinnedDirection != dir[i]
+                )
+                {
+                    continue;
+                }
+
                 col += colInc[i];
                 row += rowInc[i];
 
-                while (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                while (PieceHelper.IsInBoard(col, row))
                 {
                     if (board.Rows[col].Squares[row].Piece == null)
                     {
@@ -86,24 +99,8 @@ namespace api.pieces
             int[] colInc = { 0, 0, 1, -1 };
             int[] rowInc = { 1, -1, 0, 0 };
 
-            Vector[] dir =
-            {
-                Vector.FromLeftToRight,
-                Vector.FromRightToLeft,
-                Vector.FromTopToBottom,
-                Vector.FromBottomToTop
-            };
-
             for (int i = 0; i < 4; i++, col = Coords[0], row = Coords[1])
             {
-                if (
-                    board.Rows[col].Squares[row].PinnedDirection != Vector.None
-                    && board.Rows[col].Squares[row].PinnedDirection != dir[i]
-                )
-                {
-                    continue;
-                }
-
                 col += colInc[i];
                 row += rowInc[i];
 

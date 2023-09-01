@@ -35,7 +35,7 @@ namespace api.repository
             _cache.Set($"Board:{gameID}", board);
             return new GameStart
             {
-                Board = BoardHelper.GetBoardForDisplay(board, null),
+                Board = BoardHelper.GetBoardForDisplay(board, null, null),
                 GameID = gameID
             };
         }
@@ -45,24 +45,26 @@ namespace api.repository
             Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
             List<int[]> moves = _cache.Get<List<int[]>>($"Moves:{gameID}") ?? new();
             int[] start = _cache.Get<int[]>($"SelectedSquare:{gameID}") ?? Array.Empty<int>();
+            int[]? clickedSquare = new[] { row, col };
 
             if (
                 moves.Any()
                 && start.Any()
-                && MoveHelpers.TryMovePiece(row, col, start, ref moves, ref board)
+                && MoveHelper.TryMovePiece(clickedSquare, start, ref moves, ref board)
             )
             {
                 _cache.Remove($"Moves:{gameID}");
                 _cache.Remove($"SelectedSquare:{gameID}");
+                clickedSquare = null;
             }
             else
             {
-                moves = MoveHelpers.GetMovesFromPiece(board, row, col);
+                moves = MoveHelper.GetMovesFromPiece(board, clickedSquare);
                 _cache.Set($"Moves:{gameID}", moves);
-                _cache.Set($"SelectedSquare:{gameID}", new[] { row, col });
+                _cache.Set($"SelectedSquare:{gameID}", clickedSquare);
             }
 
-            return BoardHelper.GetBoardForDisplay(board, moves);
+            return BoardHelper.GetBoardForDisplay(board, moves, clickedSquare);
         }
     }
 }

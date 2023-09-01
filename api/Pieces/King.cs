@@ -1,13 +1,16 @@
-﻿using api.models.api;
-using Microsoft.AspNetCore.Routing.Matching;
+﻿using api.helperclasses;
+using api.models.api;
+using api.pieces.interfaces;
+using Microsoft.AspNetCore.Authentication;
 
 namespace api.pieces
 {
-    public class King : IPiece
+    public class King : IPiece, IPieceHasMoved
     {
-        public bool HasMoved { get; set; } = false;
         public string Color { get; set; }
         public int[] Coords { get; set; }
+        public bool HasMoved { get; set; } = false;
+        public bool InCheck { get; set; } = false;
 
         public King(string Color, int[] Coords)
         {
@@ -29,26 +32,12 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                if (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                if (PieceHelper.IsInBoard(col, row))
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
                     if (
                         (square.Piece == null || square.Piece.Color != this.Color)
-                        && (
-                            (
-                                this.Color == "white"
-                                && board.Rows[col].Squares[row].BlackPressure == 0
-                            )
-                            || (
-                                this.Color == "black"
-                                && board.Rows[col].Squares[row].WhitePressure == 0
-                            )
-                        )
+                        && SafeSquare(square)
                     )
                     {
                         moves.Add(new int[] { col, row });
@@ -74,12 +63,7 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                if (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                if (PieceHelper.IsInBoard(col, row))
                 {
                     moves.Add(new int[] { col, row });
                 }
@@ -122,38 +106,40 @@ namespace api.pieces
         private bool CheckCastleDir(Board board, bool left, int col, int row)
         {
             int offset = left ? -1 : 1;
-
-            if (
-                board.Rows[col].Squares[row + (1 * offset)].Piece == null
-                && board.Rows[col].Squares[row + (2 * offset)].Piece == null
-                && board.Rows[col].Squares[row + (3 * offset)].Piece == null
-                && board.Rows[col].Squares[row + (4 * offset)].Piece is Rook r
-                && r.Color == this.Color
-                && !r.HasMoved
-            )
+            int len = left ? 4 : 3;
+            bool add = true;
+            for (int i = 1; i < len; i++)
             {
-                if (
-                    this.Color == "white"
-                    && board.Rows[col].Squares[row].BlackPressure == 0
-                    && board.Rows[col].Squares[row + (1 * offset)].BlackPressure == 0
-                    && board.Rows[col].Squares[row + (2 * offset)].BlackPressure == 0
-                    && board.Rows[col].Squares[row + (3 * offset)].BlackPressure == 0
-                )
+                BoardSquare square = board.Rows[col].Squares[row + (i * offset)];
+
+                if (i + 1 == len)
                 {
-                    return true;
+                    if (square.Piece is IPieceHasMoved hm && hm.HasMoved)
+                    {
+                        add = false;
+                        break;
+                    }
                 }
-                else if (
-                    this.Color == "black"
-                    && board.Rows[col].Squares[row].WhitePressure == 0
-                    && board.Rows[col].Squares[row + (1 * offset)].WhitePressure == 0
-                    && board.Rows[col].Squares[row + (2 * offset)].WhitePressure == 0
-                    && board.Rows[col].Squares[row + (3 * offset)].WhitePressure == 0
-                )
+                if (square.Piece != null || !SafeSquare(square))
                 {
-                    return true;
+                    add = false;
+                    break;
                 }
             }
-            return false;
+
+            return add;
+        }
+
+        private bool SafeSquare(BoardSquare square)
+        {
+            if (this.Color == "white")
+            {
+                return square.BlackPressure == 0;
+            }
+            else
+            {
+                return square.WhitePressure == 0;
+            }
         }
     }
 }

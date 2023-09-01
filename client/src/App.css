@@ -36,7 +36,7 @@
   background-color: #B3CCE6;
 }
 
-.selected {
+.selected, .selected:hover, .selected:active, .selected:focus {
   background-color: #527AA3;
 }
 
