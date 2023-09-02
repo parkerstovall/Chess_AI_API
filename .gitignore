@@ -1,3 +1,4 @@
-**/api/obj/Debug/**
-**/api/bin/Debug/**
+**/api/obj/
+**/api/bin/
 **/.vscode/
+**/.DS_Store
