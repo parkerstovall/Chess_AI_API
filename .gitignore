@@ -1,4 +1,4 @@
 **/api/obj/
 **/api/bin/
 **/.vscode/
-**/.DS_Store
+.DS_Store
