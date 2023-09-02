@@ -4,16 +4,16 @@ namespace api.pieces
 {
     public static class PieceFactory
     {
-        public static IPiece? GetPiece(string color, string type, int[] coords)
+        public static IPiece? GetPiece(string color, string type)
         {
             return type switch
             {
-                "Pawn" => new Pawn(color, coords),
-                "King" => new King(color, coords),
-                "Bishop" => new Bishop(color, coords),
-                "Queen" => new Queen(color, coords),
-                "Rook" => new Rook(color, coords),
-                "Knight" => new Knight(color, coords),
+                "Pawn" => new Pawn(color),
+                "King" => new King(color),
+                "Bishop" => new Bishop(color),
+                "Queen" => new Queen(color),
+                "Rook" => new Rook(color),
+                "Knight" => new Knight(color),
                 _ => null,
             };
         }

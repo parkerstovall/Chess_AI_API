@@ -9,7 +9,7 @@ namespace api.helperclasses
         internal static List<int[]> GetMovesFromPiece(Board board, int[] clickedSquare)
         {
             List<int[]> moves =
-                board.Rows[clickedSquare[0]].Squares[clickedSquare[1]].Piece?.GetPaths(board, false)
+                board.Rows[clickedSquare[0]].Squares[clickedSquare[1]].Piece?.GetPaths(board, clickedSquare, false)
                 ?? new();
             return moves;
         }
@@ -50,7 +50,6 @@ namespace api.helperclasses
 
             to.Piece = from.Piece;
             from.Piece = null;
-            to.Piece.Coords = dest;
 
             if (to.Piece is IPieceHasMoved pieceHasMoved)
             {
@@ -149,7 +148,7 @@ namespace api.helperclasses
                 return;
             }
 
-            foreach (int[] pMove in square.Piece.GetPressure(board))
+            foreach (int[] pMove in square.Piece.GetPressure(board, square.coords))
             {
                 BoardSquare pSquare = board.Rows[pMove[0]].Squares[pMove[1]];
 

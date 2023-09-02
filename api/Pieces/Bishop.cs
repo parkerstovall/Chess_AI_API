@@ -6,20 +6,18 @@ namespace api.pieces
     public class Bishop : IPiece
     {
         public string Color { get; set; }
-        public int[] Coords { get; set; }
 
-        public Bishop(string Color, int[] Coords)
+        public Bishop(string Color)
         {
             this.Color = Color;
-            this.Coords = Coords;
         }
 
-        public List<int[]> GetPaths(Board board, bool check)
+        public List<int[]> GetPaths(Board board, int[] coords, bool check)
         {
             List<int[]> moves = new();
 
-            int col = Coords[0];
-            int row = Coords[1];
+            int col = coords[0];
+            int row = coords[1];
             int[] colInc = { -1, -1, 1, 1 };
             int[] rowInc = { 1, -1, -1, 1 };
             Direction[] Directions =
@@ -30,7 +28,7 @@ namespace api.pieces
                 Direction.FromTopLeftToBottomRight,
             };
 
-            for (int i = 0; i < 4; i++, col = Coords[0], row = Coords[1])
+            for (int i = 0; i < 4; i++, col = coords[0], row = coords[1])
             {
                 if (
                     board.Rows[col].Squares[row].PinnedDirection != Direction.None
@@ -78,16 +76,16 @@ namespace api.pieces
             return moves;
         }
 
-        public List<int[]> GetPressure(Board board)
+        public List<int[]> GetPressure(Board board, int[] coords)
         {
             List<int[]> moves = new();
 
-            int col = Coords[0];
-            int row = Coords[1];
+            int col = coords[0];
+            int row = coords[1];
             int[] colInc = { -1, -1, 1, 1 };
             int[] rowInc = { 1, -1, -1, 1 };
 
-            for (int i = 0; i < 4; i++, col = Coords[0], row = Coords[1])
+            for (int i = 0; i < 4; i++, col = coords[0], row = coords[1])
             {
                 col += colInc[i];
                 row += rowInc[i];

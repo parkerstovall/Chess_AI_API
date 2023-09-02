@@ -5,7 +5,7 @@ namespace api.models.api
     public class BoardSquare
     {
         public IPiece? Piece = null;
-        public int[] Coords { get; set; } = { -1, -1 };
+        public int[] coords { get; set; } = { -1, -1 };
         public string CheckBlockingColor { get; set; } = "";
         public Direction PinnedDirection = Direction.None;
         public int BlackPressure { get; set; }
