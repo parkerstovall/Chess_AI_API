@@ -2,3 +2,4 @@
 **/api/bin/
 **/.vscode/
 .DS_Store
+**/node_modules
