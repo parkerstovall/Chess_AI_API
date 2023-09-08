@@ -20,7 +20,7 @@ function App() {
     });
   }
 
-  function LoadInitialBoard(attempts: number) {
+  function LoadInitialBoard(attempts: number = 0) {
     api.startGame().then((gameStart) => {
       setWhiteDisplay(false);
       setBlackDisplay(false);
@@ -39,8 +39,8 @@ function App() {
   }
 
   useEffect(() => {
-    LoadInitialBoard(0);
-  }, []);
+    LoadInitialBoard();
+  }, [LoadInitialBoard]);
 
   return (
     <>
