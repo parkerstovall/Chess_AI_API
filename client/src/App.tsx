@@ -20,19 +20,26 @@ function App() {
     });
   }
 
-  function LoadInitialBoard() {
-    setWhiteDisplay(false);
-    setBlackDisplay(false);
-
+  function LoadInitialBoard(attempts: number) {
     api.startGame().then((gameStart) => {
+      setWhiteDisplay(false);
+      setBlackDisplay(false);
       setGameID(gameStart.gameID);
       setBoard(gameStart.board);
-    });
+    }).catch((err) => { 
+      
+      if(attempts < 10) {
+        setTimeout(() => {LoadInitialBoard(attempts++);}, 50);
+      }
+      else {
+        console.error("Failed to communicate with server", err);
+      }
+     });
 
   }
 
   useEffect(() => {
-    LoadInitialBoard();
+    LoadInitialBoard(0);
   }, []);
 
   return (
