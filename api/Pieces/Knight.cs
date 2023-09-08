@@ -8,6 +8,7 @@ namespace api.pieces
     {
         public string Color { get; set; }
         public string Type { get; set; }
+        public Direction PinnedDir { get; set; } = Direction.None;
 
         public Knight(string Color)
         {
@@ -23,7 +24,7 @@ namespace api.pieces
             int[] colInc = { -2, -2, 2, 2, 1, -1, 1, -1 };
             int[] rowInc = { 1, -1, 1, -1, 2, 2, -2, -2 };
 
-            if (board.Rows[col].Squares[row].PinnedDirection != Direction.None)
+            if (PinnedDir != Direction.None)
             {
                 return moves;
             }

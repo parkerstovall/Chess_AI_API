@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Authentication;
 
 namespace api.pieces
 {
-    public class King : IPiece, IPieceHasMoved
+    public class King : IPieceHasMoved
     {
         public string Color { get; set; }
         public bool HasMoved { get; set; } = false;
         public bool InCheck { get; set; } = false;
+        public Direction PinnedDir { get; set; } = Direction.None;
 
         public King(string Color)
         {

@@ -42,7 +42,7 @@ namespace api.helperclasses
                         piece = PieceFactory.GetPiece(whitePiece ? "white" : "black", "Pawn");
                     }
 
-                    board.Rows[i].Squares.Add(new() { coords = new int[] { i, j }, Piece = piece });
+                    board.Rows[i].Squares.Add(new() { Coords = new int[] { i, j }, Piece = piece });
                 }
 
                 if (i == 1)
@@ -99,8 +99,8 @@ namespace api.helperclasses
 
                 if (
                     selectedSquare != null
-                    && selectedSquare[0] == square.coords[0]
-                    && selectedSquare[1] == square.coords[1]
+                    && selectedSquare[0] == square.Coords[0]
+                    && selectedSquare[1] == square.Coords[1]
                 )
                 {
                     cssClass += " selected";
@@ -119,8 +119,8 @@ namespace api.helperclasses
 
             return new()
             {
-                Col = square.coords[0],
-                Row = square.coords[1],
+                Col = square.Coords[0],
+                Row = square.Coords[1],
                 CssClass = cssClass
             };
         }
@@ -129,7 +129,7 @@ namespace api.helperclasses
         {
             foreach (int[] move in moves)
             {
-                if (move[0] == square.coords[0] && move[1] == square.coords[1])
+                if (move[0] == square.Coords[0] && move[1] == square.Coords[1])
                 {
                     return true;
                 }

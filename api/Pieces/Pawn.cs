@@ -1,12 +1,14 @@
 ﻿using api.models.api;
+using api.helperclasses;
 using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Pawn : IPiece, IPieceHasMoved
+    public class Pawn : IPieceHasMoved
     {
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }
+        public Direction PinnedDir { get; set; } = Direction.None;
 
         public Pawn(string Color)
         {
@@ -21,17 +23,28 @@ namespace api.pieces
             int col = coords[0] + dir;
             int row = coords[1];
 
+            bool canMove = (
+                PinnedDir == Direction.None
+                || PinnedDir == Direction.FromTopToBottom
+                || PinnedDir == Direction.FromBottomToTop
+            );
+
+            bool canAttackLeft = (
+                PinnedDir == Direction.None
+                || PinnedDir == Direction.FromBottomRightToTopLeft
+                || PinnedDir == Direction.FromTopLeftToBottomRight
+            );
+
+            bool canAttackRight = (
+                PinnedDir == Direction.None
+                || PinnedDir == Direction.FromBottomLeftToTopRight
+                || PinnedDir == Direction.FromTopRightToBottomLeft
+            );
+
             if (col > -1 && col < board.Rows.Count)
             {
                 //Moving
-                if (
-                    board.Rows[col].Squares[row].Piece == null
-                    && (
-                        board.Rows[coords[0]].Squares[row].PinnedDirection == Direction.None
-                        || board.Rows[coords[0]].Squares[row].PinnedDirection
-                            == Direction.FromTopToBottom
-                    )
-                )
+                if (board.Rows[col].Squares[row].Piece == null && (canMove))
                 {
                     if (check)
                     {
@@ -74,11 +87,7 @@ namespace api.pieces
                 //Attacking
                 if (row > -1)
                 {
-                    if (
-                        board.Rows[coords[0]].Squares[row].PinnedDirection == Direction.None
-                        || board.Rows[coords[0]].Squares[row].PinnedDirection
-                            == Direction.FromTopLeftToBottomRight
-                    )
+                    if (canAttackLeft)
                     {
                         BoardSquare left = board.Rows[col].Squares[row];
 
@@ -106,11 +115,7 @@ namespace api.pieces
 
                 if (row < board.Rows[col].Squares.Count)
                 {
-                    if (
-                        board.Rows[coords[0]].Squares[row].PinnedDirection == Direction.None
-                        || board.Rows[coords[0]].Squares[row].PinnedDirection
-                            == Direction.FromTopLeftToBottomRight
-                    )
+                    if (canAttackRight)
                     {
                         BoardSquare right = board.Rows[col].Squares[row];
 
@@ -151,14 +156,14 @@ namespace api.pieces
                 //Attacking
                 if (j > -1)
                 {
-                    moves.Add(board.Rows[i].Squares[j].coords);
+                    moves.Add(board.Rows[i].Squares[j].Coords);
                 }
 
                 j += 2;
 
                 if (j < board.Rows[i].Squares.Count)
                 {
-                    moves.Add(board.Rows[i].Squares[j].coords);
+                    moves.Add(board.Rows[i].Squares[j].Coords);
                 }
             }
 

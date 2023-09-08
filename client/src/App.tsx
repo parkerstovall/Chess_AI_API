@@ -29,7 +29,7 @@ function App() {
     }).catch((err) => { 
       
       if(attempts < 10) {
-        setTimeout(() => {LoadInitialBoard(attempts++);}, 50);
+        setTimeout(() => {LoadInitialBoard(attempts + 1);}, 50);
       }
       else {
         console.error("Failed to communicate with server", err);

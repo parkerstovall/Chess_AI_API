@@ -1,10 +1,11 @@
+using api.pieces;
 using api.pieces.interfaces;
 
-namespace api.pieces
+namespace api.helperclasses
 {
-    public static class PieceFactory
+    internal static class PieceFactory
     {
-        public static IPiece? GetPiece(string color, string type)
+        internal static IPiece? GetPiece(string color, string type)
         {
             return type switch
             {

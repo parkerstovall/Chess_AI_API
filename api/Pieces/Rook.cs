@@ -4,10 +4,11 @@ using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Rook : IPiece, IPieceHasMoved
+    public class Rook : IPieceCanPin, IPieceHasMoved
     {
         public string Color { get; set; }
         public bool HasMoved { get; set; } = false;
+        public Direction PinnedDir { get; set; } = Direction.None;
 
         public Rook(string Color)
         {
@@ -20,27 +21,17 @@ namespace api.pieces
 
             int col = coords[0];
             int row = coords[1];
-            int[] colInc = { 0, 0, 1, -1 };
-            int[] rowInc = { 1, -1, 0, 0 };
 
-            Direction[] dir =
+            Tuple<int[], int[]> increments = PieceHelper.GetIncrements(
+                PinnedDir,
+                diag: false,
+                straight: true
+            );
+            int[] colInc = increments.Item1;
+            int[] rowInc = increments.Item2;
+
+            for (int i = 0; i < colInc.Length; i++, col = coords[0], row = coords[1])
             {
-                Direction.FromLeftToRight,
-                Direction.FromLeftToRight,
-                Direction.FromTopToBottom,
-                Direction.FromTopToBottom
-            };
-
-            for (int i = 0; i < 4; i++, col = coords[0], row = coords[1])
-            {
-                if (
-                    board.Rows[col].Squares[row].PinnedDirection != Direction.None
-                    && board.Rows[col].Squares[row].PinnedDirection != dir[i]
-                )
-                {
-                    continue;
-                }
-
                 col += colInc[i];
                 row += rowInc[i];
 
@@ -127,6 +118,71 @@ namespace api.pieces
             }
 
             return moves;
+        }
+
+        public bool CanPin(Board board, int[] start, int[] dest)
+        {
+            Direction dir = PieceHelper.GetDirection(start, dest);
+
+            return dir == Direction.FromTopToBottom || dir == Direction.FromLeftToRight;
+        }
+
+        public void CheckSavingSquares(int[] start, int[] dest, ref Board board)
+        {
+            Direction dir = PieceHelper.GetDirection(start, dest);
+            int[] inc = new int[2];
+
+            switch (dir)
+            {
+                case Direction.FromTopToBottom:
+                    inc[0] = 0;
+                    inc[1] = 1;
+                    break;
+                case Direction.FromBottomToTop:
+                    inc[0] = 0;
+                    inc[1] = -1;
+                    break;
+                case Direction.FromLeftToRight:
+                    inc[0] = 1;
+                    inc[1] = 0;
+                    break;
+                case Direction.FromRightToLeft:
+                    inc[0] = -1;
+                    inc[1] = 0;
+                    break;
+                default:
+                    return;
+            }
+
+            start[0] += inc[0];
+            start[1] += inc[1];
+            List<IPiece> pieces = new();
+            while (PieceHelper.IsInBoard(start[0], start[1]))
+            {
+                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
+                if (square.Piece != null)
+                {
+                    if (square.Piece is King)
+                    {
+                        break;
+                    }
+
+                    pieces.Add(square.Piece);
+
+                    if (pieces.Count > 1)
+                    {
+                        break;
+                    }
+                }
+
+                start[0] += inc[0];
+                start[1] += inc[1];
+            }
+
+            if (pieces.Count == 1)
+            {
+                pieces[0].PinnedDir = dir;
+            }
         }
 
         public override string ToString()

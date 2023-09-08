@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using api.models.api;
 using api.pieces;
 using api.pieces.interfaces;
@@ -9,8 +10,11 @@ namespace api.helperclasses
         internal static List<int[]> GetMovesFromPiece(Board board, int[] clickedSquare)
         {
             List<int[]> moves =
-                board.Rows[clickedSquare[0]].Squares[clickedSquare[1]].Piece?.GetPaths(board, clickedSquare, false)
-                ?? new();
+                board.Rows[clickedSquare[0]].Squares[clickedSquare[1]].Piece?.GetPaths(
+                    board,
+                    clickedSquare,
+                    false
+                ) ?? new();
             return moves;
         }
 
@@ -61,7 +65,26 @@ namespace api.helperclasses
                 CastleKing(start, dest, ref board);
             }
 
-            RefreshBoard(ref board);
+            CheckTracker tracker = RefreshBoard(ref board);
+
+            //ok so at this point I have a list of all the IPieceCanPin pieces
+            foreach (BoardSquare square in tracker.PinPieces)
+            {
+                if (square.Piece == null || square.Piece is not IPieceCanPin piece)
+                {
+                    continue;
+                }
+
+                int[] lStart = new int[] { square.Coords[0], square.Coords[1] };
+                if (piece.Color == "white")
+                {
+                    piece.CheckSavingSquares(lStart, tracker.BlackKingCoords, ref board);
+                }
+                else
+                {
+                    piece.CheckSavingSquares(lStart, tracker.WhiteKingCoords, ref board);
+                }
+            }
         }
 
         private static void CastleKing(int[] start, int[] dest, ref Board board)
@@ -118,43 +141,66 @@ namespace api.helperclasses
                 {
                     square.CheckBlockingColor = "";
                     square.EnPassantColor = "";
-                    square.PinnedDirection = Direction.None;
                     square.BlackPressure = 0;
                     square.WhitePressure = 0;
 
-                    if (square.Piece is King king)
+                    if (square.Piece != null)
                     {
-                        king.InCheck = false;
+                        square.Piece.PinnedDir = Direction.None;
+
+                        if (square.Piece is King king)
+                        {
+                            king.InCheck = false;
+                        }
                     }
                 }
             }
         }
 
-        private static void RefreshBoard(ref Board board)
+        private static CheckTracker RefreshBoard(ref Board board)
         {
+            CheckTracker tracker = new();
+
             foreach (BoardRow row in board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    AddBoardPressure(square, ref board);
+                    AddBoardPressure(square, ref board, ref tracker);
                 }
             }
+
+            return tracker;
         }
 
-        private static void AddBoardPressure(BoardSquare square, ref Board board)
+        private static void AddBoardPressure(
+            BoardSquare square,
+            ref Board board,
+            ref CheckTracker tracker
+        )
         {
             if (square.Piece == null)
             {
                 return;
             }
 
-            foreach (int[] pMove in square.Piece.GetPressure(board, square.coords))
+            if (square.Piece is IPieceCanPin)
+            {
+                tracker.PinPieces.Add(square);
+            }
+
+            foreach (int[] pMove in square.Piece.GetPressure(board, square.Coords))
             {
                 BoardSquare pSquare = board.Rows[pMove[0]].Squares[pMove[1]];
 
-                if (pSquare.Piece is King king && square.Piece.Color != king.Color)
+                if (pSquare.Piece is King king)
                 {
-                    king.InCheck = true;
+                    tracker.SetKing(king, pMove);
+
+                    if (square.Piece.Color != king.Color)
+                    {
+                        tracker.AddChecker(square.Piece);
+                        king.InCheck = true;
+                    }
                 }
 
                 if (square.Piece.Color == "white")

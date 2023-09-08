@@ -65,7 +65,9 @@ namespace api.repository
                 _cache.Remove($"SelectedSquare:{gameID}");
                 clickedSquare = null;
             }
-            else if (square.Piece == null || square.Piece.Color != color)
+            else if (
+                square.Piece == null /*|| square.Piece.Color != color*/
+            )
             {
                 return BoardHelper.GetBoardForDisplay(board, null, null);
             }
