@@ -102,7 +102,7 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                while (col >= 0 && row >= 0 && col < 8 && row < 8)
+                while (PieceHelper.IsInBoard(col, row))
                 {
                     moves.Add(new int[] { col, row });
 
@@ -129,13 +129,8 @@ namespace api.pieces
             return moves;
         }
 
-        public string ToString(bool pipeSeparated)
+        public override string ToString()
         {
-            if (pipeSeparated)
-            {
-                return Color + "|Rook";
-            }
-
             return Color + "Rook";
         }
     }

@@ -39,10 +39,7 @@ namespace api.helperclasses
                     }
                     else if (i == 1 || i == 6)
                     {
-                        piece = PieceFactory.GetPiece(
-                            whitePiece ? "white" : "black",
-                            "Pawn"
-                        );
+                        piece = PieceFactory.GetPiece(whitePiece ? "white" : "black", "Pawn");
                     }
 
                     board.Rows[i].Squares.Add(new() { coords = new int[] { i, j }, Piece = piece });
@@ -98,7 +95,7 @@ namespace api.helperclasses
 
             if (square.Piece != null)
             {
-                cssClass += " " + square.Piece.ToString(false);
+                cssClass += " " + square.Piece.ToString();
 
                 if (
                     selectedSquare != null

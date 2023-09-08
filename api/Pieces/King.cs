@@ -70,13 +70,8 @@ namespace api.pieces
             return moves;
         }
 
-        public string ToString(bool pipeSeparated)
+        public override string ToString()
         {
-            if (pipeSeparated)
-            {
-                return Color + "|King";
-            }
-
             return Color + "King";
         }
 

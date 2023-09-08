@@ -165,13 +165,8 @@ namespace api.pieces
             return moves;
         }
 
-        public string ToString(bool pipeSeparated)
+        public override string ToString()
         {
-            if (pipeSeparated)
-            {
-                return Color + "|Pawn";
-            }
-
             return Color + "Pawn";
         }
     }

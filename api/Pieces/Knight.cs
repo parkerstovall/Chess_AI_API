@@ -1,4 +1,5 @@
-﻿using api.models.api;
+﻿using api.helperclasses;
+using api.models.api;
 using api.pieces.interfaces;
 
 namespace api.pieces
@@ -32,12 +33,7 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                if (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                if (PieceHelper.IsInBoard(col, row))
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
                     if (square.Piece == null || square.Piece.Color != this.Color)
@@ -72,12 +68,7 @@ namespace api.pieces
                 col += colInc[i];
                 row += rowInc[i];
 
-                if (
-                    col >= 0
-                    && row >= 0
-                    && col < board.Rows.Count
-                    && row < board.Rows[col].Squares.Count
-                )
+                if (PieceHelper.IsInBoard(col, row))
                 {
                     moves.Add(new int[] { col, row });
                 }
@@ -85,13 +76,8 @@ namespace api.pieces
             return moves;
         }
 
-        public string ToString(bool pipeSeparated)
+        public override string ToString()
         {
-            if (pipeSeparated)
-            {
-                return Color + "|Knight";
-            }
-
             return Color + "Knight";
         }
     }

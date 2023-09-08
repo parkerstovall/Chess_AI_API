@@ -6,7 +6,6 @@ namespace api.pieces.interfaces
     {
         public string Color { get; set; }
 
-        public string ToString(bool pipeSeparated);
         public List<int[]> GetPaths(Board board, int[] coords, bool check);
         public List<int[]> GetPressure(Board board, int[] coords);
     }
