@@ -20,27 +20,23 @@ function App() {
     });
   }
 
-  function LoadInitialBoard(attempts: number = 0) {
-    api.startGame().then((gameStart) => {
-      setWhiteDisplay(false);
-      setBlackDisplay(false);
-      setGameID(gameStart.gameID);
-      setBoard(gameStart.board);
-    }).catch((err) => { 
-      
-      if(attempts < 10) {
-        setTimeout(() => {LoadInitialBoard(attempts + 1);}, 50);
-      }
-      else {
+  function LoadInitialBoard() {
+    
+    setTimeout(() => {
+      api.startGame().then((gameStart) => {
+        setWhiteDisplay(false);
+        setBlackDisplay(false);
+        setGameID(gameStart.gameID);
+        setBoard(gameStart.board);
+      }).catch((err) => { 
         console.error("Failed to communicate with server", err);
-      }
-     });
-
+      });
+    }, 100);
   }
 
   useEffect(() => {
     LoadInitialBoard();
-  }, [LoadInitialBoard]);
+  }, []);
 
   return (
     <>
