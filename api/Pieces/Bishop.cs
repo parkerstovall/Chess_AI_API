@@ -114,68 +114,43 @@ namespace api.pieces
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
 
+            return GoodDir(dir);
+        }
+
+        public void CheckPins(int[] start, int[] dest, ref Board board)
+        {
+            Direction dir = PieceHelper.GetDirection(start, dest);
+
+            if (!GoodDir(dir))
+            {
+                return;
+            }
+
+            int[] inc = PieceHelper.GetSingleIncrement(dir);
+
+            PieceHelper.SetPins(start, inc, dir, ref board);
+        }
+
+        public bool GoodDir(Direction dir)
+        {
             return dir == Direction.FromTopLeftToBottomRight
                 || dir == Direction.FromBottomRightToTopLeft
                 || dir == Direction.FromTopRightToBottomLeft
                 || dir == Direction.FromBottomLeftToTopRight;
         }
 
-        public void CheckSavingSquares(int[] start, int[] dest, ref Board board)
+        public bool HasSavingSquares(int[] start, int[] dest, ref Board board)
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
-            int[] inc = new int[2];
 
-            switch (dir)
+            if (!GoodDir(dir))
             {
-                case Direction.FromTopLeftToBottomRight:
-                    inc[0] = 1;
-                    inc[1] = 1;
-                    break;
-                case Direction.FromTopRightToBottomLeft:
-                    inc[0] = 1;
-                    inc[1] = -1;
-                    break;
-                case Direction.FromBottomRightToTopLeft:
-                    inc[0] = -1;
-                    inc[1] = -1;
-                    break;
-                case Direction.FromBottomLeftToTopRight:
-                    inc[0] = -1;
-                    inc[1] = 1;
-                    break;
-                default:
-                    return;
+                return false;
             }
 
-            start[0] += inc[0];
-            start[1] += inc[1];
-            List<IPiece> pieces = new();
-            while (PieceHelper.IsInBoard(start[0], start[1]))
-            {
-                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
-                if (square.Piece != null)
-                {
-                    if (square.Piece is King)
-                    {
-                        break;
-                    }
+            int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-                    pieces.Add(square.Piece);
-
-                    if (pieces.Count > 1)
-                    {
-                        break;
-                    }
-                }
-
-                start[0] += inc[0];
-                start[1] += inc[1];
-            }
-
-            if (pieces.Count == 1)
-            {
-                pieces[0].PinnedDir = dir;
-            }
+            return PieceHelper.SetSavingSquares(start, inc, this.Color, ref board);
         }
 
         public override string ToString()

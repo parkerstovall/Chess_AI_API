@@ -5,6 +5,7 @@
   justify-content: space-evenly;
   align-items: center;
 }
+
 .GameBoard {
   display: grid;
   width: min(80vh, 800px);
@@ -42,6 +43,10 @@
 
 .inCheck, .inCheck:hover, .inCheck:active, .inCheck:focus {
   background-color: pink;
+}
+
+.inCheckMate, .inCheckMate:hover, .inCheckMate:active, .inCheckMate:focus {
+  background-color: red;
 }
 
 .highlighted::after {

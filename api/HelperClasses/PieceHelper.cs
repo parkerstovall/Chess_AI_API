@@ -1,3 +1,5 @@
+using api.models.api;
+using api.pieces;
 using api.pieces.interfaces;
 
 namespace api.helperclasses
@@ -126,6 +128,153 @@ namespace api.helperclasses
             }
 
             return Tuple.Create(colInc, rowInc);
+        }
+
+        internal static int[] GetSingleIncrement(Direction dir)
+        {
+            int[] inc = new int[2];
+
+            switch (dir)
+            {
+                case Direction.FromTopLeftToBottomRight:
+                    inc[0] = 1;
+                    inc[1] = 1;
+                    break;
+                case Direction.FromTopRightToBottomLeft:
+                    inc[0] = 1;
+                    inc[1] = -1;
+                    break;
+                case Direction.FromBottomRightToTopLeft:
+                    inc[0] = -1;
+                    inc[1] = -1;
+                    break;
+                case Direction.FromBottomLeftToTopRight:
+                    inc[0] = -1;
+                    inc[1] = 1;
+                    break;
+                case Direction.FromTopToBottom:
+                    inc[0] = 0;
+                    inc[1] = 1;
+                    break;
+                case Direction.FromBottomToTop:
+                    inc[0] = 0;
+                    inc[1] = -1;
+                    break;
+                case Direction.FromLeftToRight:
+                    inc[0] = 1;
+                    inc[1] = 0;
+                    break;
+                case Direction.FromRightToLeft:
+                    inc[0] = -1;
+                    inc[1] = 0;
+                    break;
+            }
+
+            return inc;
+        }
+
+        public static void SetPins(int[] start, int[] inc, Direction dir, ref Board board)
+        {
+            start[0] += inc[0];
+            start[1] += inc[1];
+            List<IPiece> pieces = new();
+            while (IsInBoard(start[0], start[1]))
+            {
+                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
+                if (square.Piece != null)
+                {
+                    if (square.Piece is King)
+                    {
+                        break;
+                    }
+
+                    pieces.Add(square.Piece);
+
+                    if (pieces.Count > 1)
+                    {
+                        break;
+                    }
+                }
+
+                start[0] += inc[0];
+                start[1] += inc[1];
+            }
+
+            if (pieces.Count == 1)
+            {
+                pieces[0].PinnedDir = dir;
+            }
+        }
+
+        public static bool SetSavingSquares(int[] start, int[] inc, string color, ref Board board)
+        {
+            start[0] += inc[0];
+            start[1] += inc[1];
+            bool canSave = false;
+
+            while (IsInBoard(start[0], start[1]))
+            {
+                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
+
+                if (square.Piece != null)
+                {
+                    break;
+                }
+
+                int pawnInc = color == "white" ? -1 : 1;
+
+                if (IsInBoard(start[0] + pawnInc, start[1]))
+                {
+                    BoardSquare pawnSquare = board.Rows[start[0] + pawnInc].Squares[start[1]];
+                    if (
+                        pawnSquare.Piece != null
+                        && pawnSquare.Piece is Pawn pawn
+                        && pawn.Color != color
+                    )
+                    {
+                        canSave = true;
+                        square.CheckBlockingColor = color == "white" ? "black" : "white";
+                    }
+                }
+
+                if (IsInBoard(start[0] + (2 * pawnInc), start[1]))
+                {
+                    BoardSquare pawnSquare = board.Rows[start[0] + (2 * pawnInc)].Squares[start[1]];
+                    if (
+                        pawnSquare.Piece != null
+                        && pawnSquare.Piece is Pawn pawn
+                        && !pawn.HasMoved
+                        && pawn.Color != color
+                    )
+                    {
+                        canSave = true;
+                        square.CheckBlockingColor = color == "white" ? "black" : "white";
+                    }
+                }
+
+                if (GetEnemyPressure(color, square) > 0)
+                {
+                    canSave = true;
+                    square.CheckBlockingColor = color == "white" ? "black" : "white";
+                }
+
+                start[0] += inc[0];
+                start[1] += inc[1];
+            }
+
+            return canSave;
+        }
+
+        private static int GetEnemyPressure(string color, BoardSquare square)
+        {
+            if (color == "white")
+            {
+                return square.BlackPressure;
+            }
+            else
+            {
+                return square.WhitePressure;
+            }
         }
     }
 }

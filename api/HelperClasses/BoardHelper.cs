@@ -106,9 +106,16 @@ namespace api.helperclasses
                     cssClass += " selected";
                 }
 
-                if (square.Piece is King king && king.InCheck)
+                if (square.Piece is King king)
                 {
-                    cssClass += " inCheck";
+                    if (king.InCheckMate)
+                    {
+                        cssClass += " inCheckMate";
+                    }
+                    else if (king.InCheck)
+                    {
+                        cssClass += " inCheck";
+                    }
                 }
             }
 

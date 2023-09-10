@@ -6,38 +6,59 @@ namespace api.helperclasses
 {
     public class CheckTracker
     {
-        public King? BlackKing { get; set; }
-        public King? WhiteKing { get; set; }
-        public int[] WhiteKingCoords { get; set; } = new int[2];
-        public int[] BlackKingCoords { get; set; } = new int[2];
-        public List<IPiece> BlackCheckers { get; set; } = new List<IPiece>();
-        public List<IPiece> WhiteCheckers { get; set; } = new List<IPiece>();
+        public BoardSquare? WhiteKing { get; set; } = null;
+        public BoardSquare? BlackKing { get; set; } = null;
         public List<BoardSquare> PinPieces { get; set; } = new List<BoardSquare>();
+        public bool HasWhiteSavingSquares { get; set; } = false;
+        public bool HasBlackSavingSquares { get; set; } = false;
 
-        public void SetKing(King king, int[] loc)
+        public void SetKing(BoardSquare square)
         {
-            if (king.Color == "black")
+            if (square.Piece != null && square.Piece is King king)
             {
-                BlackKing = king;
-                BlackKingCoords = loc;
-            }
-            else
-            {
-                WhiteKing = king;
-                WhiteKingCoords = loc;
+                if (king.Color == "black")
+                {
+                    BlackKing = square;
+                }
+                else
+                {
+                    WhiteKing = square;
+                }
             }
         }
 
-        public void AddChecker(IPiece checker)
+        public BoardSquare? GetKing(string color)
         {
-            if (checker.Color == "black")
+            return color == "white" ? WhiteKing : BlackKing;
+        }
+
+        public void SetHasSavingSquares(string color, bool hasSavingSquares)
+        {
+            if (color == "white")
             {
-                BlackCheckers.Add(checker);
+                HasWhiteSavingSquares = hasSavingSquares;
             }
             else
             {
-                WhiteCheckers.Add(checker);
+                HasBlackSavingSquares = hasSavingSquares;
             }
+        }
+
+        public bool IsInCheck()
+        {
+            return IsKingInCheck("white") || IsKingInCheck("black");
+        }
+
+        private bool IsKingInCheck(string color)
+        {
+            BoardSquare? square = GetKing(color);
+
+            if (square == null || square.Piece == null || square.Piece is not King king)
+            {
+                return false;
+            }
+
+            return king.InCheck;
         }
     }
 }
