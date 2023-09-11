@@ -69,8 +69,7 @@ namespace api.repository
                 _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
                 _cache.Remove($"Moves:{gameID}");
                 _cache.Remove($"SelectedSquare:{gameID}");
-                string nextColor = color == "white" ? "black" : "white";
-                _cache.Set($"Check", check);
+                _cache.Set($"Check:{gameID}", check);
                 clickedSquare = null;
             }
             else if (
@@ -81,7 +80,7 @@ namespace api.repository
             }
             else
             {
-                check = _cache.Get<bool>($"Check");
+                check = _cache.Get<bool>($"Check:{gameID}");
                 moves = MoveHelper.GetMovesFromPiece(board, clickedSquare, check);
                 _cache.Set($"Moves:{gameID}", moves);
                 _cache.Set($"SelectedSquare:{gameID}", clickedSquare);

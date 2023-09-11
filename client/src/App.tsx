@@ -10,8 +10,13 @@ function App() {
   const [blackDisplay, setBlackDisplay] = useState<boolean>(false);
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameID, setGameID] = useState<number>(-1);
+  const [gameOver, setGameOver] = useState<boolean>(false);
 
   function BoardSquareClick(col: number, row: number) {
+    if(gameOver) {
+      return;
+    }
+
     document.getElementById("Root")?.classList.add("loading");
     
     api.click(gameID, col, row).then((board) => {
@@ -20,7 +25,7 @@ function App() {
     });
   }
 
-  function LoadInitialBoard() {
+  function LoadBoard() {
     
     setTimeout(() => {
       api.startGame().then((gameStart) => {
@@ -35,13 +40,14 @@ function App() {
   }
 
   useEffect(() => {
-    LoadInitialBoard();
+    LoadBoard();
   }, []);
 
   return (
     <>
+      <button onClick={() => {LoadBoard()}} id="ResetButton">Reset Game</button>
       <div className="pieceDisplay" style={{display: whiteDisplay ? "block" : "none"}} id="WhiteDisplay"></div>
-      <Board board={board} clickFunc={BoardSquareClick} />
+      <Board board={board} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
       <div className="pieceDisplay" style={{display: blackDisplay ? "block" : "none"}} id="BlackDisplay"></div>
     </>
   );

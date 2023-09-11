@@ -6,6 +6,23 @@
   align-items: center;
 }
 
+#ResetButton {
+  background-color: #75A3D1;
+  color: white;
+  position: absolute;
+  bottom: 2vh;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 25px;
+  cursor: pointer;
+  transition: .2s ease background-color;
+  font-size: 20px;
+}
+
+#ResetButton:hover, #ResetButton:focus {
+  background-color: #6699CC;
+}
+
 .GameBoard {
   display: grid;
   width: min(80vh, 800px);
