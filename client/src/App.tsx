@@ -3,7 +3,11 @@ import { BoardDisplay, GeneratedAPI } from './GeneratedAPI.ts';
 import Board from './components/Board.tsx';
 import './App.css';
 
-const api = new GeneratedAPI("http://localhost:5000");
+let api = new GeneratedAPI("");
+
+if(window.location.href.includes("localhost")) {
+  api = new GeneratedAPI("http://localhost:5000");
+}
 
 function App() {
   const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
