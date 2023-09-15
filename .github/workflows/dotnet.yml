@@ -28,3 +28,53 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v3
+        with:
+          name: package
+
+      - name: Display files in working directory
+        run: ls
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{secrets.API_KEY}}
+          known_hosts: unnecessary
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{secrets.API_HOST}}  >> ~/.ssh/known_hosts
+
+      - name: Transfer build artifacts to DO Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{secrets.API_HOST}}
+          username:  ${{secrets.API_USERNAME}}
+          key: ${{secrets.API_KEY}}
+          source: API.tar.gz
+          target: /var/www/temp/
+      
+      - name: Deploy application
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.API_HOST}}
+          username:  ${{secrets.API_USERNAME}}
+          key: ${{secrets.API_KEY}}
+          script: |
+            sudo systemctl stop chessapi.service
+            cd ..
+            cd /var/www/
+            rm -rf chess.api.parker-stovall.com
+            mkdir chess.api.parker-stovall.com
+            cd /var/www/temp/
+            tar -xvf API.tar.gz -C /var/www/chess.api.parker-stovall.com
+            cd /var/www/chess.api.parker-stovall.com/
+            mv net7.0/* .
+            sudo systemctl restart chessapi.service
+            cd /var/www/temp/
+            rm -rf API.tar.gz
