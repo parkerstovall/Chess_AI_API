@@ -63,7 +63,9 @@ jobs:
             cd /var/www/temp/
             tar -xvf client.tar.gz -C /var/www/chess.parker-stovall.com/html
             cd /var/www/chess.parker-stovall.com/html
+            ls
             mv client/* .
+            ls
             rm -rf node_modules
             npm install
             npm run build
