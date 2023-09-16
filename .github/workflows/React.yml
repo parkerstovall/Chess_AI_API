@@ -62,7 +62,7 @@ jobs:
             mkdir /var/www/chess.parker-stovall.com/html        
             cd /var/www/temp/
             tar -xvf client.tar.gz -C /var/www/chess.parker-stovall.com/html
-            cd /var/www/var/www/chess.parker-stovall.com/html
+            cd /var/www/chess.parker-stovall.com/html
             mv client/* .
             rm -rf node_modules
             npm install
