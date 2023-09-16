@@ -34,7 +34,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
     
     - name: Archive build artifacts
-      run: cd /home/runner/work/ChessAI_WebAPI/ChessAI_WebAPI/api/bin/Release/ && tar -czvf API.tar.gz net7.0
+      run: cd /home/runner/work/ChessAI_WebAPI/api/bin/Release/ && tar -czvf API.tar.gz net7.0
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
