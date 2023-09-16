@@ -35,11 +35,4 @@ public class BoardController : ControllerBase
     {
         return _repo.HandleClick(gameID, row, col);
     }
-
-    [HttpGet("test")]
-    [SwaggerOperation(Summary = "test", Description = "Returns 'test'.")]
-    public string Test()
-    {
-        return "test";
-    }
 }

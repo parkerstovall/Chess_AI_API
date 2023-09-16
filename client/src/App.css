@@ -7,7 +7,7 @@
 }
 
 #ResetButton {
-  background-color: #75A3D1;
+  background-color: yellow /*#75A3D1*/;
   color: white;
   position: absolute;
   bottom: 2vh;
