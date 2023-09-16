@@ -14,13 +14,13 @@ jobs:
       - run: rm -rf node_modules
 
       - name: Archive build artifacts
-        run: cd /home/runner/work/ChessAI_WebAPI/ChessAI_WebAPI/ && tar -czvf Client.tar.gz Client
+        run: cd /home/runner/work/ChessAI_WebAPI/ChessAI_WebAPI/ && tar -czvf client.tar.gz client
 
       - name: Upload build artifacts for deployment
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: /home/runner/work/Convisi/Convisi/Client.tar.gz
+          path: /home/runner/work/ChessAI_WebAPI/ChessAI_WebAPI/client.tar.gz
 
   deploy:
     name: Deploy
@@ -47,7 +47,7 @@ jobs:
           host: ${{secrets.API_HOST}}
           username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
-          source: Client.tar.gz
+          source: client.tar.gz
           target: /var/www/temp/
       
       - name: Deploy application
@@ -61,7 +61,7 @@ jobs:
             rm -rf /var/www/chess.parker-stovall.com/html
             mkdir /var/www/chess.parker-stovall.com/html        
             cd /var/www/temp/
-            tar -xvf Client.tar.gz -C /home/Chess
+            tar -xvf client.tar.gz -C /var/www/chess.parker-stovall.com/html
             cd /var/www/var/www/chess.parker-stovall.com/html
             mv client/* .
             rm -rf node_modules
@@ -69,4 +69,4 @@ jobs:
             npm run build
             pm2 start "npm run start" --name "ChessAI_WebAPI_Client"
             cd /var/www/temp/
-            rm -rf Client.tar.gz
+            rm -rf client.tar.gz
