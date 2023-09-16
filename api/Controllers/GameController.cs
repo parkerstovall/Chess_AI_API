@@ -36,7 +36,7 @@ public class BoardController : ControllerBase
         return _repo.HandleClick(gameID, row, col);
     }
 
-    [HttpPost("test")]
+    [HttpGet("test")]
     [SwaggerOperation(Summary = "test", Description = "Returns 'test'.")]
     public string Test()
     {
