@@ -57,16 +57,14 @@ jobs:
           username:  ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           script: |
-            pm2 kill
             rm -rf /var/www/chess.parker-stovall.com/html
             mkdir /var/www/chess.parker-stovall.com/html        
             cd /var/www/temp/
             tar -xvf client.tar.gz -C /var/www/chess.parker-stovall.com/html
             cd /var/www/chess.parker-stovall.com/html
-            mv client/* .
+            mv build/* .
             rm -rf node_modules
             npm install
             npm run build
-            pm2 start "npm run start" --name "ChessAI_WebAPI_Client"
             cd /var/www/temp/
             rm -rf client.tar.gz
