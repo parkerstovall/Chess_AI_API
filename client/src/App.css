@@ -17,7 +17,7 @@
   cursor: pointer;
   transition: .2s ease background-color;
   font-size: 20px;
-} 
+}
 
 #ResetButton:hover, #ResetButton:focus {
   background-color: #6699CC;
