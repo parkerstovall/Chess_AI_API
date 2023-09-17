@@ -40,7 +40,7 @@ function App() {
       }).catch((err) => { 
         console.error("Failed to communicate with server", err);
       });
-    }, 1000);
+    }, 250);
   }
 
   function StartPing(lGameID : string) {
