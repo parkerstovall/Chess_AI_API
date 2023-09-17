@@ -42,6 +42,7 @@ function App() {
   }
 
   useEffect(() => {
+    document.title = "Chess";
     LoadBoard();
   }, []);
 
