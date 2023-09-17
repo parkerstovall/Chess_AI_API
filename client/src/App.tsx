@@ -3,7 +3,13 @@ import { BoardDisplay, GeneratedAPI } from './GeneratedAPI.ts';
 import Board from './components/Board.tsx';
 import './App.css';
 
-const api = new GeneratedAPI("");
+
+
+let api = new GeneratedAPI("");
+
+if(window.location.href.includes("localhost")) {
+  api = new GeneratedAPI("//localhost:5000");
+}
 
 function App() {
   const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
@@ -45,10 +51,8 @@ function App() {
 
   return (
     <>
-      <button onClick={() => {LoadBoard()}} id="ResetButton">Reset Game</button>
-      <div className="pieceDisplay" style={{display: whiteDisplay ? "block" : "none"}} id="WhiteDisplay"></div>
       <Board board={board} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
-      <div className="pieceDisplay" style={{display: blackDisplay ? "block" : "none"}} id="BlackDisplay"></div>
+      <button onClick={() => {LoadBoard()}} id="ResetButton">Reset Game</button>
     </>
   );
 }

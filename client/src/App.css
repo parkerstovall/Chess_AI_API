@@ -2,15 +2,15 @@
   height: 100vh;
   width: 100vw;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
+  flex-direction: column;
+  gap: 25px;
 }
 
 #ResetButton {
-  background-color: yellow /*#75A3D1*/;
+  background-color: #75A3D1;
   color: white;
-  position: absolute;
-  bottom: 2vh;
   border: none;
   border-radius: 8px;
   padding: 10px 25px;
@@ -25,9 +25,12 @@
 
 .GameBoard {
   display: grid;
-  width: min(80vh, 800px);
+  width: 80vw;
+  height: 80vw;
+  width: min(min(80vh, 80vw), 800px);
+  height: min(min(80vh, 80vw), 800px);
   display: grid;
-  grid-template: repeat(8, min(10vh, 100px)) / repeat(8, min(10vh, 100px));
+  grid-template: repeat(8, min(min(10vh, 10vw), 100px)) / repeat(8, min(min(10vh, 10vw), 100px));
   border: .2vh solid black;
 }
 
