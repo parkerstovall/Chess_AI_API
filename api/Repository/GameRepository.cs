@@ -16,22 +16,13 @@ namespace api.repository
 
         public GameStart StartGame()
         {
-            int gameID = -1;
+            Guid gameID = Guid.NewGuid();
+            Board board = BoardHelper.GetNewBoard();
 
-            if (_cache.TryGetValue("OpenGames", out List<int>? openGames))
-            {
-                gameID = openGames == null ? 0 : openGames.Count;
-            }
-            else
-            {
-                openGames = new();
-            }
-
-            openGames?.Add(gameID);
-
+            List<OpenGame> openGames = _cache.Get<List<OpenGame>>("OpenGames") ?? new();
+            openGames.Add(new OpenGame { GameID = gameID, LastPing = DateTime.Now });
             _cache.Set("OpenGames", openGames);
 
-            Board board = BoardHelper.GetNewBoard();
             _cache.Set($"Board:{gameID}", board);
             _cache.Set($"Turn:{gameID}", "white");
 
@@ -42,7 +33,7 @@ namespace api.repository
             };
         }
 
-        public BoardDisplay HandleClick(int gameID, int row, int col)
+        public BoardDisplay HandleClick(Guid gameID, int row, int col)
         {
             Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
             string? color = _cache.Get<string>($"Turn:{gameID}");
@@ -87,6 +78,17 @@ namespace api.repository
             }
 
             return BoardHelper.GetBoardForDisplay(board, moves, clickedSquare);
+        }
+
+        public void Ping(Guid gameID)
+        {
+            List<OpenGame> openGames = _cache.Get<List<OpenGame>>("OpenGames") ?? new();
+            OpenGame? game = openGames.FirstOrDefault(g => g.GameID == gameID);
+            if (game is not null)
+            {
+                game.LastPing = DateTime.Now;
+                _cache.Set("OpenGames", openGames);
+            }
         }
     }
 }

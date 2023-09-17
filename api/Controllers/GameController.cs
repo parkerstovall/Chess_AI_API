@@ -31,8 +31,18 @@ public class BoardController : ControllerBase
         Summary = "HandlesClick",
         Description = "Handles board click and moves piece if applicable, returns board."
     )]
-    public BoardDisplay HandleClick(int gameID, [FromQuery] int row, [FromQuery] int col)
+    public BoardDisplay HandleClick(Guid gameID, [FromQuery] int row, [FromQuery] int col)
     {
         return _repo.HandleClick(gameID, row, col);
+    }
+
+    [HttpPost("{gameID}/ping")]
+    [SwaggerOperation(
+        Summary = "Pings Server to Keep Game Alive",
+        Description = "Pings Server to Keep Game Alive"
+    )]
+    public void Ping(Guid gameID)
+    {
+        _repo.Ping(gameID);
     }
 }

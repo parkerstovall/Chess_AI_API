@@ -8,12 +8,12 @@ import './App.css';
 let api = new GeneratedAPI("");
 
 if(window.location.href.includes("localhost")) {
-  api = new GeneratedAPI("//localhost:5000");
+  api = new GeneratedAPI("//localhost:4000");
 }
 
 function App() {
   const [board, setBoard] = useState<BoardDisplay>();
-  const [gameID, setGameID] = useState<number>(-1);
+  const [gameID, setGameID] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
 
   function BoardSquareClick(col: number, row: number) {
@@ -31,20 +31,36 @@ function App() {
 
   function LoadBoard() {
     
-    setTimeout(() => {
+    const interval = setInterval(() => {
       api.startGame().then((gameStart) => {
+        clearInterval(interval);
         setGameID(gameStart.gameID);
         setBoard(gameStart.board);
+        return gameStart.gameID;
       }).catch((err) => { 
         console.error("Failed to communicate with server", err);
       });
-    }, 100);
+    }, 1000);
+  }
+
+  function StartPing(lGameID : string) {
+    setInterval(() => {
+        api.ping(lGameID).catch((err) => { 
+          console.error("Failed to communicate with server", err);
+        });
+      }, 1000);
   }
 
   useEffect(() => {
     document.title = "Chess";
     LoadBoard();
   }, []);
+
+  useEffect(() => {
+    if(gameID !== "") {
+      StartPing(gameID); 
+    }
+  }, [gameID])
 
   return (
     <>

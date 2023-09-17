@@ -46,8 +46,8 @@
             "required": true,
             "style": "simple",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           },
           {
@@ -89,6 +89,30 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/game/{gameID}/ping": {
+      "post": {
+        "tags": [
+          "Board"
+        ],
+        "parameters": [
+          {
+            "name": "gameID",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -151,8 +175,8 @@
             "$ref": "#/components/schemas/BoardDisplay"
           },
           "gameID": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           }
         },
         "additionalProperties": false
