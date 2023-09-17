@@ -1,5 +1,6 @@
 **/api/obj/
 **/api/bin/
+**/client/build
 **/.vscode/
 .DS_Store
 **/node_modules

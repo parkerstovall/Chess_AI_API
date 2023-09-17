@@ -12,8 +12,6 @@ if(window.location.href.includes("localhost")) {
 }
 
 function App() {
-  const [whiteDisplay, setWhiteDisplay] = useState<boolean>(false);
-  const [blackDisplay, setBlackDisplay] = useState<boolean>(false);
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameID, setGameID] = useState<number>(-1);
   const [gameOver, setGameOver] = useState<boolean>(false);
@@ -35,8 +33,6 @@ function App() {
     
     setTimeout(() => {
       api.startGame().then((gameStart) => {
-        setWhiteDisplay(false);
-        setBlackDisplay(false);
         setGameID(gameStart.gameID);
         setBoard(gameStart.board);
       }).catch((err) => { 
