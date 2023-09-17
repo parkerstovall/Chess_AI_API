@@ -93,7 +93,7 @@ namespace api.pieces
                         {
                             col += colInc[i];
                             row += rowInc[i];
-                            if (col >= 0 && row >= 0 && col < 8 && row < 8)
+                            if (PieceHelper.IsInBoard(col, row))
                             {
                                 moves.Add(new int[] { col, row });
                             }

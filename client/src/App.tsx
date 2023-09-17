@@ -44,8 +44,12 @@ function App() {
   }
 
   function StartPing(lGameID : string) {
-    setInterval(() => {
-        api.ping(lGameID).catch((err) => { 
+    const interval = setInterval(() => {
+        api.ping(lGameID).then((isValid) => {
+          if(!isValid) {
+            clearInterval(interval);
+          }
+        }).catch((err) => { 
           console.error("Failed to communicate with server", err);
         });
       }, 1000);

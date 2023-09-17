@@ -166,13 +166,33 @@ namespace api.helperclasses
         private static CheckTracker RefreshBoard(ref Board board)
         {
             CheckTracker tracker = new();
+            BoardSquare? checkSquare = null;
+            int[] checkSavingSquareLoc = new int[] { -1, -1 };
 
             foreach (BoardRow row in board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    AddBoardPressure(square, ref board, ref tracker);
+                    AddBoardPressure(
+                        square,
+                        ref board,
+                        ref tracker,
+                        ref checkSquare,
+                        ref checkSavingSquareLoc
+                    );
                 }
+            }
+
+            if (checkSquare != null && checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
+            {
+                tracker.SetHasSavingSquares(
+                    checkSavingSquaresPiece.Color == "white" ? "black" : "white",
+                    checkSavingSquaresPiece.HasSavingSquares(
+                        new int[] { checkSquare.Coords[0], checkSquare.Coords[1] },
+                        checkSavingSquareLoc,
+                        ref board
+                    )
+                );
             }
 
             return tracker;
@@ -181,7 +201,9 @@ namespace api.helperclasses
         private static void AddBoardPressure(
             BoardSquare square,
             ref Board board,
-            ref CheckTracker tracker
+            ref CheckTracker tracker,
+            ref BoardSquare? checkSquare,
+            ref int[] kingLoc
         )
         {
             if (square.Piece == null)
@@ -203,28 +225,23 @@ namespace api.helperclasses
                     if (square.Piece.Color != king.Color)
                     {
                         if (
-                            square.Piece is IPieceCanPin piece
-                            && tracker.GetKing(piece.Color) == null
+                            square.Piece is IPieceCanPin pinPiece
+                            && tracker.GetKing(pinPiece.Color) == null
                         )
                         {
-                            tracker.SetHasSavingSquares(
-                                king.Color,
-                                piece.HasSavingSquares(
-                                    new int[] { square.Coords[0], square.Coords[1] },
-                                    pMove,
-                                    ref board
-                                )
-                            );
+                            checkSquare = square;
+                            kingLoc = pMove;
                         }
                         else
                         {
+                            checkSquare = null;
+                            kingLoc = new int[] { -1, -1 };
                             tracker.SetHasSavingSquares(king.Color, false);
                         }
 
+                        tracker.SetKing(pSquare);
                         king.InCheck = true;
                     }
-
-                    tracker.SetKing(pSquare);
                 }
 
                 if (square.Piece.Color == "white")

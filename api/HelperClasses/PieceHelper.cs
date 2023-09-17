@@ -208,15 +208,13 @@ namespace api.helperclasses
 
         public static bool SetSavingSquares(int[] start, int[] inc, string color, ref Board board)
         {
-            start[0] += inc[0];
-            start[1] += inc[1];
             bool canSave = false;
 
             while (IsInBoard(start[0], start[1]))
             {
                 BoardSquare square = board.Rows[start[0]].Squares[start[1]];
 
-                if (square.Piece != null)
+                if (square.Piece != null && square.Piece is King)
                 {
                     break;
                 }

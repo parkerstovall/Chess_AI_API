@@ -106,7 +106,7 @@ export class GeneratedAPI {
     /**
      * @return Success
      */
-    ping(gameID: string): Promise<void> {
+    ping(gameID: string): Promise<boolean> {
         let url_ = this.baseUrl + "/api/v1/game/{gameID}/ping";
         if (gameID === undefined || gameID === null)
             throw new Error("The parameter 'gameID' must be defined.");
@@ -116,6 +116,7 @@ export class GeneratedAPI {
         let options_: RequestInit = {
             method: "POST",
             headers: {
+                "Accept": "text/plain"
             }
         };
 
@@ -124,19 +125,21 @@ export class GeneratedAPI {
         });
     }
 
-    protected processPing(response: Response): Promise<void> {
+    protected processPing(response: Response): Promise<boolean> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
-            return;
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as boolean;
+            return result200;
             });
         } else if (status !== 200 && status !== 204) {
             return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<void>(null as any);
+        return Promise.resolve<boolean>(null as any);
     }
 }
 

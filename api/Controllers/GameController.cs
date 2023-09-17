@@ -41,8 +41,8 @@ public class BoardController : ControllerBase
         Summary = "Pings Server to Keep Game Alive",
         Description = "Pings Server to Keep Game Alive"
     )]
-    public void Ping(Guid gameID)
+    public bool Ping(Guid gameID)
     {
-        _repo.Ping(gameID);
+        return _repo.Ping(gameID);
     }
 }

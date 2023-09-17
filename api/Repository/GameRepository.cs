@@ -63,9 +63,7 @@ namespace api.repository
                 _cache.Set($"Check:{gameID}", check);
                 clickedSquare = null;
             }
-            else if (
-                square.Piece == null /*|| square.Piece.Color != color*/
-            )
+            else if (square.Piece == null || square.Piece.Color != color)
             {
                 return BoardHelper.GetBoardForDisplay(board, null, null);
             }
@@ -80,15 +78,19 @@ namespace api.repository
             return BoardHelper.GetBoardForDisplay(board, moves, clickedSquare);
         }
 
-        public void Ping(Guid gameID)
+        public bool Ping(Guid gameID)
         {
             List<OpenGame> openGames = _cache.Get<List<OpenGame>>("OpenGames") ?? new();
             OpenGame? game = openGames.FirstOrDefault(g => g.GameID == gameID);
+
             if (game is not null)
             {
                 game.LastPing = DateTime.Now;
                 _cache.Set("OpenGames", openGames);
+                return true;
             }
+
+            return false;
         }
     }
 }
