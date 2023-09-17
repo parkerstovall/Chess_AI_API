@@ -14,7 +14,7 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/api/bin/Debug/net7.0/ChessAPI.dll",
-            "args": ["--urls", "http://localhost:4000"],
+            "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
             // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser

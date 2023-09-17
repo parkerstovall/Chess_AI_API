@@ -167,19 +167,13 @@ namespace api.helperclasses
         {
             CheckTracker tracker = new();
             BoardSquare? checkSquare = null;
-            int[] checkSavingSquareLoc = new int[] { -1, -1 };
+            int[] kingLoc = new int[] { -1, -1 };
 
             foreach (BoardRow row in board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    AddBoardPressure(
-                        square,
-                        ref board,
-                        ref tracker,
-                        ref checkSquare,
-                        ref checkSavingSquareLoc
-                    );
+                    AddBoardPressure(square, ref board, ref tracker, ref checkSquare, ref kingLoc);
                 }
             }
 
@@ -189,7 +183,7 @@ namespace api.helperclasses
                     checkSavingSquaresPiece.Color == "white" ? "black" : "white",
                     checkSavingSquaresPiece.HasSavingSquares(
                         new int[] { checkSquare.Coords[0], checkSquare.Coords[1] },
-                        checkSavingSquareLoc,
+                        kingLoc,
                         ref board
                     )
                 );
@@ -216,6 +210,11 @@ namespace api.helperclasses
                 tracker.PinPieces.Add(square);
             }
 
+            if (square.Piece is King)
+            {
+                tracker.SetKing(square);
+            }
+
             foreach (int[] pMove in square.Piece.GetPressure(board, square.Coords))
             {
                 BoardSquare pSquare = board.Rows[pMove[0]].Squares[pMove[1]];
@@ -226,7 +225,7 @@ namespace api.helperclasses
                     {
                         if (
                             square.Piece is IPieceCanPin pinPiece
-                            && tracker.GetKing(pinPiece.Color) == null
+                            && tracker.GetKingAttackers(king.Color) == 0
                         )
                         {
                             checkSquare = square;
@@ -239,6 +238,7 @@ namespace api.helperclasses
                             tracker.SetHasSavingSquares(king.Color, false);
                         }
 
+                        tracker.AddAttacker(king.Color);
                         tracker.SetKing(pSquare);
                         king.InCheck = true;
                     }

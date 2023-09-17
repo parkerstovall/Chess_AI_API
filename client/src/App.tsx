@@ -8,7 +8,7 @@ import './App.css';
 let api = new GeneratedAPI("");
 
 if(window.location.href.includes("localhost")) {
-  api = new GeneratedAPI("//localhost:4000");
+  api = new GeneratedAPI("//localhost:5000");
 }
 
 function App() {

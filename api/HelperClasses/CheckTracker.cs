@@ -11,6 +11,8 @@ namespace api.helperclasses
         public List<BoardSquare> PinPieces { get; set; } = new List<BoardSquare>();
         public bool HasWhiteSavingSquares { get; set; } = false;
         public bool HasBlackSavingSquares { get; set; } = false;
+        public int WhiteAttackers { get; set; } = 0;
+        public int BlackAttackers { get; set; } = 0;
 
         public void SetKing(BoardSquare square)
         {
@@ -30,6 +32,23 @@ namespace api.helperclasses
         public BoardSquare? GetKing(string color)
         {
             return color == "white" ? WhiteKing : BlackKing;
+        }
+
+        public int GetKingAttackers(string color)
+        {
+            return color == "white" ? WhiteAttackers : BlackAttackers;
+        }
+
+        public void AddAttacker(string color)
+        {
+            if (color == "white")
+            {
+                WhiteAttackers++;
+            }
+            else
+            {
+                BlackAttackers++;
+            }
         }
 
         public void SetHasSavingSquares(string color, bool hasSavingSquares)
