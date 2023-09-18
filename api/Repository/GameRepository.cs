@@ -75,12 +75,13 @@ namespace api.repository
                 clickedSquare = null;
                 moved = true;
             }
-            else if (
-                square.Piece == null
-                || square.Piece.Color != color
-                || square.Piece.Color != playerColor
+            else if (square.Piece == null
+            //|| square.Piece.Color != color
+            //|| square.Piece.Color != playerColor
             )
             {
+                _cache.Remove($"Moves:{gameID}");
+                _cache.Remove($"SelectedSquare:{gameID}");
                 return new()
                 {
                     Moved = moved,
@@ -111,11 +112,12 @@ namespace api.repository
 
             ChessAI ai = new(checkColor, color == "black");
 
-            Board newBoard = ai.GetMove(board);
+            Board newBoard = ai.GetMove(board, out checkColor);
 
             _cache.Set($"Board:{gameID}", newBoard);
             _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
             _cache.Set($"Board:{gameID}:compTurn", false);
+            _cache.Set($"Check:{gameID}", checkColor);
             return BoardHelper.GetBoardForDisplay(newBoard, null, null);
         }
 

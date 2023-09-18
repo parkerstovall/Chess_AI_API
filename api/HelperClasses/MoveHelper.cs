@@ -111,6 +111,8 @@ namespace api.helperclasses
                     square.EnPassantColor = "";
                     square.BlackPressure = 0;
                     square.WhitePressure = 0;
+                    square.WhiteKingPressure = false;
+                    square.BlackKingPressure = false;
 
                     if (square.Piece != null)
                     {
@@ -248,10 +250,20 @@ namespace api.helperclasses
 
                 if (square.Piece.Color == "white")
                 {
+                    if (square.Piece is King)
+                    {
+                        pSquare.WhiteKingPressure = true;
+                    }
+
                     pSquare.WhitePressure++;
                 }
                 else
                 {
+                    if (square.Piece is King)
+                    {
+                        pSquare.BlackKingPressure = true;
+                    }
+
                     pSquare.BlackPressure++;
                 }
             }

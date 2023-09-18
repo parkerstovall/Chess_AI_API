@@ -9,6 +9,8 @@ namespace api.models.api
         public string CheckBlockingColor { get; set; } = "";
         public int BlackPressure { get; set; }
         public int WhitePressure { get; set; }
+        public bool WhiteKingPressure { get; set; }
+        public bool BlackKingPressure { get; set; }
         public string EnPassantColor = "";
 
         public BoardSquare Copy()

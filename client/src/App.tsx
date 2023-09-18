@@ -29,14 +29,13 @@ function App() {
       document.getElementById("Root")?.classList.remove("loading");
       setBoard(clickReturn.board);
       
-      if(clickReturn.moved) {
+      if(clickReturn.moved) {/*
         setIsCompTurn(true);
-        
         api.compMove(gameID).then((board) => {
           setBoard(board);
           setIsCompTurn(false);
         });
-      }
+      */}
 
     });
   }
@@ -52,11 +51,12 @@ function App() {
         setBoard(gameStart.board);
 
         if(!isWhite) {
-          
+          /*
           api.compMove(gameStart.gameID).then((board) => {
             setBoard(board);
             setIsCompTurn(false);
           });
+          */
         }
 
       }).catch((err) => { 

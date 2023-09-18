@@ -106,7 +106,7 @@ namespace api.pieces
 
         private void CheckCastle(Board board, int[] coords, ref List<int[]> moves)
         {
-            if (this.HasMoved)
+            if (this.HasMoved || this.InCheck)
             {
                 return;
             }

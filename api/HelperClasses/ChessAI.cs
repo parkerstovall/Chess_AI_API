@@ -25,7 +25,7 @@ namespace api.helperclasses
             }
         }
 
-        public Board GetMove(Board board)
+        public Board GetMove(Board board, out string checkColor)
         {
             int score = int.MinValue;
             int[] move = new int[4];
@@ -77,7 +77,7 @@ namespace api.helperclasses
                 }
             }
 
-            MoveHelper.MovePiece(
+            checkColor = MoveHelper.MovePiece(
                 new int[] { move[0], move[1] },
                 new int[] { move[2], move[3] },
                 ref board

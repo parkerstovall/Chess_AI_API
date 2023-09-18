@@ -152,19 +152,19 @@ namespace api.helperclasses
                     inc[0] = -1;
                     inc[1] = 1;
                     break;
-                case Direction.FromTopToBottom:
+                case Direction.FromLeftToRight:
                     inc[0] = 0;
                     inc[1] = 1;
                     break;
-                case Direction.FromBottomToTop:
+                case Direction.FromRightToLeft:
                     inc[0] = 0;
                     inc[1] = -1;
                     break;
-                case Direction.FromLeftToRight:
+                case Direction.FromTopToBottom:
                     inc[0] = 1;
                     inc[1] = 0;
                     break;
-                case Direction.FromRightToLeft:
+                case Direction.FromBottomToTop:
                     inc[0] = -1;
                     inc[1] = 0;
                     break;
@@ -250,7 +250,12 @@ namespace api.helperclasses
                     }
                 }
 
-                if (GetEnemyPressure(color, square) > 0)
+                if (GetEnemyPressure(color, square) > 1)
+                {
+                    canSave = true;
+                    square.CheckBlockingColor = color == "white" ? "black" : "white";
+                }
+                else if (GetEnemyPressure(color, square) == 1 && !GetKingPressure(color, square))
                 {
                     canSave = true;
                     square.CheckBlockingColor = color == "white" ? "black" : "white";
@@ -272,6 +277,18 @@ namespace api.helperclasses
             else
             {
                 return square.WhitePressure;
+            }
+        }
+
+        private static bool GetKingPressure(string color, BoardSquare square)
+        {
+            if (color == "white")
+            {
+                return square.BlackKingPressure;
+            }
+            else
+            {
+                return square.WhiteKingPressure;
             }
         }
     }
