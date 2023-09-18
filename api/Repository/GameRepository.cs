@@ -75,9 +75,10 @@ namespace api.repository
                 clickedSquare = null;
                 moved = true;
             }
-            else if (square.Piece == null
-            //|| square.Piece.Color != color
-            //|| square.Piece.Color != playerColor
+            else if (
+                square.Piece == null
+                || square.Piece.Color != color
+                || square.Piece.Color != playerColor
             )
             {
                 _cache.Remove($"Moves:{gameID}");
