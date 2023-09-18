@@ -152,6 +152,14 @@ namespace api.helperclasses
             if (to.Piece is IPieceHasMoved pieceHasMoved)
             {
                 pieceHasMoved.HasMoved = true;
+
+                if (pieceHasMoved is Pawn pawn)
+                {
+                    if (to.Coords[0] == 0 || to.Coords[0] == 7)
+                    {
+                        to.Piece = new Queen(pawn.Color);
+                    }
+                }
             }
 
             if (Math.Abs(from.Coords[1] - to.Coords[1]) > 1 && to.Piece is King)
