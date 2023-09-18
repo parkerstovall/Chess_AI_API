@@ -10,6 +10,16 @@
         "tags": [
           "Board"
         ],
+        "parameters": [
+          {
+            "name": "isWhite",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -27,6 +37,47 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GameStart"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/game/{gameID}/compMove": {
+      "get": {
+        "tags": [
+          "Board"
+        ],
+        "parameters": [
+          {
+            "name": "gameID",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoardDisplay"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoardDisplay"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               }
             }
@@ -75,17 +126,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/BoardDisplay"
+                  "$ref": "#/components/schemas/ClickReturn"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BoardDisplay"
+                  "$ref": "#/components/schemas/ClickReturn"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/BoardDisplay"
+                  "$ref": "#/components/schemas/ClickReturn"
                 }
               }
             }
@@ -177,6 +228,22 @@
           "cssClass": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClickReturn": {
+        "required": [
+          "board",
+          "moved"
+        ],
+        "type": "object",
+        "properties": {
+          "board": {
+            "$ref": "#/components/schemas/BoardDisplay"
+          },
+          "moved": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

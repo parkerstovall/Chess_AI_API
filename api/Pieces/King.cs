@@ -13,6 +13,33 @@ namespace api.pieces
         public bool InCheckMate { get; set; } = false;
         public Direction PinnedDir { get; set; } = Direction.None;
 
+        public int[,] WhiteValues { get; } =
+            new int[,]
+            {
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -20, -30, -30, -40, -40, -30, -30, -20 },
+                { -10, -20, -20, -20, -20, -20, -20, -10 },
+                { 20, 20, 0, 0, 0, 0, 20, 20 },
+                { 20, 30, 10, 0, 0, 10, 30, 20 }
+            };
+
+        public int[,] BlackValues { get; } =
+            new int[,]
+            {
+                { 20, 30, 10, 0, 0, 10, 30, 20 },
+                { 20, 20, 0, 0, 0, 0, 20, 20 },
+                { -10, -20, -20, -20, -20, -20, -20, -10 },
+                { -20, -30, -30, -40, -40, -30, -30, -20 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 },
+                { -30, -40, -40, -50, -50, -40, -40, -30 }
+            };
+        public int Value { get; } = 20000;
+
         public King(string Color)
         {
             this.Color = Color;
@@ -135,6 +162,19 @@ namespace api.pieces
             {
                 return square.WhitePressure == 0;
             }
+        }
+
+        public IPiece Copy()
+        {
+            King newPiece =
+                new(this.Color)
+                {
+                    PinnedDir = this.PinnedDir,
+                    InCheck = this.InCheck,
+                    InCheckMate = this.InCheckMate,
+                    HasMoved = this.HasMoved
+                };
+            return newPiece;
         }
     }
 }

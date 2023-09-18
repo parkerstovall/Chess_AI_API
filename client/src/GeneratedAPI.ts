@@ -19,10 +19,15 @@ export class GeneratedAPI {
     }
 
     /**
+     * @param isWhite (optional) 
      * @return Success
      */
-    startGame(): Promise<GameStart> {
-        let url_ = this.baseUrl + "/api/v1/game/startGame";
+    startGame(isWhite: boolean | undefined): Promise<GameStart> {
+        let url_ = this.baseUrl + "/api/v1/game/startGame?";
+        if (isWhite === null)
+            throw new Error("The parameter 'isWhite' cannot be null.");
+        else if (isWhite !== undefined)
+            url_ += "isWhite=" + encodeURIComponent("" + isWhite) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -55,11 +60,50 @@ export class GeneratedAPI {
     }
 
     /**
+     * @return Success
+     */
+    compMove(gameID: string): Promise<BoardDisplay> {
+        let url_ = this.baseUrl + "/api/v1/game/{gameID}/compMove";
+        if (gameID === undefined || gameID === null)
+            throw new Error("The parameter 'gameID' must be defined.");
+        url_ = url_.replace("{gameID}", encodeURIComponent("" + gameID));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCompMove(_response);
+        });
+    }
+
+    protected processCompMove(response: Response): Promise<BoardDisplay> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardDisplay;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<BoardDisplay>(null as any);
+    }
+
+    /**
      * @param row (optional) 
      * @param col (optional) 
      * @return Success
      */
-    click(gameID: string, row: number | undefined, col: number | undefined): Promise<BoardDisplay> {
+    click(gameID: string, row: number | undefined, col: number | undefined): Promise<ClickReturn> {
         let url_ = this.baseUrl + "/api/v1/game/{gameID}/click?";
         if (gameID === undefined || gameID === null)
             throw new Error("The parameter 'gameID' must be defined.");
@@ -86,13 +130,13 @@ export class GeneratedAPI {
         });
     }
 
-    protected processClick(response: Response): Promise<BoardDisplay> {
+    protected processClick(response: Response): Promise<ClickReturn> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as BoardDisplay;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as ClickReturn;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -100,7 +144,7 @@ export class GeneratedAPI {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<BoardDisplay>(null as any);
+        return Promise.resolve<ClickReturn>(null as any);
     }
 
     /**
@@ -155,6 +199,11 @@ export interface BoardDisplaySquare {
     col?: number;
     row?: number;
     cssClass?: string | undefined;
+}
+
+export interface ClickReturn {
+    board: BoardDisplay;
+    moved: boolean;
 }
 
 export interface GameStart {

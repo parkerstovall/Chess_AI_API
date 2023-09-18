@@ -4,13 +4,14 @@ import { BoardDisplay } from '../GeneratedAPI.ts';
 
 interface BoardProps {
     board: BoardDisplay | undefined;
+    isWhite: boolean;
     clickFunc: Function;
     setGameOver: Function;
 }
 
 export default function Board(props: BoardProps)  {
 
-    const { board, clickFunc, setGameOver } = props;
+    const { board, isWhite, clickFunc, setGameOver } = props;
     
     useEffect(() => {
         let breakLoop = false;
@@ -36,8 +37,13 @@ export default function Board(props: BoardProps)  {
         }
     }, [board, setGameOver]);
 
+    let className = 'GameBoard';
+    if(!isWhite) {
+        className += ' rotated';
+    }
+
     return (
-        <div id="GameBoard" className="GameBoard">
+        <div id="GameBoard" className={className}>
             {
                 board?.rows?.map((row) => {
                     return row.squares?.map((square) => {

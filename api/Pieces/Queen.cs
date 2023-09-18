@@ -1,4 +1,5 @@
-﻿using api.helperclasses;
+﻿using System.Security.Cryptography.X509Certificates;
+using api.helperclasses;
 using api.models.api;
 using api.pieces.interfaces;
 
@@ -8,6 +9,32 @@ namespace api.pieces
     {
         public string Color { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
+        public int[,] WhiteValues { get; } =
+            new int[,]
+            {
+                { -20, -10, -10, -5, -5, -10, -10, -20 },
+                { -10, 0, 0, 0, 0, 0, 0, -10 },
+                { -10, 0, 5, 5, 5, 5, 0, -10 },
+                { -5, 0, 5, 5, 5, 5, 0, -5 },
+                { 0, 0, 5, 5, 5, 5, 0, -5 },
+                { -10, 5, 5, 5, 5, 5, 0, -10 },
+                { -10, 0, 5, 0, 0, 0, 0, -10 },
+                { -20, -10, -10, -5, -5, -10, -10, -20 }
+            };
+
+        public int[,] BlackValues { get; } =
+            new int[,]
+            {
+                { -20, -10, -10, -5, -5, -10, -10, -20 },
+                { -10, 0, 5, 0, 0, 0, 0, -10 },
+                { -10, 5, 5, 5, 5, 5, 0, -10 },
+                { 0, 0, 5, 5, 5, 5, 0, -5 },
+                { -5, 0, 5, 5, 5, 5, 0, -5 },
+                { -10, 0, 5, 5, 5, 5, 0, -10 },
+                { -10, 0, 0, 0, 0, 0, 0, -10 },
+                { -20, -10, -10, -5, -5, -10, -10, -20 }
+            };
+        public int Value { get; } = 900;
 
         public Queen(string Color)
         {
@@ -156,6 +183,12 @@ namespace api.pieces
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
             return PieceHelper.SetSavingSquares(start, inc, this.Color, ref board);
+        }
+
+        public IPiece Copy()
+        {
+            Queen newPiece = new(this.Color) { PinnedDir = this.PinnedDir };
+            return newPiece;
         }
 
         public override string ToString()

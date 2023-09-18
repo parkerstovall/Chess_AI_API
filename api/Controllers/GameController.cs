@@ -21,9 +21,19 @@ public class BoardController : ControllerBase
         Summary = "Start new game",
         Description = "Builds new board and returns game ID"
     )]
-    public GameStart StartGame()
+    public GameStart StartGame(bool isWhite)
     {
-        return _repo.StartGame();
+        return _repo.StartGame(isWhite);
+    }
+
+    [HttpGet("{gameID}/compMove")]
+    [SwaggerOperation(
+        Summary = "Gets computer move",
+        Description = "Runs a MinMax algorithm on the board and returns the best move"
+    )]
+    public BoardDisplay CompMove(Guid gameID)
+    {
+        return _repo.CompMove(gameID);
     }
 
     [HttpPost("{gameID}/click")]
@@ -31,7 +41,7 @@ public class BoardController : ControllerBase
         Summary = "HandlesClick",
         Description = "Handles board click and moves piece if applicable, returns board."
     )]
-    public BoardDisplay HandleClick(Guid gameID, [FromQuery] int row, [FromQuery] int col)
+    public ClickReturn HandleClick(Guid gameID, [FromQuery] int row, [FromQuery] int col)
     {
         return _repo.HandleClick(gameID, row, col);
     }

@@ -63,9 +63,18 @@ namespace api.helperclasses
             }
         }
 
-        public bool IsInCheck()
+        public string CheckColor()
         {
-            return IsKingInCheck("white") || IsKingInCheck("black");
+            if (IsKingInCheck("white"))
+            {
+                return "white";
+            }
+            else if (IsKingInCheck("black"))
+            {
+                return "black";
+            }
+
+            return "";
         }
 
         private bool IsKingInCheck(string color)

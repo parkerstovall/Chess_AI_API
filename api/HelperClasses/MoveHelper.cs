@@ -9,14 +9,16 @@ namespace api.helperclasses
 {
     internal static class MoveHelper
     {
-        internal static List<int[]> GetMovesFromPiece(Board board, int[] clickedSquare, bool check)
+        internal static List<int[]> GetMovesFromPiece(
+            Board board,
+            int[] clickedSquare,
+            string checkColor
+        )
         {
+            BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
             List<int[]> moves =
-                board.Rows[clickedSquare[0]].Squares[clickedSquare[1]].Piece?.GetPaths(
-                    board,
-                    clickedSquare,
-                    check
-                ) ?? new();
+                square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
+                ?? new();
             return moves;
         }
 
@@ -25,16 +27,16 @@ namespace api.helperclasses
             int[] start,
             ref List<int[]> moves,
             ref Board board,
-            out bool check
+            out string checkColor
         )
         {
-            check = false;
+            checkColor = "";
 
             foreach (int[] move in moves)
             {
                 if (move[0] == coords[0] && move[1] == coords[1])
                 {
-                    check = MovePiece(start, move, ref board);
+                    checkColor = MovePiece(start, move, ref board);
                     moves.Clear();
                     return true;
                 }
@@ -43,14 +45,14 @@ namespace api.helperclasses
             return false;
         }
 
-        private static bool MovePiece(int[] start, int[] dest, ref Board board)
+        internal static string MovePiece(int[] start, int[] dest, ref Board board)
         {
             BoardSquare from = board.Rows[start[0]].Squares[start[1]];
             BoardSquare to = board.Rows[dest[0]].Squares[dest[1]];
 
             if (from.Piece == null)
             {
-                return new();
+                return "";
             }
 
             //Attempts EnPassant if valid
@@ -74,7 +76,7 @@ namespace api.helperclasses
             //Check for Checkmate
             CheckCheckmate(tracker, ref board);
 
-            return tracker.IsInCheck();
+            return tracker.CheckColor();
         }
 
         private static void CheckEnPassantCapture(

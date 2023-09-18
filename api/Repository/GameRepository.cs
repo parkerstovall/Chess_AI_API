@@ -14,7 +14,7 @@ namespace api.repository
             _cache = cache;
         }
 
-        public GameStart StartGame()
+        public GameStart StartGame(bool isWhite)
         {
             Guid gameID = Guid.NewGuid();
             Board board = BoardHelper.GetNewBoard();
@@ -25,7 +25,7 @@ namespace api.repository
 
             _cache.Set($"Board:{gameID}", board);
             _cache.Set($"Turn:{gameID}", "white");
-
+            _cache.Set($"PlayerColor:{gameID}", isWhite ? "white" : "black");
             return new GameStart
             {
                 Board = BoardHelper.GetBoardForDisplay(board, null, null),
@@ -33,10 +33,21 @@ namespace api.repository
             };
         }
 
-        public BoardDisplay HandleClick(Guid gameID, int row, int col)
+        public ClickReturn HandleClick(Guid gameID, int row, int col)
         {
             Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
+            bool moved = false;
+            if (_cache.TryGetValue($"Board:{gameID}:compTurn", out bool isCompTurn) && isCompTurn)
+            {
+                return new()
+                {
+                    Moved = moved,
+                    Board = BoardHelper.GetBoardForDisplay(board, null, null)
+                };
+            }
+
             string? color = _cache.Get<string>($"Turn:{gameID}");
+            string? playerColor = _cache.Get<string>($"PlayerColor:{gameID}");
 
             int[]? clickedSquare = new[] { row, col };
 
@@ -53,29 +64,59 @@ namespace api.repository
                     start,
                     ref moves,
                     ref board,
-                    out bool check
+                    out string checkColor
                 )
             )
             {
                 _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
                 _cache.Remove($"Moves:{gameID}");
                 _cache.Remove($"SelectedSquare:{gameID}");
-                _cache.Set($"Check:{gameID}", check);
+                _cache.Set($"Check:{gameID}", checkColor);
                 clickedSquare = null;
+                moved = true;
             }
-            else if (square.Piece == null || square.Piece.Color != color)
+            else if (
+                square.Piece == null
+                || square.Piece.Color != color
+                || square.Piece.Color != playerColor
+            )
             {
-                return BoardHelper.GetBoardForDisplay(board, null, null);
+                return new()
+                {
+                    Moved = moved,
+                    Board = BoardHelper.GetBoardForDisplay(board, null, null)
+                };
             }
             else
             {
-                check = _cache.Get<bool>($"Check:{gameID}");
-                moves = MoveHelper.GetMovesFromPiece(board, clickedSquare, check);
+                checkColor = _cache.Get<string>($"Check:{gameID}") ?? "";
+                moves = MoveHelper.GetMovesFromPiece(board, clickedSquare, checkColor);
                 _cache.Set($"Moves:{gameID}", moves);
                 _cache.Set($"SelectedSquare:{gameID}", clickedSquare);
             }
 
-            return BoardHelper.GetBoardForDisplay(board, moves, clickedSquare);
+            return new()
+            {
+                Moved = moved,
+                Board = BoardHelper.GetBoardForDisplay(board, moves, clickedSquare)
+            };
+        }
+
+        public BoardDisplay CompMove(Guid gameID)
+        {
+            _cache.Set($"Board:{gameID}:compTurn", true);
+            Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
+            string? color = _cache.Get<string>($"Turn:{gameID}");
+            string checkColor = _cache.Get<string>($"Check:{gameID}") ?? "";
+
+            ChessAI ai = new(checkColor, color == "black");
+
+            Board newBoard = ai.GetMove(board);
+
+            _cache.Set($"Board:{gameID}", newBoard);
+            _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
+            _cache.Set($"Board:{gameID}:compTurn", false);
+            return BoardHelper.GetBoardForDisplay(newBoard, null, null);
         }
 
         public bool Ping(Guid gameID)

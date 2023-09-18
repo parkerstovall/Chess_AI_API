@@ -6,6 +6,7 @@ import './App.css';
 
 
 let api = new GeneratedAPI("");
+let isWhite = true;
 
 if(window.location.href.includes("localhost")) {
   api = new GeneratedAPI("//localhost:5000");
@@ -15,28 +16,49 @@ function App() {
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameID, setGameID] = useState<string>("");
   const [gameOver, setGameOver] = useState<boolean>(false);
+  const [isCompTurn, setIsCompTurn] = useState<boolean>(false);
 
   function BoardSquareClick(col: number, row: number) {
-    if(gameOver) {
+    if(gameOver || isCompTurn) {
       return;
     }
 
     document.getElementById("Root")?.classList.add("loading");
     
-    api.click(gameID, col, row).then((board) => {
+    api.click(gameID, col, row).then((clickReturn) => {
       document.getElementById("Root")?.classList.remove("loading");
-      setBoard(board);
+      setBoard(clickReturn.board);
+      
+      if(clickReturn.moved) {
+        setIsCompTurn(true);
+        
+        api.compMove(gameID).then((board) => {
+          setBoard(board);
+          setIsCompTurn(false);
+        });
+      }
+
     });
   }
 
   function LoadBoard() {
+
+    isWhite = window.confirm("Play as white?");
     
     const interval = setInterval(() => {
-      api.startGame().then((gameStart) => {
+      api.startGame(isWhite).then((gameStart) => {
         clearInterval(interval);
         setGameID(gameStart.gameID);
         setBoard(gameStart.board);
-        return gameStart.gameID;
+
+        if(!isWhite) {
+          
+          api.compMove(gameStart.gameID).then((board) => {
+            setBoard(board);
+            setIsCompTurn(false);
+          });
+        }
+
       }).catch((err) => { 
         console.error("Failed to communicate with server", err);
       });
@@ -57,6 +79,7 @@ function App() {
 
   useEffect(() => {
     document.title = "Chess";
+
     LoadBoard();
   }, []);
 
@@ -68,7 +91,7 @@ function App() {
 
   return (
     <>
-      <Board board={board} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
+      <Board board={board} isWhite={isWhite} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
       <button onClick={() => {LoadBoard()}} id="ResetButton">Reset Game</button>
     </>
   );

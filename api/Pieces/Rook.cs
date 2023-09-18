@@ -9,6 +9,32 @@ namespace api.pieces
         public string Color { get; set; }
         public bool HasMoved { get; set; } = false;
         public Direction PinnedDir { get; set; } = Direction.None;
+        public int[,] WhiteValues { get; } =
+            new int[,]
+            {
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 5, 10, 10, 10, 10, 10, 10, 5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { 0, 0, 0, 5, 5, 0, 0, 0 }
+            };
+
+        public int[,] BlackValues { get; } =
+            new int[,]
+            {
+                { 0, 0, 0, 5, 5, 0, 0, 0 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { -5, 0, 0, 0, 0, 0, 0, -5 },
+                { 5, 10, 10, 10, 10, 10, 10, 5 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 }
+            };
+        public int Value { get; } = 500;
 
         public Rook(string Color)
         {
@@ -161,6 +187,13 @@ namespace api.pieces
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
             return PieceHelper.SetSavingSquares(start, inc, this.Color, ref board);
+        }
+
+        public IPiece Copy()
+        {
+            Rook newPiece =
+                new(this.Color) { PinnedDir = this.PinnedDir, HasMoved = this.HasMoved };
+            return newPiece;
         }
 
         public override string ToString()

@@ -9,6 +9,33 @@ namespace api.pieces
         public string Color { get; set; }
         public string Type { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
+        public int[,] WhiteValues { get; } =
+            new int[,]
+            {
+                { -50, -40, -30, -30, -30, -30, -40, -50 },
+                { -40, -20, 0, 0, 0, 0, -20, -40 },
+                { -30, 0, 10, 15, 15, 10, 0, -30 },
+                { -30, 5, 15, 20, 20, 15, 5, -30 },
+                { -30, 0, 15, 20, 20, 15, 0, -30 },
+                { -30, 5, 10, 15, 15, 10, 5, -30 },
+                { -40, -20, 0, 5, 5, 0, -20, -40 },
+                { -50, -40, -30, -30, -30, -30, -40, -50 }
+            };
+
+        public int[,] BlackValues { get; } =
+            new int[,]
+            {
+                { -50, -40, -30, -30, -30, -30, -40, -50 },
+                { -40, -20, 0, 5, 5, 0, -20, -40 },
+                { -30, 0, 10, 15, 15, 10, 0, -30 },
+                { -30, 5, 15, 20, 20, 15, 5, -30 },
+                { -30, 0, 15, 20, 20, 15, 0, -30 },
+                { -30, 5, 10, 15, 15, 10, 5, -30 },
+                { -40, -20, 0, 0, 0, 0, -20, -40 },
+                { -50, -40, -30, -30, -30, -30, -40, -50 }
+            };
+
+        public int Value { get; } = 300;
 
         public Knight(string Color)
         {
@@ -75,6 +102,12 @@ namespace api.pieces
                 }
             }
             return moves;
+        }
+
+        public IPiece Copy()
+        {
+            Knight newPiece = new(this.Color) { PinnedDir = this.PinnedDir };
+            return newPiece;
         }
 
         public override string ToString()

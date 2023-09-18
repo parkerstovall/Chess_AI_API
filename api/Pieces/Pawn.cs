@@ -1,6 +1,8 @@
 ﻿using api.models.api;
 using api.helperclasses;
 using api.pieces.interfaces;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Net.Http.Headers;
 
 namespace api.pieces
 {
@@ -9,6 +11,34 @@ namespace api.pieces
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
+
+        public int[,] WhiteValues { get; } =
+            new int[,]
+            {
+                { 0, 0, 0, 0, 0, 0, 0, 0, },
+                { 50, 50, 50, 50, 50, 50, 50, 50 },
+                { 10, 10, 20, 30, 30, 20, 10, 10 },
+                { 5, 5, 10, 25, 25, 10, 5, 5 },
+                { 0, 0, 0, 20, 20, 0, 0, 0 },
+                { 5, -5, -10, 0, 0, -10, -5, 5 },
+                { 5, 10, 10, -20, -20, 10, 10, 5 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 }
+            };
+
+        public int[,] BlackValues { get; } =
+            new int[,]
+            {
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 5, 10, 10, -20, -20, 10, 10, 5 },
+                { 5, -5, -10, 0, 0, -10, -5, 5 },
+                { 0, 0, 0, 20, 20, 0, 0, 0 },
+                { 5, 5, 10, 25, 25, 10, 5, 5 },
+                { 10, 10, 20, 30, 30, 20, 10, 10 },
+                { 50, 50, 50, 50, 50, 50, 50, 50 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, },
+            };
+
+        public int Value { get; } = 100;
 
         public Pawn(string Color)
         {
@@ -168,6 +198,13 @@ namespace api.pieces
             }
 
             return moves;
+        }
+
+        public IPiece Copy()
+        {
+            Pawn newPiece =
+                new(this.Color) { HasMoved = this.HasMoved, PinnedDir = this.PinnedDir };
+            return newPiece;
         }
 
         public override string ToString()
