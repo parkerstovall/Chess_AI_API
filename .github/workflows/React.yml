@@ -65,7 +65,5 @@ jobs:
             mv client/build/* .
             rm -rf client
             rm -rf node_modules
-            npm install
-            npm run build
             cd /var/www/temp/
             rm -rf client.tar.gz
