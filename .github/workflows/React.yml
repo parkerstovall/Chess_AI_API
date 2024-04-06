@@ -14,13 +14,13 @@ jobs:
       - run: rm -rf node_modules
 
       - name: Archive build artifacts
-        run: cd /home/runner/work/ && ls && cd Personal_Webiste/ && tar -czvf client.tar.gz client
+        run: cd /home/runner/work/Personal_Website/Personal_Website/ && tar -czvf client.tar.gz client
 
       - name: Upload build artifacts for deployment
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: /home/runner/work/Personal_Website/Personal_Webiste/client.tar.gz
+          path: /home/runner/work/Personal_Website/Personal_Website/client.tar.gz
 
   deploy:
     name: Deploy
