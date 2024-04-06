@@ -83,12 +83,12 @@ jobs:
             sudo systemctl stop chessapi.service
             cd ..
             cd /var/www/
-            rm -rf chess.api.parker-stovall.com
-            mkdir chess.api.parker-stovall.com
+            rm -rf api.parker-stovall.com
+            mkdir api.parker-stovall.com
             cd /var/www/temp/
-            tar -xvf API.tar.gz -C /var/www/chess.api.parker-stovall.com
-            cd /var/www/chess.api.parker-stovall.com/
+            tar -xvf API.tar.gz -C /var/www/api.parker-stovall.com
+            cd /var/www/api.parker-stovall.com/
             mv net7.0/* .
-            sudo systemctl restart chessapi.service
+            # sudo systemctl restart chessapi.service
             cd /var/www/temp/
             rm -rf API.tar.gz
