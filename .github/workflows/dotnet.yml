@@ -17,10 +17,10 @@ jobs:
       run:
         working-directory: ./api
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 6.0.x
         
@@ -37,7 +37,7 @@ jobs:
       run: cd /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/ && tar -czvf API.tar.gz net7.0
     
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: package
         path: /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/API.tar.gz
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
 
