@@ -33,7 +33,7 @@ jobs:
         run: dotnet test -c Release --no-build --verbosity normal
 
       - name: Archive build artifacts
-        run: cd /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/ && tar -czvf API.tar.gz net7.0
+        run: cd /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/ && tar -czvf API.tar.gz net8.0
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -87,7 +87,7 @@ jobs:
             cd /var/www/temp/
             tar -xvf API.tar.gz -C /var/www/api.parker-stovall.com
             cd /var/www/api.parker-stovall.com/
-            mv net7.0/* .
+            mv net8.0/* .
             # sudo systemctl restart api.service
             cd /var/www/temp/
             rm -rf API.tar.gz
