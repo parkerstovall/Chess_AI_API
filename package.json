@@ -1,7 +1,7 @@
 {
-  "name": "chessai_webapi",
+  "name": "personal_website",
   "version": "1.0.0",
-  "description": "A basic chess game utilizing a custom Chess AI built using React and .Net 7 WebAPI",
+  "description": "A personal website to showcase my various apps and projects",
   "scripts": {
     "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm start\""
   },

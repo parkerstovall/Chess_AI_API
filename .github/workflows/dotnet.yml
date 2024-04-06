@@ -5,43 +5,42 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./api
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 6.0.x
-        
-    - name: Restore dependencies
-      run: dotnet restore
-   
-    - name: Build
-      run: dotnet build -c Release --no-restore
-    
-    - name: Test
-      run: dotnet test -c Release --no-build --verbosity normal
-    
-    - name: Archive build artifacts
-      run: cd /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/ && tar -czvf API.tar.gz net7.0
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: package
-        path: /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/API.tar.gz
-        
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test -c Release --no-build --verbosity normal
+
+      - name: Archive build artifacts
+        run: cd /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/ && tar -czvf API.tar.gz net7.0
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: /home/runner/work/Personal_Website/Personal_Website/api/bin/Release/API.tar.gz
+
   deploy:
     name: Deploy
     needs: build
@@ -68,19 +67,19 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{secrets.API_HOST}}
-          username:  ${{secrets.API_USERNAME}}
+          username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           source: API.tar.gz
           target: /var/www/temp/
-      
+
       - name: Deploy application
         uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.API_HOST}}
-          username:  ${{secrets.API_USERNAME}}
+          username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           script: |
-            sudo systemctl stop chessapi.service
+            # sudo systemctl stop api.service
             cd ..
             cd /var/www/
             rm -rf api.parker-stovall.com
@@ -89,6 +88,6 @@ jobs:
             tar -xvf API.tar.gz -C /var/www/api.parker-stovall.com
             cd /var/www/api.parker-stovall.com/
             mv net7.0/* .
-            # sudo systemctl restart chessapi.service
+            # sudo systemctl restart api.service
             cd /var/www/temp/
             rm -rf API.tar.gz
