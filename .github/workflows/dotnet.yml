@@ -79,7 +79,7 @@ jobs:
           username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           script: |
-            # sudo systemctl stop api.service
+            sudo systemctl stop api.service
             cd ..
             cd /var/www/
             rm -rf api.parker-stovall.com
@@ -88,6 +88,6 @@ jobs:
             tar -xvf API.tar.gz -C /var/www/api.parker-stovall.com
             cd /var/www/api.parker-stovall.com/
             mv net8.0/* .
-            # sudo systemctl restart api.service
+            sudo systemctl restart api.service
             cd /var/www/temp/
             rm -rf API.tar.gz
