@@ -17,7 +17,7 @@ jobs:
         run: cd /home/runner/work/Personal_Website/Personal_Website/ && tar -czvf client.tar.gz client
 
       - name: Upload build artifacts for deployment
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: package
           path: /home/runner/work/Personal_Website/Personal_Website/client.tar.gz
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download package
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: package
 
