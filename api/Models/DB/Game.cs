@@ -12,11 +12,24 @@ namespace api.models.db
         public bool IsPlayerWhite { get; set; }
         public bool IsTwoPlayer { get; set; }
         public bool IsWhiteTurn { get; set; } = true;
-        public bool IsComplete { get; set; } = false;
-        public List<Move> MoveHistory { get; set; } = new();
+        public string Status { get; set; } = "Open";
         public List<int[]> AvailableMoves { get; set; } = new();
         public int[]? SelectedSquare { get; set; } = null;
         public string? CheckedColor { get; set; } = null;
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
+
+        public void SetStatus(GameStatus status)
+        {
+            this.Status = status.ToString();
+        }
+    }
+
+    public enum GameStatus
+    {
+        Open,
+        Expired,
+        CheckMateWhite,
+        CheckMateBlack,
+        UserEnded
     }
 }

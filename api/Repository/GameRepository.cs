@@ -25,7 +25,7 @@ namespace api.repository
             };
 
             // Add cookie to response, save game to DB
-            await GetsertGame(game);
+            await GetsertGame(game, true);
 
             return BoardHelper.GetBoardForDisplay(game);
         }
@@ -33,10 +33,10 @@ namespace api.repository
         public async Task<ClickReturn> HandleClick(int row, int col)
         {
             Game game = await GetsertGame();
-            if (!game.IsTwoPlayer && game.IsPlayerWhite != game.IsWhiteTurn)
-            {
-                return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
-            }
+            // if (!game.IsTwoPlayer && game.IsPlayerWhite != game.IsWhiteTurn)
+            // {
+            //     return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
+            // }
 
             bool moved = false;
             int[]? clickedSquare = [row, col];
@@ -58,7 +58,8 @@ namespace api.repository
                 IPiece? piece = game.Board.Rows[row].Squares[col].Piece;
                 if (piece != null && game.SelectedSquare != null)
                 {
-                    game.MoveHistory.Add(
+                    var moveHistory = _connRepo.GetCollection<Move>("MoveHistory");
+                    await moveHistory.InsertOneAsync(
                         new Move
                         {
                             From = game.SelectedSquare,
@@ -74,10 +75,9 @@ namespace api.repository
                 game.SelectedSquare = null;
                 moved = true;
             }
-            else if (
-                square.Piece == null
-                || square.Piece.Color != currentTurnColor
-                || (!game.IsTwoPlayer && square.Piece.Color != playerColor)
+            else if (square.Piece == null
+            // || square.Piece.Color != currentTurnColor
+            // || (!game.IsTwoPlayer && square.Piece.Color != playerColor)
             )
             {
                 game.AvailableMoves.Clear();
@@ -109,34 +109,52 @@ namespace api.repository
 
             ChessAI ai = new(game.IsPlayerWhite);
             ai.GetMove(ref game, out Move? foundMove);
+
+            if (foundMove != null)
+            {
+                await _connRepo.GetCollection<Move>("MoveHistory").InsertOneAsync(foundMove);
+            }
+
             game.IsWhiteTurn = !game.IsWhiteTurn;
             game = await GetsertGame(game);
 
             return BoardHelper.GetBoardForDisplay(game);
         }
 
-        private async Task<Game> GetsertGame(Game? updateGame = null)
+        private async Task<Game> GetsertGame(Game? updateGame = null, bool forceInsert = false)
         {
             var collection = _connRepo.GetCollection<Game>("Games");
             var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
             if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
             {
                 var filter = Builders<Game>.Filter.Eq("_id", oGameID);
-
-                //Update and return if game is provided
-                if (updateGame != null)
+                if (forceInsert)
                 {
-                    updateGame.GameID = oGameID;
-                    var replaceOptions = new ReplaceOptions() { IsUpsert = true };
-                    await collection.ReplaceOneAsync(filter, updateGame, replaceOptions);
-                    return updateGame;
+                    //End the current game, then start a new one after the if block
+                    var update = Builders<Game>.Update.Set(
+                        game => game.Status,
+                        GameStatus.UserEnded.ToString()
+                    );
+
+                    await collection.UpdateOneAsync(filter, update);
                 }
-
-                // Get if no game is provided
-                var dbGame = await collection.Find(filter).FirstOrDefaultAsync();
-                if (dbGame != null)
+                else
                 {
-                    return dbGame;
+                    //Update and return if game is provided
+                    if (updateGame != null)
+                    {
+                        updateGame.GameID = oGameID;
+                        var replaceOptions = new ReplaceOptions() { IsUpsert = true };
+                        await collection.ReplaceOneAsync(filter, updateGame, replaceOptions);
+                        return updateGame;
+                    }
+
+                    // Get if no game is provided
+                    var dbGame = await collection.Find(filter).FirstOrDefaultAsync();
+                    if (dbGame != null)
+                    {
+                        return dbGame;
+                    }
                 }
             }
 

@@ -75,15 +75,13 @@ namespace api.helperclasses
             IPiece? piece = game.Board.Rows[move[2]].Squares[move[3]].Piece;
             if (piece != null)
             {
-                game.MoveHistory.Add(
-                    new()
-                    {
-                        From = [move[0], move[1]],
-                        To = [move[2], move[3]],
-                        PieceColor = piece.Color,
-                        PieceType = piece.GetType().Name
-                    }
-                );
+                foundMove = new()
+                {
+                    From = [move[0], move[1]],
+                    To = [move[2], move[3]],
+                    PieceColor = piece.Color,
+                    PieceType = piece.GetType().Name
+                };
             }
         }
 

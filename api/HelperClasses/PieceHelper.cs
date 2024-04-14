@@ -2,6 +2,7 @@ using api.models.api;
 using api.models.db;
 using api.pieces;
 using api.pieces.interfaces;
+using ZstdSharp.Unsafe;
 
 namespace api.helperclasses
 {
@@ -174,7 +175,13 @@ namespace api.helperclasses
             return inc;
         }
 
-        public static void SetPins(int[] start, int[] inc, Direction dir, ref Game game)
+        public static void SetPins(
+            int[] start,
+            int[] inc,
+            Direction dir,
+            string color,
+            ref Game game
+        )
         {
             start[0] += inc[0];
             start[1] += inc[1];
@@ -184,7 +191,7 @@ namespace api.helperclasses
                 BoardSquare square = game.Board.Rows[start[0]].Squares[start[1]];
                 if (square.Piece != null)
                 {
-                    if (square.Piece is King)
+                    if (square.Piece.Color == color || square.Piece is King)
                     {
                         break;
                     }

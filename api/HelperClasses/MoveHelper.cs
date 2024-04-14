@@ -267,7 +267,7 @@ namespace api.helperclasses
                             tracker.SetHasSavingSquares(king.Color, false);
                         }
 
-                        tracker.AddAttacker(pSquare);
+                        tracker.AddAttacker(square);
                         tracker.SetKing(pSquare);
                         king.InCheck = true;
                     }
@@ -389,6 +389,9 @@ namespace api.helperclasses
             }
 
             king.InCheckMate = true;
+            game.SetStatus(
+                king.Color == "white" ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack
+            );
         }
     }
 }

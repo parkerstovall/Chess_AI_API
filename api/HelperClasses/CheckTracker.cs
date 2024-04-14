@@ -35,7 +35,7 @@ namespace api.helperclasses
 
         public List<BoardSquare> GetKingAttackers(string color)
         {
-            return Attackers.Where((a) => a.Piece?.Color == color).ToList();
+            return Attackers.Where((a) => a.Piece?.Color != color).ToList();
         }
 
         public void AddAttacker(BoardSquare attacker)

@@ -168,7 +168,7 @@ namespace api.pieces
 
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-            PieceHelper.SetPins(start, inc, dir, ref game);
+            PieceHelper.SetPins(start, inc, dir, this.Color, ref game);
         }
 
         public bool HasSavingSquares(int[] start, int[] dest, ref Game game)
