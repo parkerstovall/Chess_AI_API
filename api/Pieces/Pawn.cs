@@ -1,8 +1,6 @@
-﻿using api.models.api;
-using api.helperclasses;
+﻿using api.helperclasses;
+using api.models.api;
 using api.pieces.interfaces;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Net.Http.Headers;
 
 namespace api.pieces
 {

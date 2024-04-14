@@ -8,6 +8,6 @@ namespace api.models.client
         public BoardDisplay Board { get; set; } = new BoardDisplay();
 
         [Required]
-        public Guid GameID { get; set; }
+        public string? GameID { get; set; }
     }
 }

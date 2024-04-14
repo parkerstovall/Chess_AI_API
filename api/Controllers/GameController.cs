@@ -16,43 +16,33 @@ public class BoardController : ControllerBase
         _repo = repo;
     }
 
-    [HttpGet("startGame")]
+    [HttpPost("startGame")]
     [SwaggerOperation(
         Summary = "Start new game",
         Description = "Builds new board and returns game ID"
     )]
-    public GameStart StartGame(bool isWhite)
+    public async Task<BoardDisplay> StartGame(bool isWhite)
     {
-        return _repo.StartGame(isWhite);
+        return await _repo.StartGame(isWhite);
     }
 
-    [HttpGet("{gameID}/compMove")]
+    [HttpPost("compMove")]
     [SwaggerOperation(
         Summary = "Gets computer move",
         Description = "Runs a MinMax algorithm on the board and returns the best move"
     )]
-    public BoardDisplay CompMove(Guid gameID)
+    public async Task<BoardDisplay> CompMove()
     {
-        return _repo.CompMove(gameID);
+        return await _repo.CompMove();
     }
 
-    [HttpPost("{gameID}/click")]
+    [HttpPost("click")]
     [SwaggerOperation(
         Summary = "HandlesClick",
         Description = "Handles board click and moves piece if applicable, returns board."
     )]
-    public ClickReturn HandleClick(Guid gameID, [FromQuery] int row, [FromQuery] int col)
+    public async Task<ClickReturn> HandleClick(int row, int col)
     {
-        return _repo.HandleClick(gameID, row, col);
-    }
-
-    [HttpPost("{gameID}/ping")]
-    [SwaggerOperation(
-        Summary = "Pings Server to Keep Game Alive",
-        Description = "Pings Server to Keep Game Alive"
-    )]
-    public bool Ping(Guid gameID)
-    {
-        return _repo.Ping(gameID);
+        return await _repo.HandleClick(row, col);
     }
 }

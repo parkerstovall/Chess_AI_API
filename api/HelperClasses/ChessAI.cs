@@ -10,11 +10,11 @@ namespace api.helperclasses
     public class ChessAI
     {
         private readonly int Max_Depth;
-        private readonly string CheckColor;
+        private readonly string? CheckColor;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
 
-        public ChessAI(string CheckColor = "", bool isBlack = true, int Max_Depth = 3)
+        public ChessAI(string? CheckColor = null, bool isBlack = true, int Max_Depth = 3)
         {
             this.Max_Depth = Max_Depth;
             this.CheckColor = CheckColor;
@@ -25,7 +25,7 @@ namespace api.helperclasses
             }
         }
 
-        public Board GetMove(Board board, out string checkColor)
+        public Board GetMove(Board board, out string? checkColor)
         {
             int score = int.MinValue;
             int[] move = new int[4];
@@ -89,7 +89,7 @@ namespace api.helperclasses
         private int MinMax(
             Board board,
             bool max,
-            string checkedColor,
+            string? checkedColor,
             int depth,
             double alpha,
             double beta

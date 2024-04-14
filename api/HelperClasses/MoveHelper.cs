@@ -12,7 +12,7 @@ namespace api.helperclasses
         internal static List<int[]> GetMovesFromPiece(
             Board board,
             int[] clickedSquare,
-            string checkColor
+            string? checkColor
         )
         {
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
@@ -25,19 +25,18 @@ namespace api.helperclasses
         internal static bool TryMovePiece(
             int[] coords,
             int[] start,
-            ref List<int[]> moves,
+            List<int[]> moves,
             ref Board board,
-            out string checkColor
+            out string? checkColor
         )
         {
-            checkColor = "";
+            checkColor = null;
 
             foreach (int[] move in moves)
             {
                 if (move[0] == coords[0] && move[1] == coords[1])
                 {
                     checkColor = MovePiece(start, move, ref board);
-                    moves.Clear();
                     return true;
                 }
             }
@@ -45,7 +44,7 @@ namespace api.helperclasses
             return false;
         }
 
-        internal static string MovePiece(int[] start, int[] dest, ref Board board)
+        internal static string? MovePiece(int[] start, int[] dest, ref Board board)
         {
             BoardSquare from = board.Rows[start[0]].Squares[start[1]];
             BoardSquare to = board.Rows[dest[0]].Squares[dest[1]];

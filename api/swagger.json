@@ -6,7 +6,7 @@
   },
   "paths": {
     "/api/v1/game/startGame": {
-      "get": {
+      "post": {
         "tags": [
           "Board"
         ],
@@ -26,17 +26,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               }
             }
@@ -44,22 +44,10 @@
         }
       }
     },
-    "/api/v1/game/{gameID}/compMove": {
-      "get": {
+    "/api/v1/game/compMove": {
+      "post": {
         "tags": [
           "Board"
-        ],
-        "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
         ],
         "responses": {
           "200": {
@@ -85,22 +73,12 @@
         }
       }
     },
-    "/api/v1/game/{gameID}/click": {
+    "/api/v1/game/click": {
       "post": {
         "tags": [
           "Board"
         ],
         "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           {
             "name": "row",
             "in": "query",
@@ -137,47 +115,6 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClickReturn"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/game/{gameID}/ping": {
-      "post": {
-        "tags": [
-          "Board"
-        ],
-        "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "boolean"
                 }
               }
             }
@@ -244,23 +181,6 @@
           },
           "moved": {
             "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "GameStart": {
-        "required": [
-          "board",
-          "gameID"
-        ],
-        "type": "object",
-        "properties": {
-          "board": {
-            "$ref": "#/components/schemas/BoardDisplay"
-          },
-          "gameID": {
-            "type": "string",
-            "format": "uuid"
           }
         },
         "additionalProperties": false

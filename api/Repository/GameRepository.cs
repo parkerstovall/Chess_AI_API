@@ -1,140 +1,144 @@
-using api.models.client;
-using api.models.api;
-using Microsoft.Extensions.Caching.Memory;
 using api.helperclasses;
+using api.models.api;
+using api.models.client;
+using api.models.db;
+using Microsoft.Extensions.Caching.Memory;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace api.repository
 {
-    public class GameRepository
+    public class GameRepository(ConnectionRepository connRepo, IHttpContextAccessor context)
     {
-        private readonly IMemoryCache _cache;
+        private readonly ConnectionRepository _connRepo = connRepo;
+        private readonly IHttpContextAccessor _context = context;
 
-        public GameRepository(IMemoryCache cache)
+        public async Task<BoardDisplay> StartGame(bool isWhite)
         {
-            _cache = cache;
+            //Create new Game
+            var game = new Game() { Board = BoardHelper.GetNewBoard(), IsPlayerWhite = isWhite };
+
+            // Add cookie to response, save game to DB
+            await GetsertGame(game);
+
+            return BoardHelper.GetBoardForDisplay(game);
         }
 
-        public GameStart StartGame(bool isWhite)
+        public async Task<ClickReturn> HandleClick(int row, int col)
         {
-            Guid gameID = Guid.NewGuid();
-            Board board = BoardHelper.GetNewBoard();
-
-            List<OpenGame> openGames = _cache.Get<List<OpenGame>>("OpenGames") ?? new();
-            openGames.Add(new OpenGame { GameID = gameID, LastPing = DateTime.Now });
-            _cache.Set("OpenGames", openGames);
-
-            _cache.Set($"Board:{gameID}", board);
-            _cache.Set($"Turn:{gameID}", "white");
-            _cache.Set($"PlayerColor:{gameID}", isWhite ? "white" : "black");
-            return new GameStart
+            Game game = await GetsertGame();
+            if (game.IsPlayerWhite != game.IsWhiteTurn)
             {
-                Board = BoardHelper.GetBoardForDisplay(board, null, null),
-                GameID = gameID
-            };
-        }
-
-        public ClickReturn HandleClick(Guid gameID, int row, int col)
-        {
-            Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
-            bool moved = false;
-            if (_cache.TryGetValue($"Board:{gameID}:compTurn", out bool isCompTurn) && isCompTurn)
-            {
-                return new()
-                {
-                    Moved = moved,
-                    Board = BoardHelper.GetBoardForDisplay(board, null, null)
-                };
+                return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
             }
 
-            string? color = _cache.Get<string>($"Turn:{gameID}");
-            string? playerColor = _cache.Get<string>($"PlayerColor:{gameID}");
-
-            int[]? clickedSquare = new[] { row, col };
-
+            bool moved = false;
+            int[]? clickedSquare = [row, col];
+            var board = game.Board;
             BoardSquare square = board.Rows[row].Squares[col];
-
-            List<int[]> moves = _cache.Get<List<int[]>>($"Moves:{gameID}") ?? new();
-            int[] start = _cache.Get<int[]>($"SelectedSquare:{gameID}") ?? Array.Empty<int>();
+            var currentTurnColor = game.IsWhiteTurn ? "white" : "black";
+            var playerColor = game.IsPlayerWhite ? "white" : "black";
 
             if (
-                moves.Any()
-                && start.Any()
+                game.AvailableMoves.Count != 0
+                && game.SelectedSquare != null
                 && MoveHelper.TryMovePiece(
                     clickedSquare,
-                    start,
-                    ref moves,
+                    game.SelectedSquare,
+                    game.AvailableMoves,
                     ref board,
-                    out string checkColor
+                    out string? checkColor
                 )
             )
             {
-                _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
-                _cache.Remove($"Moves:{gameID}");
-                _cache.Remove($"SelectedSquare:{gameID}");
-                _cache.Set($"Check:{gameID}", checkColor);
-                clickedSquare = null;
+                game.Board = board;
+                game.AvailableMoves.Clear();
+                game.IsWhiteTurn = !game.IsWhiteTurn;
+                game.SelectedSquare = null;
+                game.CheckedColor = checkColor;
                 moved = true;
             }
             else if (
                 square.Piece == null
-                || square.Piece.Color != color
+                || square.Piece.Color != currentTurnColor
                 || square.Piece.Color != playerColor
             )
             {
-                _cache.Remove($"Moves:{gameID}");
-                _cache.Remove($"SelectedSquare:{gameID}");
-                return new()
-                {
-                    Moved = moved,
-                    Board = BoardHelper.GetBoardForDisplay(board, null, null)
-                };
+                game.AvailableMoves.Clear();
+                game.SelectedSquare = null;
+                return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
             }
             else
             {
-                checkColor = _cache.Get<string>($"Check:{gameID}") ?? "";
-                moves = MoveHelper.GetMovesFromPiece(board, clickedSquare, checkColor);
-                _cache.Set($"Moves:{gameID}", moves);
-                _cache.Set($"SelectedSquare:{gameID}", clickedSquare);
+                game.AvailableMoves = MoveHelper.GetMovesFromPiece(
+                    board,
+                    clickedSquare,
+                    game.CheckedColor
+                );
+                game.SelectedSquare = clickedSquare;
             }
 
-            return new()
-            {
-                Moved = moved,
-                Board = BoardHelper.GetBoardForDisplay(board, moves, clickedSquare)
-            };
+            game = await GetsertGame(game);
+
+            return new() { Moved = moved, Board = BoardHelper.GetBoardForDisplay(game) };
         }
 
-        public BoardDisplay CompMove(Guid gameID)
+        public async Task<BoardDisplay> CompMove()
         {
-            _cache.Set($"Board:{gameID}:compTurn", true);
-            Board board = _cache.Get<Board>($"Board:{gameID}") ?? BoardHelper.GetNewBoard();
-            string? color = _cache.Get<string>($"Turn:{gameID}");
-            string checkColor = _cache.Get<string>($"Check:{gameID}") ?? "";
-
-            ChessAI ai = new(checkColor, color == "black");
-
-            Board newBoard = ai.GetMove(board, out checkColor);
-
-            _cache.Set($"Board:{gameID}", newBoard);
-            _cache.Set($"Turn:{gameID}", color == "white" ? "black" : "white");
-            _cache.Set($"Board:{gameID}:compTurn", false);
-            _cache.Set($"Check:{gameID}", checkColor);
-            return BoardHelper.GetBoardForDisplay(newBoard, null, null);
-        }
-
-        public bool Ping(Guid gameID)
-        {
-            List<OpenGame> openGames = _cache.Get<List<OpenGame>>("OpenGames") ?? new();
-            OpenGame? game = openGames.FirstOrDefault(g => g.GameID == gameID);
-
-            if (game is not null)
+            var game = await GetsertGame();
+            if (game.IsWhiteTurn == game.IsPlayerWhite)
             {
-                game.LastPing = DateTime.Now;
-                _cache.Set("OpenGames", openGames);
-                return true;
+                return BoardHelper.GetBoardForDisplay(game);
             }
 
-            return false;
+            ChessAI ai = new(game.CheckedColor, game.IsPlayerWhite);
+
+            game.Board = ai.GetMove(game.Board, out string? checkColor);
+            game.CheckedColor = checkColor;
+            game.IsWhiteTurn = !game.IsWhiteTurn;
+            game = await GetsertGame(game);
+
+            return BoardHelper.GetBoardForDisplay(game);
+        }
+
+        private async Task<Game> GetsertGame(Game? updateGame = null)
+        {
+            var collection = _connRepo.GetCollection<Game>("Games");
+            var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
+            if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
+            {
+                var filter = Builders<Game>.Filter.Eq("_id", oGameID);
+
+                //Update and return if game is provided
+                if (updateGame != null)
+                {
+                    updateGame.GameID = oGameID;
+                    var replaceOptions = new ReplaceOptions() { IsUpsert = true };
+                    await collection.ReplaceOneAsync(filter, updateGame, replaceOptions);
+                    return updateGame;
+                }
+
+                // Get if no game is provided
+                var dbGame = await collection.Find(filter).FirstOrDefaultAsync();
+                if (dbGame != null)
+                {
+                    return dbGame;
+                }
+            }
+
+            //Insert if no game ID in cookie and game is provided
+            if (updateGame != null)
+            {
+                await collection.InsertOneAsync(updateGame);
+                _context?.HttpContext?.Response.Cookies.Append(
+                    "GameID",
+                    updateGame.GameID.ToString()
+                );
+                return updateGame;
+            }
+
+            // Otherwise, bad request
+            throw new InvalidOperationException("GameID or UpdateGame must be present");
         }
     }
 }

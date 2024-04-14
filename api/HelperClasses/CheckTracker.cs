@@ -63,7 +63,7 @@ namespace api.helperclasses
             }
         }
 
-        public string CheckColor()
+        public string? CheckColor()
         {
             if (IsKingInCheck("white"))
             {
@@ -74,7 +74,7 @@ namespace api.helperclasses
                 return "black";
             }
 
-            return "";
+            return null;
         }
 
         private bool IsKingInCheck(string color)

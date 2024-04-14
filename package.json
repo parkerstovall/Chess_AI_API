@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "description": "A personal website to showcase my various apps and projects",
   "scripts": {
-    "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm start\""
+    "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm run dev\""
   },
   "author": "Parker Stovall",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.19",
+    "next": "^14.1.4",
+    "postcss": "^8.4.38"
+  }
 }
