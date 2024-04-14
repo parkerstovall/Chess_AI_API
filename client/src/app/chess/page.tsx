@@ -11,10 +11,11 @@ export default function App() {
   const [board, setBoard] = useState<BoardDisplay>();
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [isCompTurn, setIsCompTurn] = useState<boolean>(false);
+  const [isTwoPlayer, setIsTwoPlayer] = useState<boolean>(false);
   const [isWhite, setIsWhite] = useState<boolean>(true);
 
   function BoardSquareClick(col: number, row: number) {
-    if (gameOver || isCompTurn) {
+    if (gameOver || (isCompTurn && !isTwoPlayer)) {
       return;
     }
 
@@ -34,7 +35,7 @@ export default function App() {
       .then((clickReturn: ClickReturn) => {
         setBoard(clickReturn.board);
 
-        if (clickReturn.moved) {
+        if (clickReturn.moved && !isTwoPlayer) {
           setIsCompTurn(true);
           fetch(`http://localhost:5000/api/v1/game/compMove`, {
             mode: "cors",
@@ -69,15 +70,19 @@ export default function App() {
     // });
   }
 
-  function Start(isWhite: boolean) {
-    fetch(`http://localhost:5000/api/v1/game/startGame?isWhite=${isWhite}`, {
-      mode: "cors",
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
+  function Start(isWhite: boolean, isTwoPlayer: boolean) {
+    setIsTwoPlayer(isTwoPlayer);
+    fetch(
+      `http://localhost:5000/api/v1/game/startGame?isWhite=${isWhite}&isTwoPlayer=${isTwoPlayer}`,
+      {
+        mode: "cors",
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
       .then((res) => {
         if (res.ok) {
           return res.json();
@@ -87,7 +92,7 @@ export default function App() {
         setIsWhite(isWhite);
         setBoard(board);
 
-        if (!isWhite) {
+        if (!isWhite && !isTwoPlayer) {
           setIsCompTurn(true);
           fetch(`http://localhost:5000/api/v1/game/compMove`, {
             mode: "cors",

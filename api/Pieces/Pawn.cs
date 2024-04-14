@@ -4,7 +4,7 @@ using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Pawn : IPieceHasMoved
+    public class Pawn : IPieceDirectAttacker, IPieceHasMoved
     {
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }

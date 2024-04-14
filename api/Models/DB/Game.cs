@@ -10,6 +10,7 @@ namespace api.models.db
         public ObjectId GameID { get; set; }
         public required Board Board { get; set; }
         public bool IsPlayerWhite { get; set; }
+        public bool IsTwoPlayer { get; set; }
         public bool IsWhiteTurn { get; set; } = true;
         public bool IsComplete { get; set; } = false;
         public List<Move> MoveHistory { get; set; } = new();

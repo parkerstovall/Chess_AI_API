@@ -18,6 +18,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "isTwoPlayer",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {

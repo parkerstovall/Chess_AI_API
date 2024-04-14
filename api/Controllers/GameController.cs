@@ -21,9 +21,9 @@ public class BoardController : ControllerBase
         Summary = "Start new game",
         Description = "Builds new board and returns game ID"
     )]
-    public async Task<BoardDisplay> StartGame(bool isWhite)
+    public async Task<BoardDisplay> StartGame(bool isWhite, bool isTwoPlayer = false)
     {
-        return await _repo.StartGame(isWhite);
+        return await _repo.StartGame(isWhite, isTwoPlayer);
     }
 
     [HttpPost("compMove")]

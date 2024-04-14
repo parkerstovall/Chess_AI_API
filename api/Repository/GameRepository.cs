@@ -14,10 +14,15 @@ namespace api.repository
         private readonly ConnectionRepository _connRepo = connRepo;
         private readonly IHttpContextAccessor _context = context;
 
-        public async Task<BoardDisplay> StartGame(bool isWhite)
+        public async Task<BoardDisplay> StartGame(bool isWhite, bool isTwoPlayer)
         {
             //Create new Game
-            var game = new Game() { Board = BoardHelper.GetNewBoard(), IsPlayerWhite = isWhite };
+            var game = new Game()
+            {
+                Board = BoardHelper.GetNewBoard(),
+                IsPlayerWhite = isWhite,
+                IsTwoPlayer = isTwoPlayer
+            };
 
             // Add cookie to response, save game to DB
             await GetsertGame(game);
@@ -28,15 +33,14 @@ namespace api.repository
         public async Task<ClickReturn> HandleClick(int row, int col)
         {
             Game game = await GetsertGame();
-            if (game.IsPlayerWhite != game.IsWhiteTurn)
+            if (!game.IsTwoPlayer && game.IsPlayerWhite != game.IsWhiteTurn)
             {
                 return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
             }
 
             bool moved = false;
             int[]? clickedSquare = [row, col];
-            var board = game.Board;
-            BoardSquare square = board.Rows[row].Squares[col];
+            BoardSquare square = game.Board.Rows[row].Squares[col];
             var currentTurnColor = game.IsWhiteTurn ? "white" : "black";
             var playerColor = game.IsPlayerWhite ? "white" : "black";
 
@@ -47,13 +51,12 @@ namespace api.repository
                     clickedSquare,
                     game.SelectedSquare,
                     game.AvailableMoves,
-                    ref board,
-                    out string? checkColor
+                    ref game
                 )
             )
             {
                 IPiece? piece = game.Board.Rows[row].Squares[col].Piece;
-                if (piece != null)
+                if (piece != null && game.SelectedSquare != null)
                 {
                     game.MoveHistory.Add(
                         new Move
@@ -65,17 +68,16 @@ namespace api.repository
                         }
                     );
                 }
-                game.Board = board;
+
                 game.AvailableMoves.Clear();
                 game.IsWhiteTurn = !game.IsWhiteTurn;
                 game.SelectedSquare = null;
-                game.CheckedColor = checkColor;
                 moved = true;
             }
             else if (
                 square.Piece == null
                 || square.Piece.Color != currentTurnColor
-                || square.Piece.Color != playerColor
+                || (!game.IsTwoPlayer && square.Piece.Color != playerColor)
             )
             {
                 game.AvailableMoves.Clear();
@@ -85,7 +87,7 @@ namespace api.repository
             else
             {
                 game.AvailableMoves = MoveHelper.GetMovesFromPiece(
-                    board,
+                    game.Board,
                     clickedSquare,
                     game.CheckedColor
                 );
@@ -105,14 +107,8 @@ namespace api.repository
                 return BoardHelper.GetBoardForDisplay(game);
             }
 
-            ChessAI ai = new(game.CheckedColor, game.IsPlayerWhite);
-
-            game.Board = ai.GetMove(game.Board, out Move? foundMove, out string? checkColor);
-            if (foundMove != null)
-            {
-                game.MoveHistory.Add(foundMove);
-            }
-            game.CheckedColor = checkColor;
+            ChessAI ai = new(game.IsPlayerWhite);
+            ai.GetMove(ref game, out Move? foundMove);
             game.IsWhiteTurn = !game.IsWhiteTurn;
             game = await GetsertGame(game);
 

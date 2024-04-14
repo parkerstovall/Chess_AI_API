@@ -20,14 +20,19 @@ export class GeneratedAPI {
 
     /**
      * @param isWhite (optional) 
+     * @param isTwoPlayer (optional) 
      * @return Success
      */
-    startGame(isWhite: boolean | undefined): Promise<BoardDisplay> {
+    startGame(isWhite: boolean | undefined, isTwoPlayer: boolean | undefined): Promise<BoardDisplay> {
         let url_ = this.baseUrl + "/api/v1/game/startGame?";
         if (isWhite === null)
             throw new Error("The parameter 'isWhite' cannot be null.");
         else if (isWhite !== undefined)
             url_ += "isWhite=" + encodeURIComponent("" + isWhite) + "&";
+        if (isTwoPlayer === null)
+            throw new Error("The parameter 'isTwoPlayer' cannot be null.");
+        else if (isTwoPlayer !== undefined)
+            url_ += "isTwoPlayer=" + encodeURIComponent("" + isTwoPlayer) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {

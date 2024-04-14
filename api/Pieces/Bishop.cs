@@ -1,5 +1,6 @@
 ﻿using api.helperclasses;
 using api.models.api;
+using api.models.db;
 using api.pieces.interfaces;
 
 namespace api.pieces
@@ -70,12 +71,12 @@ namespace api.pieces
                         {
                             if (square.CheckBlockingColor == this.Color)
                             {
-                                moves.Add(new int[] { col, row });
+                                moves.Add([col, row]);
                             }
                         }
                         else
                         {
-                            moves.Add(new int[] { col, row });
+                            moves.Add([col, row]);
                         }
 
                         if (square.Piece != null)
@@ -144,7 +145,7 @@ namespace api.pieces
             return GoodDir(dir);
         }
 
-        public void CheckPins(int[] start, int[] dest, ref Board board)
+        public void CheckPins(int[] start, int[] dest, ref Game game)
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
 
@@ -155,7 +156,7 @@ namespace api.pieces
 
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-            PieceHelper.SetPins(start, inc, dir, ref board);
+            PieceHelper.SetPins(start, inc, dir, ref game);
         }
 
         public bool GoodDir(Direction dir)
@@ -166,7 +167,7 @@ namespace api.pieces
                 || dir == Direction.FromBottomLeftToTopRight;
         }
 
-        public bool HasSavingSquares(int[] start, int[] dest, ref Board board)
+        public bool HasSavingSquares(int[] start, int[] dest, ref Game game)
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
 
@@ -177,7 +178,7 @@ namespace api.pieces
 
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-            return PieceHelper.SetSavingSquares(start, inc, this.Color, ref board);
+            return PieceHelper.SetSavingSquares(start, inc, this.Color, ref game);
         }
 
         public IPiece Copy()

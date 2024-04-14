@@ -11,14 +11,12 @@ namespace api.helperclasses
     public class ChessAI
     {
         private readonly int Max_Depth;
-        private readonly string? CheckColor;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
 
-        public ChessAI(string? CheckColor = null, bool isBlack = true, int Max_Depth = 3)
+        public ChessAI(bool isBlack = true, int Max_Depth = 3)
         {
             this.Max_Depth = Max_Depth;
-            this.CheckColor = CheckColor;
             if (!isBlack)
             {
                 max_color = "white";
@@ -26,12 +24,12 @@ namespace api.helperclasses
             }
         }
 
-        public Board GetMove(Board board, out Move? foundMove, out string? checkColor)
+        public void GetMove(ref Game game, out Move? foundMove)
         {
             int score = int.MinValue;
             int[] move = new int[4];
 
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
@@ -39,28 +37,21 @@ namespace api.helperclasses
                     {
                         foreach (
                             int[] localMove in MoveHelper.GetMovesFromPiece(
-                                board,
+                                game.Board,
                                 square.Coords,
-                                CheckColor
+                                game.CheckedColor
                             )
                         )
                         {
-                            Board newBoard = CopyBoard(board);
+                            Game newGame = CopyGame(game);
 
                             MoveHelper.MovePiece(
-                                new int[] { square.Coords[0], square.Coords[1] },
-                                new int[] { localMove[0], localMove[1] },
-                                ref newBoard
+                                [square.Coords[0], square.Coords[1]],
+                                [localMove[0], localMove[1]],
+                                ref newGame
                             );
 
-                            int tempScore = MinMax(
-                                newBoard,
-                                false,
-                                CheckColor,
-                                0,
-                                int.MinValue,
-                                int.MaxValue
-                            );
+                            int tempScore = MinMax(newGame, false, 0, int.MinValue, int.MaxValue);
 
                             if (tempScore > score)
                             {
@@ -78,56 +69,44 @@ namespace api.helperclasses
                 }
             }
 
-            checkColor = MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref board);
+            MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref game);
 
             foundMove = null;
-            IPiece? piece = board.Rows[move[2]].Squares[move[3]].Piece;
+            IPiece? piece = game.Board.Rows[move[2]].Squares[move[3]].Piece;
             if (piece != null)
             {
-                foundMove = new()
-                {
-                    From = [move[0], move[1]],
-                    To = [move[2], move[3]],
-                    PieceColor = piece.Color,
-                    PieceType = piece.GetType().Name
-                };
+                game.MoveHistory.Add(
+                    new()
+                    {
+                        From = [move[0], move[1]],
+                        To = [move[2], move[3]],
+                        PieceColor = piece.Color,
+                        PieceType = piece.GetType().Name
+                    }
+                );
             }
-
-            return board;
         }
 
-        private int MinMax(
-            Board board,
-            bool max,
-            string? checkedColor,
-            int depth,
-            double alpha,
-            double beta
-        )
+        private int MinMax(Game game, bool max, int depth, double alpha, double beta)
         {
             string color = max ? max_color : min_color;
 
             if (depth == Max_Depth)
             {
-                return GetBoardScore(board, color);
+                return GetBoardScore(game.Board, color);
             }
 
             List<BoardSquare> moveSquares = new();
 
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
                     if (square.Piece != null && square.Piece.Color == color)
                     {
-                        if (square.Piece is King king && king.InCheck)
+                        if (square.Piece is King king && king.InCheckMate)
                         {
-                            checkedColor = color;
-
-                            if (king.InCheckMate)
-                            {
-                                return color == max_color ? int.MinValue : int.MaxValue;
-                            }
+                            return color == max_color ? int.MinValue : int.MaxValue;
                         }
 
                         moveSquares.Add(square);
@@ -135,7 +114,7 @@ namespace api.helperclasses
                 }
             }
 
-            List<int[]> moves = new();
+            List<int[]> moves = [];
             foreach (BoardSquare square in moveSquares)
             {
                 if (square.Piece == null)
@@ -144,37 +123,31 @@ namespace api.helperclasses
                 }
 
                 List<int[]> localMoves = MoveHelper.GetMovesFromPiece(
-                    board,
+                    game.Board,
                     square.Coords,
-                    CheckColor
+                    game.CheckedColor
                 );
 
                 foreach (int[] localMove in localMoves)
                 {
-                    moves.Add(
-                        new int[] { square.Coords[0], square.Coords[1], localMove[0], localMove[1] }
-                    );
+                    moves.Add([square.Coords[0], square.Coords[1], localMove[0], localMove[1]]);
                 }
             }
 
             int score = max ? int.MinValue : int.MaxValue;
 
-            if (!moves.Any())
+            if (moves.Count == 0)
             {
                 return 0;
             }
 
             foreach (int[] move in moves)
             {
-                Board newBoard = CopyBoard(board);
+                Game newGame = CopyGame(game);
 
-                MoveHelper.MovePiece(
-                    new int[] { move[0], move[1] },
-                    new int[] { move[2], move[3] },
-                    ref newBoard
-                );
+                MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref newGame);
 
-                int tempScore = MinMax(newBoard, !max, checkedColor, depth + 1, alpha, beta);
+                int tempScore = MinMax(newGame, !max, depth + 1, alpha, beta);
 
                 if ((tempScore > score && max) || (tempScore < score && !max))
                 {
@@ -184,15 +157,18 @@ namespace api.helperclasses
                 if (max)
                 {
                     alpha = Math.Max(score, alpha);
+                    if (alpha >= beta)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
                     beta = Math.Min(score, beta);
-                }
-
-                if (beta <= alpha)
-                {
-                    break;
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -229,21 +205,22 @@ namespace api.helperclasses
             return boardScore;
         }
 
-        public Board CopyBoard(Board board)
+        public Game CopyGame(Game game)
         {
-            Board newBoard = new();
+            Game newGame = new() { Board = new(), CheckedColor = game.CheckedColor };
+
             int i = 0;
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
-                newBoard.Rows.Add(new());
+                newGame.Board.Rows.Add(new());
                 foreach (BoardSquare square in row.Squares)
                 {
-                    newBoard.Rows[i].Squares.Add(square.Copy());
+                    newGame.Board.Rows[i].Squares.Add(square.Copy());
                 }
                 i++;
             }
 
-            return newBoard;
+            return newGame;
         }
     }
 }
