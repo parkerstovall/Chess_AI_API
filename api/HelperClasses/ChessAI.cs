@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 using api.models.api;
+using api.models.db;
 using api.pieces;
 using api.pieces.interfaces;
 
@@ -25,7 +26,7 @@ namespace api.helperclasses
             }
         }
 
-        public Board GetMove(Board board, out string? checkColor)
+        public Board GetMove(Board board, out Move? foundMove, out string? checkColor)
         {
             int score = int.MinValue;
             int[] move = new int[4];
@@ -64,24 +65,33 @@ namespace api.helperclasses
                             if (tempScore > score)
                             {
                                 score = tempScore;
-                                move = new int[]
-                                {
+                                move =
+                                [
                                     square.Coords[0],
                                     square.Coords[1],
                                     localMove[0],
                                     localMove[1]
-                                };
+                                ];
                             }
                         }
                     }
                 }
             }
 
-            checkColor = MoveHelper.MovePiece(
-                new int[] { move[0], move[1] },
-                new int[] { move[2], move[3] },
-                ref board
-            );
+            checkColor = MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref board);
+
+            foundMove = null;
+            IPiece? piece = board.Rows[move[2]].Squares[move[3]].Piece;
+            if (piece != null)
+            {
+                foundMove = new()
+                {
+                    From = [move[0], move[1]],
+                    To = [move[2], move[3]],
+                    PieceColor = piece.Color,
+                    PieceType = piece.GetType().Name
+                };
+            }
 
             return board;
         }

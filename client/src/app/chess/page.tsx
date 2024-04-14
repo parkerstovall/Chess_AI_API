@@ -1,11 +1,11 @@
 "use client";
 
-import { BoardDisplay, ClickReturn, GeneratedAPI } from "src/GeneratedAPI";
-import React, { useState, useEffect } from "react";
+import { BoardDisplay, ClickReturn } from "src/GeneratedAPI";
+import React, { useState } from "react";
 import Board from "src/components/chess/board";
 import ResetButtons from "src/components/chess/resetbuttons";
 
-let api = new GeneratedAPI(process.env.NEXT_PUBLIC_API_URL);
+//let api = new GeneratedAPI(process.env.NEXT_PUBLIC_API_URL);
 
 export default function App() {
   const [board, setBoard] = useState<BoardDisplay>();

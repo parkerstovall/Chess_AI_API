@@ -18,7 +18,7 @@ namespace api.helperclasses
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
             List<int[]> moves =
                 square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
-                ?? new();
+                ?? [];
             return moves;
         }
 
@@ -193,7 +193,7 @@ namespace api.helperclasses
                 tracker.SetHasSavingSquares(
                     checkSavingSquaresPiece.Color == "white" ? "black" : "white",
                     checkSavingSquaresPiece.HasSavingSquares(
-                        new int[] { checkSquare.Coords[0], checkSquare.Coords[1] },
+                        [checkSquare.Coords[0], checkSquare.Coords[1]],
                         kingLoc,
                         ref board
                     )

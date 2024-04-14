@@ -2,6 +2,7 @@ using api.helperclasses;
 using api.models.api;
 using api.models.client;
 using api.models.db;
+using api.pieces.interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -51,6 +52,19 @@ namespace api.repository
                 )
             )
             {
+                IPiece? piece = game.Board.Rows[row].Squares[col].Piece;
+                if (piece != null)
+                {
+                    game.MoveHistory.Add(
+                        new Move
+                        {
+                            From = game.SelectedSquare,
+                            To = clickedSquare,
+                            PieceColor = piece.Color,
+                            PieceType = piece.GetType().Name
+                        }
+                    );
+                }
                 game.Board = board;
                 game.AvailableMoves.Clear();
                 game.IsWhiteTurn = !game.IsWhiteTurn;
@@ -93,7 +107,11 @@ namespace api.repository
 
             ChessAI ai = new(game.CheckedColor, game.IsPlayerWhite);
 
-            game.Board = ai.GetMove(game.Board, out string? checkColor);
+            game.Board = ai.GetMove(game.Board, out Move? foundMove, out string? checkColor);
+            if (foundMove != null)
+            {
+                game.MoveHistory.Add(foundMove);
+            }
             game.CheckedColor = checkColor;
             game.IsWhiteTurn = !game.IsWhiteTurn;
             game = await GetsertGame(game);
