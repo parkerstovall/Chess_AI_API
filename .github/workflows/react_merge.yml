@@ -1,5 +1,9 @@
 name: React
-on: [push]
+
+on:
+  push:
+    branches: ["master"]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -49,12 +53,12 @@ jobs:
           key: ${{secrets.API_KEY}}
           source: client.tar.gz
           target: /var/www/temp/
-      
+
       - name: Deploy application
         uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.API_HOST}}
-          username:  ${{secrets.API_USERNAME}}
+          username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           script: |
             rm -rf /var/www/parker-stovall.com/html
