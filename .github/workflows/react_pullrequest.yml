@@ -13,4 +13,6 @@ jobs:
       - uses: actions/setup-node@v4
       - run: npm install
       - run: npm run build
+      - run: npx tsc --build --clean
+      - run: npx prettier -c "./**/{app,components}/**/*{.ts,.tsx}"
       - run: rm -rf node_modules
