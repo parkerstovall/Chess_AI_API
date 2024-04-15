@@ -16,12 +16,6 @@ export default function Board(props: BoardProps) {
     for (const row of board?.rows ?? []) {
       for (const square of row.squares ?? []) {
         if (square.cssClass?.includes("inCheckMate")) {
-          let color = "White";
-
-          if (square.cssClass.includes("whiteKing")) {
-            color = "Black";
-          }
-
           setGameOver(true);
           breakLoop = true;
           break;

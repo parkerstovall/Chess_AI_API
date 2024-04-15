@@ -81,7 +81,7 @@ export default function App() {
         headers: {
           "Access-Control-Allow-Origin": "*",
         },
-      }
+      },
     )
       .then((res) => {
         if (res.ok) {
