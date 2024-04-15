@@ -72,17 +72,14 @@ export default function App() {
 
   function Start(isWhite: boolean, isTwoPlayer: boolean) {
     setIsTwoPlayer(isTwoPlayer);
-    fetch(
-      `http://localhost:5000/api/v1/game/startGame?isWhite=${isWhite}&isTwoPlayer=${isTwoPlayer}`,
-      {
-        mode: "cors",
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
+    fetch(`http://localhost:5000/api/v1/game/startGame?isWhite=${isWhite}&isTwoPlayer=${isTwoPlayer}`, {
+      mode: "cors",
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
       },
-    )
+    })
       .then((res) => {
         if (res.ok) {
           return res.json();
@@ -177,12 +174,7 @@ export default function App() {
 
   return (
     <>
-      <Board
-        board={board}
-        isWhite={isWhite}
-        clickFunc={BoardSquareClick}
-        setGameOver={setGameOver}
-      />
+      <Board board={board} isWhite={isWhite} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
       <ResetButtons StartFunc={Start} />
     </>
   );
