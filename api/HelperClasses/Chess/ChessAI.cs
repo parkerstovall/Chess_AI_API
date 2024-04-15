@@ -6,7 +6,7 @@ using api.models.db;
 using api.pieces;
 using api.pieces.interfaces;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     public class ChessAI
     {
@@ -77,6 +77,7 @@ namespace api.helperclasses
             {
                 foundMove = new()
                 {
+                    GameID = game.GameID,
                     From = [move[0], move[1]],
                     To = [move[2], move[3]],
                     PieceColor = piece.Color,

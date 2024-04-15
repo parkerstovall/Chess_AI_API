@@ -1,7 +1,7 @@
 using api.pieces;
 using api.pieces.interfaces;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     internal static class PieceFactory
     {

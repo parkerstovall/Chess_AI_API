@@ -16,6 +16,16 @@ public class BoardController : ControllerBase
         _repo = repo;
     }
 
+    [HttpPost("tryGetSavedGame")]
+    [SwaggerOperation(
+        Summary = "Try Get Game From Cookie",
+        Description = "Try to get a saved game from cookie"
+    )]
+    public async Task<SavedGameResult?> TryGetSavedGame()
+    {
+        return await _repo.TryGetSavedGame();
+    }
+
     [HttpPost("startGame")]
     [SwaggerOperation(
         Summary = "Start new game",

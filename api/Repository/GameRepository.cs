@@ -1,4 +1,4 @@
-using api.helperclasses;
+using api.helperclasses.chess;
 using api.models.api;
 using api.models.client;
 using api.models.db;
@@ -13,6 +13,23 @@ namespace api.repository
     {
         private readonly ConnectionRepository _connRepo = connRepo;
         private readonly IHttpContextAccessor _context = context;
+
+        public async Task<SavedGameResult?> TryGetSavedGame()
+        {
+            var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
+            if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
+            {
+                var game = await GetsertGame();
+                return new()
+                {
+                    BoardDisplay = BoardHelper.GetBoardForDisplay(game),
+                    IsPlayerWhite = game.IsPlayerWhite,
+                    IsTwoPlayer = game.IsTwoPlayer
+                };
+            }
+
+            return null;
+        }
 
         public async Task<BoardDisplay> StartGame(bool isWhite, bool isTwoPlayer)
         {
@@ -62,6 +79,7 @@ namespace api.repository
                     await moveHistory.InsertOneAsync(
                         new Move
                         {
+                            GameID = game.GameID,
                             From = game.SelectedSquare,
                             To = clickedSquare,
                             PieceColor = piece.Color,

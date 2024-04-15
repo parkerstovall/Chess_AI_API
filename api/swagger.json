@@ -5,6 +5,35 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/v1/game/tryGetSavedGame": {
+      "post": {
+        "tags": [
+          "Board"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/game/startGame": {
       "post": {
         "tags": [
@@ -189,6 +218,21 @@
             "$ref": "#/components/schemas/BoardDisplay"
           },
           "moved": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SavedGameResult": {
+        "type": "object",
+        "properties": {
+          "boardDisplay": {
+            "$ref": "#/components/schemas/BoardDisplay"
+          },
+          "isPlayerWhite": {
+            "type": "boolean"
+          },
+          "isTwoPlayer": {
             "type": "boolean"
           }
         },

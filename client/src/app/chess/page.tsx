@@ -1,7 +1,7 @@
 "use client";
 
-import { BoardDisplay, ClickReturn } from "src/GeneratedAPI";
-import React, { useState } from "react";
+import { BoardDisplay, ClickReturn, SavedGameResult } from "src/GeneratedAPI";
+import React, { useState, useEffect } from "react";
 import Board from "src/components/chess/board";
 import ResetButtons from "src/components/chess/resetbuttons";
 
@@ -123,6 +123,57 @@ export default function App() {
     //     console.log(ex);
     //   });
   }
+
+  function tryGetSavedGame() {
+    fetch(`http://localhost:5000/api/v1/game/tryGetSavedGame`, {
+      mode: "cors",
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          return res.text();
+        }
+      })
+      .then((strResp: string | undefined) => {
+        if (!strResp || strResp.length === 0) {
+          return;
+        }
+
+        const resp: SavedGameResult = JSON.parse(strResp);
+        setIsWhite(resp.isPlayerWhite ?? true);
+        setBoard(resp.boardDisplay);
+        setIsTwoPlayer(resp.isTwoPlayer ?? false);
+
+        if (resp.isPlayerWhite && !resp.isTwoPlayer) {
+          setIsCompTurn(true);
+          fetch(`http://localhost:5000/api/v1/game/compMove`, {
+            mode: "cors",
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          })
+            .then((res) => {
+              if (res.ok) {
+                return res.json();
+              }
+            })
+            .then((board: BoardDisplay) => {
+              setBoard(board);
+              setIsCompTurn(false);
+            });
+        }
+      });
+  }
+
+  useEffect(() => {
+    tryGetSavedGame();
+  }, []);
 
   return (
     <>

@@ -19,6 +19,42 @@ export class GeneratedAPI {
     }
 
     /**
+     * @return Success
+     */
+    tryGetSavedGame(): Promise<SavedGameResult> {
+        let url_ = this.baseUrl + "/api/v1/game/tryGetSavedGame";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processTryGetSavedGame(_response);
+        });
+    }
+
+    protected processTryGetSavedGame(response: Response): Promise<SavedGameResult> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as SavedGameResult;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<SavedGameResult>(null as any);
+    }
+
+    /**
      * @param isWhite (optional) 
      * @param isTwoPlayer (optional) 
      * @return Success
@@ -164,6 +200,12 @@ export interface BoardDisplaySquare {
 export interface ClickReturn {
     board: BoardDisplay;
     moved: boolean;
+}
+
+export interface SavedGameResult {
+    boardDisplay?: BoardDisplay;
+    isPlayerWhite?: boolean;
+    isTwoPlayer?: boolean;
 }
 
 export class ApiException extends Error {

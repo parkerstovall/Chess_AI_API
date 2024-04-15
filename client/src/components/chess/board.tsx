@@ -22,7 +22,6 @@ export default function Board(props: BoardProps) {
             color = "Black";
           }
 
-          alert(`Checkmate, ${color} wins!`);
           setGameOver(true);
           breakLoop = true;
           break;
