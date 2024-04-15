@@ -6,7 +6,7 @@
     "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm run dev\"",
     "verify": "concurrently \"npm run verify:api\" \"npm run verify:client\"",
     "verify:api": "cd api && dotnet build",
-    "verify:client": "cd client && npm run build && npx tsc --build --clean && npx prettier -w \"./**/{app,components}/**/*{.ts,.tsx}\""
+    "verify:client": "cd client && npm run build && npx tsc --build --clean && npx prettier -w \"./src/{app,components}/**/*{.ts,.tsx}\""
   },
   "author": "Parker Stovall",
   "license": "ISC",
