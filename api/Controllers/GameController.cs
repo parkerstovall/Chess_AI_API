@@ -7,21 +7,16 @@ namespace api.Controllers;
 
 [ApiController]
 [Route("api/v1/game")]
-public class BoardController : ControllerBase
+public class BoardController(GameRepository repo) : ControllerBase
 {
-    private readonly GameRepository _repo;
-
-    public BoardController(GameRepository repo)
-    {
-        _repo = repo;
-    }
+    private readonly GameRepository _repo = repo;
 
     [HttpPost("tryGetSavedGame")]
     [SwaggerOperation(
         Summary = "Try Get Game From Cookie",
         Description = "Try to get a saved game from cookie"
     )]
-    public async Task<SavedGameResult?> TryGetSavedGame()
+    public async Task<SavedGameResult> TryGetSavedGame()
     {
         return await _repo.TryGetSavedGame();
     }

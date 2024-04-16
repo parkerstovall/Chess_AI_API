@@ -14,9 +14,10 @@ namespace api.repository
         private readonly ConnectionRepository _connRepo = connRepo;
         private readonly IHttpContextAccessor _context = context;
 
-        public async Task<SavedGameResult?> TryGetSavedGame()
+        public async Task<SavedGameResult> TryGetSavedGame()
         {
             var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
+
             if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
             {
                 var game = await GetsertGame();
@@ -28,7 +29,7 @@ namespace api.repository
                 };
             }
 
-            return null;
+            return new();
         }
 
         public async Task<BoardDisplay> StartGame(bool isWhite, bool isTwoPlayer)
