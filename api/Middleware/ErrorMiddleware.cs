@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using api.models.db;
 using api.repository;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,7 @@ public class ErrorMiddleware(RequestDelegate next)
         catch (Exception ex)
         {
             await connRepo.GetCollection<Error>("ErrorLog").InsertOneAsync(new Error(ex));
+            Debug.WriteLine(ex.ToString());
         }
     }
 }
