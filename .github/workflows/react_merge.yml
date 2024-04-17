@@ -72,8 +72,8 @@ jobs:
             cd /var/www/temp/
             tar -xvf client.tar.gz -C /var/www/parker-stovall.com/html
             cd /var/www/parker-stovall.com/html
-            mv client/build/* .
-            rm -rf client
-            rm -rf node_modules
-            cd /var/www/temp/
-            rm -rf client.tar.gz
+            # mv client/build/* .
+            # rm -rf client
+            # rm -rf node_modules
+            # cd /var/www/temp/
+            # rm -rf client.tar.gz
