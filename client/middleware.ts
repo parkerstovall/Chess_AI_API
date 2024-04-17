@@ -2,17 +2,20 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  console.log("here");
   const config: RequestInit = {
     method: request.method,
     body: request.body,
+    mode: "cors",
+    credentials: "include",
   };
 
+  console.log("here2");
   if (process.env.NODE_ENV === "development") {
     request.headers.append("Access-Control-Allow-Origin:", "localhost:5000");
-    config.mode = "cors";
-    config.credentials = "include";
   }
 
+  console.log("here3");
   let path = new URL(request.url).pathname.replace("/app", "");
   if (path.endsWith("/")) {
     path = path.slice(0, -1);
