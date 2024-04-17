@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     config.credentials = "include";
   }
 
-  let path = new URL(request.url).pathname;
+  let path = new URL(request.url).pathname.replace("/app", "");
   if (path.endsWith("/")) {
     path = path.slice(0, -1);
   }
@@ -40,5 +40,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: "/app/api/:path*",
 };

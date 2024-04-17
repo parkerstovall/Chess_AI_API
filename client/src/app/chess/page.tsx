@@ -14,7 +14,7 @@ export default function App() {
 
   function ComputerMove() {
     setIsCompTurn(true);
-    new GeneratedAPI("").compMove().then((board: BoardDisplay) => {
+    new GeneratedAPI("/app/").compMove().then((board: BoardDisplay) => {
       setBoard(board);
       setIsCompTurn(false);
     });
@@ -25,7 +25,7 @@ export default function App() {
       return;
     }
 
-    new GeneratedAPI("").click(row, col).then((clickReturn: ClickReturn) => {
+    new GeneratedAPI("/app/").click(row, col).then((clickReturn: ClickReturn) => {
       setBoard(clickReturn.board);
 
       if (clickReturn.moved && !isTwoPlayer) {
@@ -36,7 +36,7 @@ export default function App() {
 
   function Start(isWhite: boolean, isTwoPlayer: boolean) {
     setIsTwoPlayer(isTwoPlayer);
-    new GeneratedAPI("").startGame(isWhite, isTwoPlayer).then((board: BoardDisplay) => {
+    new GeneratedAPI("/app/").startGame(isWhite, isTwoPlayer).then((board: BoardDisplay) => {
       setIsWhite(isWhite);
       setBoard(board);
 
@@ -47,7 +47,7 @@ export default function App() {
   }
 
   function tryGetSavedGame() {
-    new GeneratedAPI("").tryGetSavedGame().then((resp: SavedGameResult) => {
+    new GeneratedAPI("/app/").tryGetSavedGame().then((resp: SavedGameResult) => {
       if (!resp.boardDisplay) {
         return;
       }

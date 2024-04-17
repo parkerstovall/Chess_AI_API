@@ -73,6 +73,8 @@ jobs:
             tar -xvf client.tar.gz -C /var/www/parker-stovall.com/html
             cd /var/www/parker-stovall.com/html
             mv client/* .
+            npm run build
+            npm run start
             rm -rf client
             rm -rf node_modules
             cd /var/www/temp/
