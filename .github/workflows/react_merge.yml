@@ -74,6 +74,7 @@ jobs:
             cd /var/www/parker-stovall.com/html
             mv client/* .
             rm -rf client
+            echo "NEXT_PUBLIC_API_URL=https://www.parker-stovall.com" > .env.local
             npm i
             npm run build
             systemctl restart client
