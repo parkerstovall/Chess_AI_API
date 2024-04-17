@@ -1,7 +1,7 @@
 "use client";
 
 import { BoardDisplay, ClickReturn, GeneratedAPI, SavedGameResult } from "src/GeneratedAPI";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Board from "src/components/chess/board";
 import ResetButtons from "src/components/chess/resetbuttons";
 
@@ -46,7 +46,7 @@ export default function App() {
     });
   }
 
-  function tryGetSavedGame() {
+  const tryGetSavedGame = useCallback(() => {
     new GeneratedAPI("/app/").tryGetSavedGame().then((resp: SavedGameResult) => {
       if (!resp.boardDisplay) {
         return;
@@ -60,12 +60,11 @@ export default function App() {
         ComputerMove();
       }
     });
-  }
+  }, []);
 
   useEffect(() => {
     tryGetSavedGame();
-    //eslint-disable-next-line
-  }, []);
+  }, [tryGetSavedGame]);
 
   return (
     <>
