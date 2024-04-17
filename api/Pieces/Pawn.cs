@@ -1,12 +1,10 @@
-﻿using api.models.api;
-using api.helperclasses;
+﻿using api.helperclasses.chess;
+using api.models.api;
 using api.pieces.interfaces;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Net.Http.Headers;
 
 namespace api.pieces
 {
-    public class Pawn : IPieceHasMoved
+    public class Pawn : IPieceDirectAttacker, IPieceHasMoved
     {
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }

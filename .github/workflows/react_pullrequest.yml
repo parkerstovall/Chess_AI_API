@@ -1,0 +1,18 @@
+name: React PR
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm install
+      - run: npx prettier -c "./src/{app,components}/**/*{.ts,.tsx}"
+      - run: npx tsc --build --clean
+      - run: npm run build
+      - run: rm -rf node_modules

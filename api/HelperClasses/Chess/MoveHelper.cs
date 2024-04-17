@@ -2,42 +2,39 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reflection.Metadata.Ecma335;
 using api.models.api;
+using api.models.db;
 using api.pieces;
 using api.pieces.interfaces;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     internal static class MoveHelper
     {
         internal static List<int[]> GetMovesFromPiece(
             Board board,
             int[] clickedSquare,
-            string checkColor
+            string? checkColor
         )
         {
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
             List<int[]> moves =
                 square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
-                ?? new();
+                ?? [];
             return moves;
         }
 
         internal static bool TryMovePiece(
             int[] coords,
             int[] start,
-            ref List<int[]> moves,
-            ref Board board,
-            out string checkColor
+            List<int[]> moves,
+            ref Game game
         )
         {
-            checkColor = "";
-
             foreach (int[] move in moves)
             {
                 if (move[0] == coords[0] && move[1] == coords[1])
                 {
-                    checkColor = MovePiece(start, move, ref board);
-                    moves.Clear();
+                    MovePiece(start, move, ref game);
                     return true;
                 }
             }
@@ -45,38 +42,38 @@ namespace api.helperclasses
             return false;
         }
 
-        internal static string MovePiece(int[] start, int[] dest, ref Board board)
+        internal static void MovePiece(int[] start, int[] dest, ref Game game)
         {
-            BoardSquare from = board.Rows[start[0]].Squares[start[1]];
-            BoardSquare to = board.Rows[dest[0]].Squares[dest[1]];
+            BoardSquare from = game.Board.Rows[start[0]].Squares[start[1]];
+            BoardSquare to = game.Board.Rows[dest[0]].Squares[dest[1]];
 
             if (from.Piece == null)
             {
-                return "";
+                return;
             }
 
             //Attempts EnPassant if valid
-            CheckEnPassantCapture(from.Piece, to, start, dest, ref board);
+            CheckEnPassantCapture(from.Piece, to, start, dest, ref game);
 
             //Set all values to empty
-            ResetBoard(ref board);
+            ResetBoard(ref game);
 
             //Check if EnPassant is available for next turn
-            CheckEnPassantMove(from.Piece, start, dest, ref board);
+            CheckEnPassantMove(from.Piece, start, dest, ref game);
 
             //Actual Piece move
-            MovePieceInner(to, from, ref board);
+            MovePieceInner(to, from, ref game);
 
             //Refresh board stats
-            CheckTracker tracker = RefreshBoard(ref board);
+            CheckTracker tracker = RefreshBoard(ref game);
 
             //Checks for Pins
-            CheckPins(tracker, ref board);
+            CheckPins(tracker, ref game);
 
             //Check for Checkmate
-            CheckCheckmate(tracker, ref board);
+            CheckCheckmate(tracker, ref game);
 
-            return tracker.CheckColor();
+            game.CheckedColor = tracker.CheckColor();
         }
 
         private static void CheckEnPassantCapture(
@@ -84,7 +81,7 @@ namespace api.helperclasses
             BoardSquare to,
             int[] start,
             int[] dest,
-            ref Board board
+            ref Game game
         )
         {
             //Checking for en passant capture
@@ -97,13 +94,13 @@ namespace api.helperclasses
             {
                 int[] enPassantSquare = { dest[0], dest[1] };
                 enPassantSquare[0] += (start[0] > dest[0]) ? 1 : -1;
-                board.Rows[enPassantSquare[0]].Squares[enPassantSquare[1]].Piece = null;
+                game.Board.Rows[enPassantSquare[0]].Squares[enPassantSquare[1]].Piece = null;
             }
         }
 
-        private static void ResetBoard(ref Board board)
+        private static void ResetBoard(ref Game game)
         {
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
@@ -127,24 +124,19 @@ namespace api.helperclasses
             }
         }
 
-        private static void CheckEnPassantMove(
-            IPiece piece,
-            int[] start,
-            int[] dest,
-            ref Board board
-        )
+        private static void CheckEnPassantMove(IPiece piece, int[] start, int[] dest, ref Game game)
         {
             //Checking for en passant opportunity
             if (Math.Abs(start[0] - dest[0]) == 2 && piece is Pawn pawn)
             {
                 int[] enPassantSquare = { start[0], start[1] };
                 enPassantSquare[0] += (start[0] > dest[0]) ? -1 : 1;
-                board.Rows[enPassantSquare[0]].Squares[enPassantSquare[1]].EnPassantColor =
+                game.Board.Rows[enPassantSquare[0]].Squares[enPassantSquare[1]].EnPassantColor =
                     pawn.Color;
             }
         }
 
-        private static void MovePieceInner(BoardSquare to, BoardSquare from, ref Board board)
+        private static void MovePieceInner(BoardSquare to, BoardSquare from, ref Game game)
         {
             to.Piece = from.Piece;
             from.Piece = null;
@@ -164,41 +156,66 @@ namespace api.helperclasses
 
             if (Math.Abs(from.Coords[1] - to.Coords[1]) > 1 && to.Piece is King)
             {
-                CastleKing(from.Coords, to.Coords, ref board);
+                CastleKing(from.Coords, to.Coords, ref game);
             }
         }
 
-        private static void CastleKing(int[] start, int[] dest, ref Board board)
+        private static void CastleKing(int[] start, int[] dest, ref Game game)
         {
             int[] rookStart = { start[0], start[1] > dest[1] ? 0 : 7 };
             int[] rookDest = { start[0], start[1] > dest[1] ? 3 : 5 };
-            MovePiece(rookStart, rookDest, ref board);
+            MovePiece(rookStart, rookDest, ref game);
         }
 
-        private static CheckTracker RefreshBoard(ref Board board)
+        private static CheckTracker RefreshBoard(ref Game game)
         {
             CheckTracker tracker = new();
             BoardSquare? checkSquare = null;
-            int[] kingLoc = new int[] { -1, -1 };
+            int[] kingLoc = [-1, -1];
 
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    AddBoardPressure(square, ref board, ref tracker, ref checkSquare, ref kingLoc);
+                    AddBoardPressure(square, ref game, ref tracker, ref checkSquare, ref kingLoc);
                 }
             }
 
-            if (checkSquare != null && checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
+            if (checkSquare != null)
             {
-                tracker.SetHasSavingSquares(
-                    checkSavingSquaresPiece.Color == "white" ? "black" : "white",
-                    checkSavingSquaresPiece.HasSavingSquares(
-                        new int[] { checkSquare.Coords[0], checkSquare.Coords[1] },
-                        kingLoc,
-                        ref board
-                    )
-                );
+                if (checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
+                {
+                    tracker.SetHasSavingSquares(
+                        checkSavingSquaresPiece.Color == "white" ? "black" : "white",
+                        checkSavingSquaresPiece.HasSavingSquares(
+                            [checkSquare.Coords[0], checkSquare.Coords[1]],
+                            kingLoc,
+                            ref game
+                        )
+                    );
+                }
+                else if (checkSquare.Piece is IPieceDirectAttacker directAttacker)
+                {
+                    var color = directAttacker.Color == "white" ? "black" : "white";
+                    var pressure =
+                        directAttacker.Color == "white"
+                            ? checkSquare.WhitePressure
+                            : checkSquare.BlackPressure;
+                    var enemyPressure =
+                        directAttacker.Color == "white"
+                            ? checkSquare.BlackPressure
+                            : checkSquare.WhitePressure;
+                    var isFromKing =
+                        directAttacker.Color == "white"
+                            ? checkSquare.WhiteKingPressure
+                            : checkSquare.BlackKingPressure;
+
+                    if (enemyPressure > 1 || (enemyPressure == 1 && (!isFromKing || pressure == 0)))
+                    {
+                        checkSquare.CheckBlockingColor = color;
+                        tracker.SetHasSavingSquares(color, true);
+                    }
+                }
             }
 
             return tracker;
@@ -206,7 +223,7 @@ namespace api.helperclasses
 
         private static void AddBoardPressure(
             BoardSquare square,
-            ref Board board,
+            ref Game game,
             ref CheckTracker tracker,
             ref BoardSquare? checkSquare,
             ref int[] kingLoc
@@ -227,17 +244,17 @@ namespace api.helperclasses
                 tracker.SetKing(square);
             }
 
-            foreach (int[] pMove in square.Piece.GetPressure(board, square.Coords))
+            foreach (int[] pMove in square.Piece.GetPressure(game.Board, square.Coords))
             {
-                BoardSquare pSquare = board.Rows[pMove[0]].Squares[pMove[1]];
+                BoardSquare pSquare = game.Board.Rows[pMove[0]].Squares[pMove[1]];
 
                 if (pSquare.Piece is King king)
                 {
                     if (square.Piece.Color != king.Color)
                     {
                         if (
-                            square.Piece is IPieceCanPin pinPiece
-                            && tracker.GetKingAttackers(king.Color) == 0
+                            (square.Piece is IPieceCanPin || square.Piece is IPieceDirectAttacker)
+                            && tracker.GetKingAttackers(king.Color).Count == 0
                         )
                         {
                             checkSquare = square;
@@ -246,11 +263,11 @@ namespace api.helperclasses
                         else
                         {
                             checkSquare = null;
-                            kingLoc = new int[] { -1, -1 };
+                            kingLoc = [-1, -1];
                             tracker.SetHasSavingSquares(king.Color, false);
                         }
 
-                        tracker.AddAttacker(king.Color);
+                        tracker.AddAttacker(square);
                         tracker.SetKing(pSquare);
                         king.InCheck = true;
                     }
@@ -277,7 +294,7 @@ namespace api.helperclasses
             }
         }
 
-        private static void CheckPins(CheckTracker tracker, ref Board board)
+        private static void CheckPins(CheckTracker tracker, ref Game game)
         {
             foreach (BoardSquare square in tracker.PinPieces)
             {
@@ -289,31 +306,31 @@ namespace api.helperclasses
                 int[] lStart = new int[] { square.Coords[0], square.Coords[1] };
                 if (piece.Color == "white" && tracker.BlackKing != null)
                 {
-                    piece.CheckPins(lStart, tracker.BlackKing.Coords, ref board);
+                    piece.CheckPins(lStart, tracker.BlackKing.Coords, ref game);
                 }
                 else if (tracker.WhiteKing != null)
                 {
-                    piece.CheckPins(lStart, tracker.WhiteKing.Coords, ref board);
+                    piece.CheckPins(lStart, tracker.WhiteKing.Coords, ref game);
                 }
             }
         }
 
-        private static void CheckCheckmate(CheckTracker tracker, ref Board board)
+        private static void CheckCheckmate(CheckTracker tracker, ref Game game)
         {
             if (tracker.WhiteKing != null)
             {
-                CheckKingInCheckMate(tracker.WhiteKing, tracker, ref board);
+                CheckKingInCheckMate(tracker.WhiteKing, tracker, ref game);
             }
             else if (tracker.BlackKing != null)
             {
-                CheckKingInCheckMate(tracker.BlackKing, tracker, ref board);
+                CheckKingInCheckMate(tracker.BlackKing, tracker, ref game);
             }
         }
 
         private static void CheckKingInCheckMate(
             BoardSquare square,
             CheckTracker tracker,
-            ref Board board
+            ref Game game
         )
         {
             if (square.Piece == null || square.Piece is not King king || !king.InCheck)
@@ -321,7 +338,43 @@ namespace api.helperclasses
                 return;
             }
 
-            if (king.GetPaths(board, square.Coords, true).Count > 0)
+            var attackers = tracker.GetKingAttackers(king.Color);
+            if (attackers.Count == 1)
+            {
+                var attacker = attackers[0];
+                var pressure =
+                    king.Color == "white" ? attacker.WhitePressure : attacker.BlackPressure;
+                var enemyPressure =
+                    king.Color == "white" ? attacker.BlackPressure : attacker.WhitePressure;
+                var isFromKing =
+                    king.Color == "white" ? attacker.WhiteKingPressure : attacker.BlackKingPressure;
+
+                if (pressure > 1 || (pressure == 1 && (!isFromKing || enemyPressure == 0)))
+                {
+                    return;
+                }
+            }
+            else
+            {
+                foreach (var attacker in attackers)
+                {
+                    var pressure =
+                        king.Color == "white" ? attacker.WhitePressure : attacker.BlackPressure;
+                    var enemyPressure =
+                        king.Color == "white" ? attacker.BlackPressure : attacker.WhitePressure;
+                    var isFromKing =
+                        king.Color == "white"
+                            ? attacker.WhiteKingPressure
+                            : attacker.BlackKingPressure;
+
+                    if (pressure == 1 && (!isFromKing || enemyPressure == 0))
+                    {
+                        return;
+                    }
+                }
+            }
+
+            if (king.GetPaths(game.Board, square.Coords, true).Count > 0)
             {
                 return;
             }
@@ -336,6 +389,9 @@ namespace api.helperclasses
             }
 
             king.InCheckMate = true;
+            game.SetStatus(
+                king.Color == "white" ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack
+            );
         }
     }
 }

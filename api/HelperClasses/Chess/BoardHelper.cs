@@ -1,9 +1,10 @@
-using api.pieces.interfaces;
 using api.models.api;
 using api.models.client;
+using api.models.db;
 using api.pieces;
+using api.pieces.interfaces;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     internal static class BoardHelper
     {
@@ -55,23 +56,24 @@ namespace api.helperclasses
         }
 
         //Don't want to expose the full board class to the client
-        internal static BoardDisplay GetBoardForDisplay(
-            Board board,
-            List<int[]>? moves,
-            int[]? selectedSquare
-        )
+        internal static BoardDisplay GetBoardForDisplay(Game game)
         {
             BoardDisplay boardDisplay = new();
             bool whiteSquare = true;
 
-            foreach (BoardRow row in board.Rows)
+            foreach (BoardRow row in game.Board.Rows)
             {
                 BoardDisplayRow displayRow = new();
 
                 foreach (BoardSquare square in row.Squares)
                 {
                     displayRow.Squares.Add(
-                        CreateBoardSquare(whiteSquare, square, moves, selectedSquare)
+                        CreateBoardSquare(
+                            whiteSquare,
+                            square,
+                            game.AvailableMoves,
+                            game.SelectedSquare
+                        )
                     );
                     whiteSquare = !whiteSquare;
                 }
@@ -126,8 +128,8 @@ namespace api.helperclasses
 
             return new()
             {
-                Col = square.Coords[0],
-                Row = square.Coords[1],
+                Row = square.Coords[0],
+                Col = square.Coords[1],
                 CssClass = cssClass
             };
         }

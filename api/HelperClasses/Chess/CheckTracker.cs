@@ -2,17 +2,16 @@ using api.models.api;
 using api.pieces;
 using api.pieces.interfaces;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     public class CheckTracker
     {
         public BoardSquare? WhiteKing { get; set; } = null;
         public BoardSquare? BlackKing { get; set; } = null;
-        public List<BoardSquare> PinPieces { get; set; } = new List<BoardSquare>();
+        public List<BoardSquare> PinPieces { get; set; } = [];
         public bool HasWhiteSavingSquares { get; set; } = false;
         public bool HasBlackSavingSquares { get; set; } = false;
-        public int WhiteAttackers { get; set; } = 0;
-        public int BlackAttackers { get; set; } = 0;
+        public List<BoardSquare> Attackers { get; set; } = [];
 
         public void SetKing(BoardSquare square)
         {
@@ -34,21 +33,14 @@ namespace api.helperclasses
             return color == "white" ? WhiteKing : BlackKing;
         }
 
-        public int GetKingAttackers(string color)
+        public List<BoardSquare> GetKingAttackers(string color)
         {
-            return color == "white" ? WhiteAttackers : BlackAttackers;
+            return Attackers.Where((a) => a.Piece?.Color != color).ToList();
         }
 
-        public void AddAttacker(string color)
+        public void AddAttacker(BoardSquare attacker)
         {
-            if (color == "white")
-            {
-                WhiteAttackers++;
-            }
-            else
-            {
-                BlackAttackers++;
-            }
+            Attackers.Add(attacker);
         }
 
         public void SetHasSavingSquares(string color, bool hasSavingSquares)
@@ -63,7 +55,7 @@ namespace api.helperclasses
             }
         }
 
-        public string CheckColor()
+        public string? CheckColor()
         {
             if (IsKingInCheck("white"))
             {
@@ -74,7 +66,7 @@ namespace api.helperclasses
                 return "black";
             }
 
-            return "";
+            return null;
         }
 
         private bool IsKingInCheck(string color)

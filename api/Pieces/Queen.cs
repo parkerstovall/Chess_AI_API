@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using api.helperclasses;
+﻿using api.helperclasses.chess;
 using api.models.api;
+using api.models.db;
 using api.pieces.interfaces;
 
 namespace api.pieces
@@ -157,7 +157,7 @@ namespace api.pieces
             return dir != Direction.None;
         }
 
-        public void CheckPins(int[] start, int[] dest, ref Board board)
+        public void CheckPins(int[] start, int[] dest, ref Game game)
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
 
@@ -168,10 +168,10 @@ namespace api.pieces
 
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-            PieceHelper.SetPins(start, inc, dir, ref board);
+            PieceHelper.SetPins(start, inc, dir, this.Color, ref game);
         }
 
-        public bool HasSavingSquares(int[] start, int[] dest, ref Board board)
+        public bool HasSavingSquares(int[] start, int[] dest, ref Game game)
         {
             Direction dir = PieceHelper.GetDirection(start, dest);
 
@@ -182,7 +182,7 @@ namespace api.pieces
 
             int[] inc = PieceHelper.GetSingleIncrement(dir);
 
-            return PieceHelper.SetSavingSquares(start, inc, this.Color, ref board);
+            return PieceHelper.SetSavingSquares(start, inc, this.Color, ref game);
         }
 
         public IPiece Copy()

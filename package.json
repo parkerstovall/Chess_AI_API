@@ -3,8 +3,15 @@
   "version": "1.0.0",
   "description": "A personal website to showcase my various apps and projects",
   "scripts": {
-    "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm start\""
+    "start": "concurrently \"cd api && dotnet run --urls=http://localhost:5000/\" \"cd client && npm run dev\"",
+    "verify": "concurrently \"npm run verify:api\" \"npm run verify:client\"",
+    "verify:api": "cd api && dotnet build",
+    "verify:client": "cd client && npm run build && npx tsc --build --clean && npx prettier -w \"./src/{app,components}/**/*{.ts,.tsx}\""
   },
   "author": "Parker Stovall",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^14.2.1",
+    "next": "^14.2.1"
+  }
 }

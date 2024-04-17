@@ -1,4 +1,4 @@
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     public enum Direction
     {

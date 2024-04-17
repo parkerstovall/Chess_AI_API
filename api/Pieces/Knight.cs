@@ -1,10 +1,10 @@
-﻿using api.helperclasses;
+﻿using api.helperclasses.chess;
 using api.models.api;
 using api.pieces.interfaces;
 
 namespace api.pieces
 {
-    public class Knight : IPiece
+    public class Knight : IPieceDirectAttacker
     {
         public string Color { get; set; }
         public string Type { get; set; }

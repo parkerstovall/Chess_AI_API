@@ -1,8 +1,10 @@
 using api.models.api;
+using api.models.db;
 using api.pieces;
 using api.pieces.interfaces;
+using ZstdSharp.Unsafe;
 
-namespace api.helperclasses
+namespace api.helperclasses.chess
 {
     internal static class PieceHelper
     {
@@ -173,17 +175,23 @@ namespace api.helperclasses
             return inc;
         }
 
-        public static void SetPins(int[] start, int[] inc, Direction dir, ref Board board)
+        public static void SetPins(
+            int[] start,
+            int[] inc,
+            Direction dir,
+            string color,
+            ref Game game
+        )
         {
             start[0] += inc[0];
             start[1] += inc[1];
             List<IPiece> pieces = new();
             while (IsInBoard(start[0], start[1]))
             {
-                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
+                BoardSquare square = game.Board.Rows[start[0]].Squares[start[1]];
                 if (square.Piece != null)
                 {
-                    if (square.Piece is King)
+                    if (square.Piece.Color == color || square.Piece is King)
                     {
                         break;
                     }
@@ -206,13 +214,13 @@ namespace api.helperclasses
             }
         }
 
-        public static bool SetSavingSquares(int[] start, int[] inc, string color, ref Board board)
+        public static bool SetSavingSquares(int[] start, int[] inc, string color, ref Game game)
         {
             bool canSave = false;
 
             while (IsInBoard(start[0], start[1]))
             {
-                BoardSquare square = board.Rows[start[0]].Squares[start[1]];
+                BoardSquare square = game.Board.Rows[start[0]].Squares[start[1]];
 
                 if (square.Piece != null && square.Piece is King)
                 {
@@ -223,7 +231,7 @@ namespace api.helperclasses
 
                 if (IsInBoard(start[0] + pawnInc, start[1]))
                 {
-                    BoardSquare pawnSquare = board.Rows[start[0] + pawnInc].Squares[start[1]];
+                    BoardSquare pawnSquare = game.Board.Rows[start[0] + pawnInc].Squares[start[1]];
                     if (
                         pawnSquare.Piece != null
                         && pawnSquare.Piece is Pawn pawn
@@ -237,7 +245,9 @@ namespace api.helperclasses
 
                 if (IsInBoard(start[0] + (2 * pawnInc), start[1]))
                 {
-                    BoardSquare pawnSquare = board.Rows[start[0] + (2 * pawnInc)].Squares[start[1]];
+                    BoardSquare pawnSquare = game.Board.Rows[start[0] + (2 * pawnInc)].Squares[
+                        start[1]
+                    ];
                     if (
                         pawnSquare.Piece != null
                         && pawnSquare.Piece is Pawn pawn

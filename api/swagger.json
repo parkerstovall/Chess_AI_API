@@ -5,8 +5,37 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/v1/game/tryGetSavedGame": {
+      "post": {
+        "tags": [
+          "Board"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedGameResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/game/startGame": {
-      "get": {
+      "post": {
         "tags": [
           "Board"
         ],
@@ -18,6 +47,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "isTwoPlayer",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -26,17 +64,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GameStart"
+                  "$ref": "#/components/schemas/BoardDisplay"
                 }
               }
             }
@@ -44,23 +82,11 @@
         }
       }
     },
-    "/api/v1/game/{gameID}/compMove": {
-      "get": {
+    "/api/v1/game/compMove": {
+      "post": {
         "tags": [
           "Board"
         ],
-        "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -85,22 +111,12 @@
         }
       }
     },
-    "/api/v1/game/{gameID}/click": {
+    "/api/v1/game/click": {
       "post": {
         "tags": [
           "Board"
         ],
         "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           {
             "name": "row",
             "in": "query",
@@ -137,47 +153,6 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClickReturn"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/game/{gameID}/ping": {
-      "post": {
-        "tags": [
-          "Board"
-        ],
-        "parameters": [
-          {
-            "name": "gameID",
-            "in": "path",
-            "required": true,
-            "style": "simple",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "boolean"
                 }
               }
             }
@@ -248,19 +223,17 @@
         },
         "additionalProperties": false
       },
-      "GameStart": {
-        "required": [
-          "board",
-          "gameID"
-        ],
+      "SavedGameResult": {
         "type": "object",
         "properties": {
-          "board": {
+          "boardDisplay": {
             "$ref": "#/components/schemas/BoardDisplay"
           },
-          "gameID": {
-            "type": "string",
-            "format": "uuid"
+          "isPlayerWhite": {
+            "type": "boolean"
+          },
+          "isTwoPlayer": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

@@ -1,5 +1,13 @@
-name: React
-on: [push]
+name: React Merge
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+    types:
+      - closed
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,6 +18,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
       - run: npm install
+      - run: npx prettier -c "./src/{app,components}/**/*{.ts,.tsx}"
+      - run: npx tsc --build --clean
       - run: npm run build
       - run: rm -rf node_modules
 
@@ -49,12 +59,12 @@ jobs:
           key: ${{secrets.API_KEY}}
           source: client.tar.gz
           target: /var/www/temp/
-      
+
       - name: Deploy application
         uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.API_HOST}}
-          username:  ${{secrets.API_USERNAME}}
+          username: ${{secrets.API_USERNAME}}
           key: ${{secrets.API_KEY}}
           script: |
             rm -rf /var/www/parker-stovall.com/html

@@ -1,7 +1,6 @@
-﻿using api.helperclasses;
+﻿using api.helperclasses.chess;
 using api.models.api;
 using api.pieces.interfaces;
-using Microsoft.AspNetCore.Authentication;
 
 namespace api.pieces
 {
