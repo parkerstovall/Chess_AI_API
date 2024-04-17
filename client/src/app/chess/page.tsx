@@ -64,7 +64,8 @@ export default function App() {
 
   useEffect(() => {
     tryGetSavedGame();
-  });
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <>
