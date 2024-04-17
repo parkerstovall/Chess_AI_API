@@ -27,7 +27,8 @@ export async function middleware(request: NextRequest) {
 
   config.headers = request.headers;
   const params = new URL(request.url).search;
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/${path}/${params}`;
+  const prefix = process.env.NEXT_PUBLIC_API_URL ?? "";
+  const url = `${prefix}/${path}/${params}`;
   console.log(url);
   console.log(config);
   const response = await fetch(url, config);
