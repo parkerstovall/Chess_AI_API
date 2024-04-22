@@ -21,7 +21,7 @@ public class CommunicationController(IConfiguration configuration) : ControllerB
         var client = new SendGridClient(_configuration.GetSection("SendGrid.ApiKey").Value);
         var from = new EmailAddress("contact@parker-stovall.com", "#yournewstalker");
         var subject = "hey bb";
-        var to = new EmailAddress("5732397896@");
+        var to = new EmailAddress("test");
         var plainTextContent = "text";
         var htmlContent = "html";
         var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
