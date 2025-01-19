@@ -1,4 +1,4 @@
-name: React PR
+name: Pull Request - Build and Test
 
 on:
   pull_request:
@@ -71,5 +71,5 @@ jobs:
           dotnet build
       - name: Run Playwright tests
         run: |
-          cd playwright_testing
+          cd playwright_tests
           npx playwright test
