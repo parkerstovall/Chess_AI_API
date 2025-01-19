@@ -72,4 +72,6 @@ jobs:
       - name: Run Playwright tests
         run: |
           cd playwright_tests
+          npm ci
+          npx playwright install --with-deps
           npx playwright test
