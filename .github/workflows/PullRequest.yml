@@ -35,10 +35,11 @@ jobs:
         run: |
           cd playwright_tests
           npm ci
-          npx playwright install --with-deps
+          npx playwright install chromium --with-deps
 
       - name: Run Playwright tests
         run: |
+          mkdir Docker/data
           cd playwright_tests
           npx playwright test
 
