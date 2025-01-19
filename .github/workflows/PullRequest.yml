@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: ./api/global.json
-          cache: true
 
       - name: Restore dependencies
         run: |
@@ -64,7 +63,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: ./api/global.json
-          cache: true
 
       - name: Install API dependencies
         run: |
