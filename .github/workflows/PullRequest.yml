@@ -40,6 +40,9 @@ jobs:
       - name: Run Playwright tests
         run: |
           mkdir Docker/data
+          sudo chmod -R go+w Docker/data/
+          mkdir Docker/data/db
+          sudo chmod -R go+w Docker/data/db
           npm run start:db
           # cd playwright_tests
           # npx playwright test
