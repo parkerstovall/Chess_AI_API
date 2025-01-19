@@ -8,3 +8,6 @@
 .next
 next-env.d.ts
 dist
+
+Docker/data
+output.css

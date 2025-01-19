@@ -24,7 +24,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="dotnet tool restore" /> 
     <Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)\$(AssemblyName).dll v1" />
-    <Exec Command="$(NSwagExe_Net80) openapi2tsclient /input:swagger.json /output:../client/src/GeneratedAPI.ts /className:GeneratedAPI /typeStyle:Interface" />
+    <!--<Exec WorkingDirectory="$(ProjectDir)" Command="$(NSwagExe_Net80) run ./nswag.json" />-->
+    <Exec Command="$(NSwagExe_Net80) openapi2tsclient /clientBaseClass:IncludeCredentials /extensionCode:../client/src/api/IncludeCredentials.ts /input:swagger.json /output:../client/src/api/GeneratedAPI.ts /className:GeneratedAPI /typeStyle:Interface /useTransformOptionsMethod:true" />
   </Target>
 
 </Project>

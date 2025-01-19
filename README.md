@@ -4,5 +4,6 @@ This is a custom build chess AI game that stores games in a local Mongo DB ran o
 
 To run the app, do the following in two separate terminals:
 
+- npm run build:css (This only needs to be done the first run)
 - npm run start:db
 - npm run start:app
