@@ -12,7 +12,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -43,7 +43,6 @@
           {
             "name": "isWhite",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "boolean"
             }
@@ -51,7 +50,6 @@
           {
             "name": "isTwoPlayer",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "boolean",
               "default": false
@@ -60,7 +58,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -89,7 +87,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
@@ -120,7 +118,6 @@
           {
             "name": "row",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -129,7 +126,6 @@
           {
             "name": "col",
             "in": "query",
-            "style": "form",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -138,7 +134,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
