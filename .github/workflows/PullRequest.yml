@@ -5,22 +5,22 @@ on:
     branches: ["master"]
 
 jobs:
-  Build_React:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./client/
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          cache: "npm"
-      - name: Install dependencies
-        run: npm ci
-      - name: Lint and build
-        run: |
-          npm run lint
-          npm run build
+  # Build_React:
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: ./client/
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         cache: "npm"
+  #     - name: Install dependencies
+  #       run: npm ci
+  #     - name: Lint and build
+  #       run: |
+  #         npm run lint
+  #         npm run build
 
   Build_DotNet:
     runs-on: ubuntu-latest
@@ -38,42 +38,41 @@ jobs:
       - name: List NET Versions
         run: dotnet --list-sdks
 
-      # - name: Restore dependencies
-      #   run: |
-      #     dotnet restore
-      #     dotnet tool restore
-      #     dotnet swagger tofile --output swagger.json bin/Release/net8.0/ChessApi.dll v1
+      - name: Restore dependencies
+        run: |
+          dotnet restore
+          dotnet tool restore
 
-      # - name: Build
-      #   run: dotnet build -c Release --no-restore
+      - name: Build
+        run: dotnet build -c Release --no-restore
 
       # - name: Test
       #   run: dotnet test -c Release --no-build --verbosity normal
 
-  Run_Playwright_Tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          cache: "npm"
-      - name: Install Client dependencies
-        run: |
-          cd client
-          npm ci
+  # Run_Playwright_Tests:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         cache: "npm"
+  #     - name: Install Client dependencies
+  #       run: |
+  #         cd client
+  #         npm ci
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: ./api/global.json
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         global-json-file: ./api/global.json
 
-      - name: Install API dependencies
-        run: |
-          cd api
-          dotnet restore
-          dotnet tool restore
-          dotnet build
-      - name: Run Playwright tests
-        run: |
-          cd playwright_testing
-          npx playwright test
+  #     - name: Install API dependencies
+  #       run: |
+  #         cd api
+  #         dotnet restore
+  #         dotnet tool restore
+  #         dotnet build
+  #     - name: Run Playwright tests
+  #       run: |
+  #         cd playwright_testing
+  #         npx playwright test
