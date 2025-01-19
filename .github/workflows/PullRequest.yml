@@ -34,11 +34,13 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: ./api/global.json
+          cache: true
 
       - name: Restore dependencies
         run: |
           dotnet restore
           dotnet tool restore
+          dotnet swagger tofile --output swagger.json bin/Release/net8.0/ChessApi.dll v1
 
       - name: Build
         run: dotnet build -c Release --no-restore
@@ -62,6 +64,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: ./api/global.json
+          cache: true
 
       - name: Install API dependencies
         run: |
