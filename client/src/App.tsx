@@ -1,78 +1,83 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useCallback } from "react";
-import { BoardDisplay, ClickReturn, SavedGameResult } from "./api/GeneratedAPI";
-import Board from "./components/board";
-import ResetButtons from "./components/resetbuttons";
-import Api from "./api/api";
+import { useState, useEffect, useCallback } from 'react'
+import { BoardDisplay, ClickReturn, SavedGameResult } from './api/GeneratedAPI'
+import Board from './components/board'
+import ResetButtons from './components/resetbuttons'
+import Api from './api/api'
 
-const api = Api();
+const api = Api()
 
 export default function App() {
-  const [board, setBoard] = useState<BoardDisplay>();
-  const [gameOver, setGameOver] = useState<boolean>(false);
-  const [isCompTurn, setIsCompTurn] = useState<boolean>(false);
-  const [isTwoPlayer, setIsTwoPlayer] = useState<boolean>(false);
-  const [isWhite, setIsWhite] = useState<boolean>(true);
+  const [board, setBoard] = useState<BoardDisplay>()
+  const [gameOver, setGameOver] = useState<boolean>(false)
+  const [isCompTurn, setIsCompTurn] = useState<boolean>(false)
+  const [isTwoPlayer, setIsTwoPlayer] = useState<boolean>(false)
+  const [isWhite, setIsWhite] = useState<boolean>(true)
 
   function ComputerMove() {
-    setIsCompTurn(true);
+    setIsCompTurn(true)
     api.compMove().then((board: BoardDisplay) => {
-      setBoard(board);
-      setIsCompTurn(false);
-    });
+      setBoard(board)
+      setIsCompTurn(false)
+    })
   }
 
   function BoardSquareClick(col: number, row: number) {
     if (gameOver || (isCompTurn && !isTwoPlayer)) {
-      return;
+      return
     }
 
     api.click(row, col).then((clickReturn: ClickReturn) => {
-      setBoard(clickReturn.board);
+      setBoard(clickReturn.board)
 
       if (clickReturn.moved && !isTwoPlayer) {
-        ComputerMove();
+        ComputerMove()
       }
-    });
+    })
   }
 
   function Start(isWhite: boolean, isTwoPlayer: boolean) {
-    setIsTwoPlayer(isTwoPlayer);
+    setIsTwoPlayer(isTwoPlayer)
     api.startGame(isWhite, isTwoPlayer).then((board: BoardDisplay) => {
-      setIsWhite(isWhite);
-      setBoard(board);
+      setIsWhite(isWhite)
+      setBoard(board)
 
       if (!isWhite && !isTwoPlayer) {
-        ComputerMove();
+        ComputerMove()
       }
-    });
+    })
   }
 
   const tryGetSavedGame = useCallback(() => {
     api.tryGetSavedGame().then((resp: SavedGameResult) => {
       if (!resp.boardDisplay) {
-        return;
+        return
       }
 
-      setIsWhite(resp.isPlayerWhite ?? true);
-      setBoard(resp.boardDisplay);
-      setIsTwoPlayer(resp.isTwoPlayer ?? false);
+      setIsWhite(resp.isPlayerWhite ?? true)
+      setBoard(resp.boardDisplay)
+      setIsTwoPlayer(resp.isTwoPlayer ?? false)
 
       if (resp.isPlayerWhite && !resp.isTwoPlayer) {
-        ComputerMove();
+        ComputerMove()
       }
-    });
-  }, []);
+    })
+  }, [])
 
   useEffect(() => {
-    tryGetSavedGame();
-  }, [tryGetSavedGame]);
+    tryGetSavedGame()
+  }, [tryGetSavedGame])
 
   return (
     <>
-      <Board board={board} isWhite={isWhite} clickFunc={BoardSquareClick} setGameOver={setGameOver} />
+      <Board
+        board={board}
+        isWhite={isWhite}
+        clickFunc={BoardSquareClick}
+        setGameOver={setGameOver}
+      />
       <ResetButtons StartFunc={Start} />
     </>
-  );
+  )
 }
