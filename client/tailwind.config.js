@@ -3,12 +3,7 @@
  */
 module.exports = {
   darkMode: ["class"],
-  content: [
-    "./node_modules/flowbite-react/**/*.js",
-    "./public/**/*.html",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  content: ["./components/**/*.{js,ts,jsx,tsx,mdx}", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     container: {
       center: true,
