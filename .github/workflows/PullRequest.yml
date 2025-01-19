@@ -32,6 +32,8 @@ jobs:
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ./api/global.json
 
       - name: Restore dependencies
         run: dotnet restore
@@ -53,6 +55,12 @@ jobs:
         run: |
           cd client
           npm ci
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ./api/global.json
+
       - name: Install API dependencies
         run: |
           cd api
