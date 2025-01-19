@@ -21,14 +21,6 @@ var configBuilder = new ConfigurationBuilder()
     .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-var config = configBuilder.Build();
-builder
-    .Services.AddOptions<Dictionary<string, DatabaseSettings>>()
-    .Bind(config.GetSection("Collections"))
-    .Services.AddOptions<string>()
-    .Bind(config.GetSection("SendGrid.ApiKey"));
-
-builder.Services.AddSingleton<IConfiguration>(config);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

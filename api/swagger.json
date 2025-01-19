@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "PersonalWebsiteAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "title": "ChessApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
     "version": "1.0"
   },
   "paths": {
@@ -153,35 +153,6 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClickReturn"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/communication/sendEmail": {
-      "post": {
-        "tags": [
-          "Communication"
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "boolean"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "boolean"
                 }
               }
             }
