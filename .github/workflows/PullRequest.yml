@@ -36,7 +36,9 @@ jobs:
           global-json-file: ./api/global.json
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: |
+          dotnet restore
+          dotnet tool restore
 
       - name: Build
         run: dotnet build -c Release --no-restore
@@ -65,6 +67,7 @@ jobs:
         run: |
           cd api
           dotnet restore
+          dotnet tool restore
           dotnet build
       - name: Run Playwright tests
         run: |
