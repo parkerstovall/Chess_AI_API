@@ -1,4 +1,4 @@
-namespace api.models.db;
+namespace ChessApi.Models.DB;
 
 public class DatabaseSettings
 {

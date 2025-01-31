@@ -1,4 +1,4 @@
-using api.models.db;
+using ChessApi.Models.DB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 

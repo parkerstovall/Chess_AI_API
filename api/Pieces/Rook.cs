@@ -1,9 +1,9 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
-using api.models.db;
-using api.pieces.interfaces;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.pieces
+namespace ChessApi.Pieces
 {
     public class Rook : IPieceCanPin, IPieceHasMoved
     {
@@ -42,9 +42,9 @@ namespace api.pieces
             this.Color = Color;
         }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check)
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
-            List<int[]> moves = new();
+            List<PossibleMove> moves = [];
 
             int col = coords[0];
             int row = coords[1];
@@ -64,32 +64,35 @@ namespace api.pieces
 
                 while (PieceHelper.IsInBoard(col, row))
                 {
-                    if (board.Rows[col].Squares[row].Piece == null)
+                    if (board.Rows[col].Squares[row].Piece is null)
                     {
-                        if (check)
+                        if (!check || board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
                         {
-                            if (board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
-                            {
-                                moves.Add(new int[] { col, row });
-                            }
-                        }
-                        else
-                        {
-                            moves.Add(new int[] { col, row });
+                            //moves.Add(new int[] { col, row });
+                            moves.Add(
+                                new()
+                                {
+                                    MoveTo = [col, row],
+                                    MoveFrom = [coords[0], coords[1]],
+                                    PieceValue = this.Value
+                                }
+                            );
                         }
                     }
                     else if (board.Rows[col].Squares[row].Piece?.Color != this.Color)
                     {
-                        if (check)
+                        if (!check || board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
                         {
-                            if (board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
-                            {
-                                moves.Add(new int[] { col, row });
-                            }
-                        }
-                        else
-                        {
-                            moves.Add(new int[] { col, row });
+                            //moves.Add(new int[] { col, row });
+                            moves.Add(
+                                new()
+                                {
+                                    MoveTo = [col, row],
+                                    MoveFrom = [coords[0], coords[1]],
+                                    CaptureValue = board.Rows[col].Squares[row].Piece?.Value,
+                                    PieceValue = this.Value
+                                }
+                            );
                         }
                         break;
                     }
@@ -124,7 +127,7 @@ namespace api.pieces
                 {
                     moves.Add(new int[] { col, row });
 
-                    if (board.Rows[col].Squares[row].Piece != null)
+                    if (board.Rows[col].Squares[row].Piece is not null)
                     {
                         if (board.Rows[col].Squares[row].Piece is King)
                         {

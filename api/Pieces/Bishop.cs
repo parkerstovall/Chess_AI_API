@@ -1,9 +1,9 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
-using api.models.db;
-using api.pieces.interfaces;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.pieces
+namespace ChessApi.Pieces
 {
     public class Bishop : IPieceCanPin
     {
@@ -42,9 +42,9 @@ namespace api.pieces
             this.Color = Color;
         }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check)
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
-            List<int[]> moves = new();
+            List<PossibleMove> moves = [];
 
             int col = coords[0];
             int row = coords[1];
@@ -65,21 +65,22 @@ namespace api.pieces
                 while (PieceHelper.IsInBoard(col, row))
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
-                    if (square.Piece == null || square.Piece.Color != this.Color)
+                    if (square.Piece is null || square.Piece?.Color != this.Color)
                     {
-                        if (check)
+                        if (!check || square.CheckBlockingColor == this.Color)
                         {
-                            if (square.CheckBlockingColor == this.Color)
-                            {
-                                moves.Add([col, row]);
-                            }
-                        }
-                        else
-                        {
-                            moves.Add([col, row]);
+                            //moves.Add(new int[] { col, row });
+                            moves.Add(
+                                new()
+                                {
+                                    MoveTo = [col, row],
+                                    MoveFrom = [coords[0], coords[1]],
+                                    PieceValue = this.Value
+                                }
+                            );
                         }
 
-                        if (square.Piece != null)
+                        if (square.Piece is not null)
                         {
                             break;
                         }
@@ -115,7 +116,7 @@ namespace api.pieces
                 {
                     moves.Add(new int[] { col, row });
 
-                    if (board.Rows[col].Squares[row].Piece != null)
+                    if (board.Rows[col].Squares[row].Piece is not null)
                     {
                         if (board.Rows[col].Squares[row].Piece is King)
                         {

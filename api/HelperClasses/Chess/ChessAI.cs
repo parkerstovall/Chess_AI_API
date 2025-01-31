@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using api.models.api;
-using api.models.db;
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     public class ChessAI
     {
@@ -29,43 +29,42 @@ namespace api.helperclasses.chess
             int score = int.MinValue;
             int[] move = new int[4];
 
+            var possibleMoves = new List<PossibleMove>();
             foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    if (square.Piece != null && square.Piece.Color == max_color)
+                    if (square.Piece is not null && square.Piece?.Color == max_color)
                     {
-                        foreach (
-                            int[] localMove in MoveHelper.GetMovesFromPiece(
-                                game.Board,
-                                square.Coords,
-                                game.CheckedColor
-                            )
-                        )
-                        {
-                            Game newGame = CopyGame(game);
+                        var moves = MoveHelper.GetMovesFromPiece(
+                            game.Board,
+                            square.Coords,
+                            game.CheckedColor
+                        );
 
-                            MoveHelper.MovePiece(
-                                [square.Coords[0], square.Coords[1]],
-                                [localMove[0], localMove[1]],
-                                ref newGame
-                            );
-
-                            int tempScore = MinMax(newGame, false, 0, int.MinValue, int.MaxValue);
-
-                            if (tempScore > score)
-                            {
-                                score = tempScore;
-                                move =
-                                [
-                                    square.Coords[0],
-                                    square.Coords[1],
-                                    localMove[0],
-                                    localMove[1]
-                                ];
-                            }
-                        }
+                        possibleMoves.AddRange(moves);
                     }
+                }
+            }
+
+            //OrderPossibleMoves(possibleMoves);
+
+            foreach (var pMove in possibleMoves)
+            {
+                Game newGame = CopyGame(game);
+
+                MoveHelper.MovePiece(
+                    [pMove.MoveFrom[0], pMove.MoveFrom[1]],
+                    [pMove.MoveTo[0], pMove.MoveTo[1]],
+                    ref newGame
+                );
+
+                int tempScore = MinMax(newGame, false, 0, int.MinValue, int.MaxValue);
+
+                if (tempScore > score)
+                {
+                    score = tempScore;
+                    move = [pMove.MoveFrom[0], pMove.MoveFrom[1], pMove.MoveTo[0], pMove.MoveTo[1]];
                 }
             }
 
@@ -73,7 +72,7 @@ namespace api.helperclasses.chess
 
             foundMove = null;
             IPiece? piece = game.Board.Rows[move[2]].Squares[move[3]].Piece;
-            if (piece != null)
+            if (piece is not null)
             {
                 foundMove = new()
                 {
@@ -89,7 +88,6 @@ namespace api.helperclasses.chess
         private int MinMax(Game game, bool max, int depth, double alpha, double beta)
         {
             string color = max ? max_color : min_color;
-
             if (depth == Max_Depth)
             {
                 return GetBoardScore(game.Board, color);
@@ -101,7 +99,7 @@ namespace api.helperclasses.chess
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    if (square.Piece != null && square.Piece.Color == color)
+                    if (square.Piece is not null && square.Piece?.Color == color)
                     {
                         if (square.Piece is King king && king.InCheckMate)
                         {
@@ -113,38 +111,41 @@ namespace api.helperclasses.chess
                 }
             }
 
-            List<int[]> moves = [];
+            List<PossibleMove> possibleMoves = [];
             foreach (BoardSquare square in moveSquares)
             {
-                if (square.Piece == null)
+                if (square.Piece is null)
                 {
                     continue;
                 }
 
-                List<int[]> localMoves = MoveHelper.GetMovesFromPiece(
+                List<PossibleMove> localMoves = MoveHelper.GetMovesFromPiece(
                     game.Board,
                     square.Coords,
                     game.CheckedColor
                 );
 
-                foreach (int[] localMove in localMoves)
-                {
-                    moves.Add([square.Coords[0], square.Coords[1], localMove[0], localMove[1]]);
-                }
+                possibleMoves.AddRange(localMoves);
             }
 
-            int score = max ? int.MinValue : int.MaxValue;
-
-            if (moves.Count == 0)
+            if (possibleMoves.Count == 0)
             {
                 return 0;
             }
 
-            foreach (int[] move in moves)
+            //OrderPossibleMoves(possibleMoves);
+
+            int score = max ? int.MinValue : int.MaxValue;
+
+            foreach (var pMove in possibleMoves)
             {
                 Game newGame = CopyGame(game);
 
-                MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref newGame);
+                MoveHelper.MovePiece(
+                    [pMove.MoveFrom[0], pMove.MoveFrom[1]],
+                    [pMove.MoveTo[0], pMove.MoveTo[1]],
+                    ref newGame
+                );
 
                 int tempScore = MinMax(newGame, !max, depth + 1, alpha, beta);
 
@@ -183,7 +184,7 @@ namespace api.helperclasses.chess
                 foreach (BoardSquare square in row.Squares)
                 {
                     IPiece? piece = square.Piece;
-                    if (piece != null)
+                    if (piece is not null)
                     {
                         int[,] modifier =
                             piece.Color == "white" ? piece.WhiteValues : piece.BlackValues;
@@ -220,6 +221,32 @@ namespace api.helperclasses.chess
             }
 
             return newGame;
+        }
+
+        public List<PossibleMove> OrderPossibleMoves(List<PossibleMove> possibleMoves)
+        {
+            var orderedMoves = new List<PossibleMove>();
+
+            orderedMoves.AddRange(
+                possibleMoves.Where(p => p.CaptureValue is not null).OrderBy(p => p.CaptureValue)
+            );
+
+            orderedMoves.AddRange(
+                possibleMoves
+                    .Where(p => p.CaptureValue is null)
+                    .OrderBy(p =>
+                    {
+                        // Pieces that have already moved should be prioritized
+                        if (p.HasMoved)
+                        {
+                            return p.PieceValue + 1;
+                        }
+
+                        return p.PieceValue;
+                    })
+            );
+
+            return orderedMoves;
         }
     }
 }

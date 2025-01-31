@@ -1,7 +1,7 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
 
-namespace api.pieces.interfaces
+namespace ChessApi.Pieces.Interfaces
 {
     public interface IPiece
     {
@@ -11,7 +11,7 @@ namespace api.pieces.interfaces
         public int[,] BlackValues { get; }
         public int Value { get; }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check);
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check);
         public List<int[]> GetPressure(Board board, int[] coords);
         public IPiece Copy();
     }

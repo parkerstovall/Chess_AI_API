@@ -1,4 +1,4 @@
-namespace api.pieces.interfaces
+namespace ChessApi.Pieces.Interfaces
 {
     public interface IPieceHasMoved : IPiece
     {

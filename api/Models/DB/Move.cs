@@ -1,7 +1,7 @@
-using api.models.api;
+using ChessApi.Models.API;
 using MongoDB.Bson;
 
-namespace api.models.db
+namespace ChessApi.Models.DB
 {
     public class Move
     {

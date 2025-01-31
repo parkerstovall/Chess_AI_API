@@ -1,10 +1,10 @@
-using api.models.api;
 using api.models.client;
-using api.models.db;
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     internal static class BoardHelper
     {
@@ -95,12 +95,12 @@ namespace api.helperclasses.chess
             string backColor = whiteSquare ? "white" : "black";
             string cssClass = $"boardBtn {backColor}";
 
-            if (square.Piece != null)
+            if (square.Piece is not null)
             {
                 cssClass += " " + square.Piece.ToString();
 
                 if (
-                    selectedSquare != null
+                    selectedSquare is not null
                     && selectedSquare[0] == square.Coords[0]
                     && selectedSquare[1] == square.Coords[1]
                 )
@@ -121,7 +121,7 @@ namespace api.helperclasses.chess
                 }
             }
 
-            if (moves != null && CheckSquareInMoves(square, moves))
+            if (moves is not null && CheckSquareInMoves(square, moves))
             {
                 cssClass += " highlighted";
             }

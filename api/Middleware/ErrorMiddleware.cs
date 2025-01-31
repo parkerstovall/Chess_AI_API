@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using api.models.db;
 using api.repository;
+using ChessApi.Models.DB;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 

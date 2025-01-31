@@ -1,8 +1,8 @@
-namespace api.models.api
+namespace ChessApi.Models.API
 {
     public class Board
     {
-        public List<BoardRow> Rows { get; set; } = new List<BoardRow>();
+        public List<BoardRow> Rows { get; set; } = [];
 
         public override string ToString()
         {
@@ -11,7 +11,7 @@ namespace api.models.api
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    if (square.Piece == null)
+                    if (square.Piece is null)
                     {
                         board += "0";
                     }
