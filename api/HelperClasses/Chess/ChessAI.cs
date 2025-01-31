@@ -47,7 +47,7 @@ namespace ChessApi.HelperClasses.Chess
                 }
             }
 
-            //OrderPossibleMoves(possibleMoves);
+            OrderPossibleMoves(possibleMoves);
 
             foreach (var pMove in possibleMoves)
             {
@@ -133,7 +133,7 @@ namespace ChessApi.HelperClasses.Chess
                 return 0;
             }
 
-            //OrderPossibleMoves(possibleMoves);
+            OrderPossibleMoves(possibleMoves);
 
             int score = max ? int.MinValue : int.MaxValue;
 
