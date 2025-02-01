@@ -19,12 +19,14 @@ namespace ChessApi.HelperClasses.Chess
         }
 
         private readonly int Max_Depth;
+        private readonly int Max_Threads;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
 
-        public ChessAI(bool isBlack = true, int Max_Depth = 4)
+        public ChessAI(bool isBlack = true, int Max_Depth = 4, int Max_Threads = 5)
         {
             this.Max_Depth = Max_Depth;
+            this.Max_Threads = Max_Threads;
             if (!isBlack)
             {
                 max_color = "white";
@@ -74,13 +76,12 @@ namespace ChessApi.HelperClasses.Chess
             threadResources.alpha = MinMax(firstMove, false, 0, int.MinValue, int.MaxValue);
 
             var len = possibleMoves.Count;
-            var numThreads = 4;
-            var interval = len / numThreads;
+            var interval = len / Max_Threads;
             var tasks = new List<Task>();
-            for (var j = 0; j < numThreads; j++)
+            for (var j = 0; j < Max_Threads; j++)
             {
                 var start = j == 0 ? 0 : interval * j;
-                var end = (j + 1 == numThreads) ? len : start + interval;
+                var end = (j + 1 == Max_Threads) ? len : start + interval;
                 var moveSet = possibleMoves.GetRange(start, end - start);
 
                 var task = Task.Run(() =>
