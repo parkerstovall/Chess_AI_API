@@ -1,6 +1,6 @@
 using api.BackgroundJobs;
-using api.models.db;
 using api.repository;
+using ChessApi.Models.DB;
 using Middleware;
 
 DatabaseInit.RegisterModels();
@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("https://localhost:5173")
+                .WithOrigins("https://localhost:5173", "http://localhost:5173")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();

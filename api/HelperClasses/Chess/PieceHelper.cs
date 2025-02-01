@@ -1,10 +1,9 @@
-using api.models.api;
-using api.models.db;
-using api.pieces;
-using api.pieces.interfaces;
-using ZstdSharp.Unsafe;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     internal static class PieceHelper
     {
@@ -189,7 +188,7 @@ namespace api.helperclasses.chess
             while (IsInBoard(start[0], start[1]))
             {
                 BoardSquare square = game.Board.Rows[start[0]].Squares[start[1]];
-                if (square.Piece != null)
+                if (square.Piece is not null)
                 {
                     if (square.Piece.Color == color || square.Piece is King)
                     {
@@ -222,7 +221,7 @@ namespace api.helperclasses.chess
             {
                 BoardSquare square = game.Board.Rows[start[0]].Squares[start[1]];
 
-                if (square.Piece != null && square.Piece is King)
+                if (square.Piece is not null && square.Piece is King)
                 {
                     break;
                 }
@@ -233,7 +232,7 @@ namespace api.helperclasses.chess
                 {
                     BoardSquare pawnSquare = game.Board.Rows[start[0] + pawnInc].Squares[start[1]];
                     if (
-                        pawnSquare.Piece != null
+                        pawnSquare.Piece is not null
                         && pawnSquare.Piece is Pawn pawn
                         && pawn.Color != color
                     )
@@ -249,7 +248,7 @@ namespace api.helperclasses.chess
                         start[1]
                     ];
                     if (
-                        pawnSquare.Piece != null
+                        pawnSquare.Piece is not null
                         && pawnSquare.Piece is Pawn pawn
                         && !pawn.HasMoved
                         && pawn.Color != color

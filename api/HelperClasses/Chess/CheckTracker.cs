@@ -1,8 +1,8 @@
-using api.models.api;
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.Models.API;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     public class CheckTracker
     {
@@ -15,7 +15,7 @@ namespace api.helperclasses.chess
 
         public void SetKing(BoardSquare square)
         {
-            if (square.Piece != null && square.Piece is King king)
+            if (square.Piece is not null && square.Piece is King king)
             {
                 if (king.Color == "black")
                 {
@@ -73,7 +73,7 @@ namespace api.helperclasses.chess
         {
             BoardSquare? square = GetKing(color);
 
-            if (square == null || square.Piece == null || square.Piece is not King king)
+            if (square is null || square.Piece is null || square.Piece is not King king)
             {
                 return false;
             }

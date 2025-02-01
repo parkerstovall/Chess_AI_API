@@ -1,5 +1,5 @@
-using api.models.api;
+using ChessApi.Models.API;
 
-namespace api.pieces.interfaces;
+namespace ChessApi.Pieces.Interfaces;
 
 public interface IPieceDirectAttacker : IPiece { }

@@ -1,8 +1,8 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
-using api.pieces.interfaces;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.pieces
+namespace ChessApi.Pieces
 {
     public class King : IPieceHasMoved
     {
@@ -44,14 +44,14 @@ namespace api.pieces
             this.Color = Color;
         }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check)
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
-            List<int[]> moves = new();
+            List<PossibleMove> moves = [];
 
             int col = coords[0];
             int row = coords[1];
-            int[] colInc = { 0, 0, 1, -1, 1, -1, 1, -1 };
-            int[] rowInc = { 1, -1, 0, -0, 1, -1, -1, 1 };
+            int[] colInc = [0, 0, 1, -1, 1, -1, 1, -1];
+            int[] rowInc = [1, -1, 0, -0, 1, -1, -1, 1];
 
             for (int i = 0; i < 8; i++, col = coords[0], row = coords[1])
             {
@@ -62,11 +62,19 @@ namespace api.pieces
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
                     if (
-                        (square.Piece == null || square.Piece.Color != this.Color)
+                        (square.Piece is null || square.Piece?.Color != this.Color)
                         && SafeSquare(square)
                     )
                     {
-                        moves.Add(new int[] { col, row });
+                        //moves.Add(new int[] { col, row });
+                        moves.Add(
+                            new()
+                            {
+                                MoveTo = [col, row],
+                                MoveFrom = [coords[0], coords[1]],
+                                PieceValue = this.Value
+                            }
+                        );
                     }
                 }
             }
@@ -103,7 +111,7 @@ namespace api.pieces
             return Color + "King";
         }
 
-        private void CheckCastle(Board board, int[] coords, ref List<int[]> moves)
+        private void CheckCastle(Board board, int[] coords, ref List<PossibleMove> moves)
         {
             if (this.HasMoved || this.InCheck)
             {
@@ -115,12 +123,28 @@ namespace api.pieces
 
             if (CheckCastleDir(board, true, col, row))
             {
-                moves.Add(new int[] { col, row - 2 });
+                //moves.Add(new int[] { col, row - 2 });
+                moves.Add(
+                    new()
+                    {
+                        MoveTo = [col, row - 2],
+                        MoveFrom = [coords[0], coords[1]],
+                        PieceValue = this.Value
+                    }
+                );
             }
 
             if (CheckCastleDir(board, false, col, row))
             {
-                moves.Add(new int[] { col, row + 2 });
+                //moves.Add(new int[] { col, row + 2 });
+                moves.Add(
+                    new()
+                    {
+                        MoveTo = [col, row + 2],
+                        MoveFrom = [coords[0], coords[1]],
+                        PieceValue = this.Value
+                    }
+                );
             }
         }
 
@@ -141,7 +165,7 @@ namespace api.pieces
                         break;
                     }
                 }
-                if (square.Piece != null || !SafeSquare(square))
+                if (square.Piece is not null || !SafeSquare(square))
                 {
                     add = false;
                     break;

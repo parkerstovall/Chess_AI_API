@@ -1,23 +1,23 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection.Metadata.Ecma335;
-using api.models.api;
-using api.models.db;
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     internal static class MoveHelper
     {
-        internal static List<int[]> GetMovesFromPiece(
+        internal static List<PossibleMove> GetMovesFromPiece(
             Board board,
             int[] clickedSquare,
             string? checkColor
         )
         {
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
-            List<int[]> moves =
+            List<PossibleMove> moves =
                 square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
                 ?? [];
             return moves;
@@ -47,7 +47,7 @@ namespace api.helperclasses.chess
             BoardSquare from = game.Board.Rows[start[0]].Squares[start[1]];
             BoardSquare to = game.Board.Rows[dest[0]].Squares[dest[1]];
 
-            if (from.Piece == null)
+            if (from.Piece is null)
             {
                 return;
             }
@@ -87,7 +87,7 @@ namespace api.helperclasses.chess
             //Checking for en passant capture
             if (
                 from is Pawn pawn
-                && to.Piece == null
+                && to.Piece is null
                 && to.EnPassantColor != ""
                 && to.EnPassantColor != pawn.Color
             )
@@ -111,7 +111,7 @@ namespace api.helperclasses.chess
                     square.WhiteKingPressure = false;
                     square.BlackKingPressure = false;
 
-                    if (square.Piece != null)
+                    if (square.Piece is not null)
                     {
                         square.Piece.PinnedDir = Direction.None;
 
@@ -181,7 +181,7 @@ namespace api.helperclasses.chess
                 }
             }
 
-            if (checkSquare != null)
+            if (checkSquare is not null)
             {
                 if (checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
                 {
@@ -229,7 +229,7 @@ namespace api.helperclasses.chess
             ref int[] kingLoc
         )
         {
-            if (square.Piece == null)
+            if (square.Piece is null)
             {
                 return;
             }
@@ -298,17 +298,17 @@ namespace api.helperclasses.chess
         {
             foreach (BoardSquare square in tracker.PinPieces)
             {
-                if (square.Piece == null || square.Piece is not IPieceCanPin piece)
+                if (square.Piece is null || square.Piece is not IPieceCanPin piece)
                 {
                     continue;
                 }
 
-                int[] lStart = new int[] { square.Coords[0], square.Coords[1] };
-                if (piece.Color == "white" && tracker.BlackKing != null)
+                int[] lStart = [square.Coords[0], square.Coords[1]];
+                if (piece.Color == "white" && tracker.BlackKing is not null)
                 {
                     piece.CheckPins(lStart, tracker.BlackKing.Coords, ref game);
                 }
-                else if (tracker.WhiteKing != null)
+                else if (tracker.WhiteKing is not null)
                 {
                     piece.CheckPins(lStart, tracker.WhiteKing.Coords, ref game);
                 }
@@ -317,11 +317,11 @@ namespace api.helperclasses.chess
 
         private static void CheckCheckmate(CheckTracker tracker, ref Game game)
         {
-            if (tracker.WhiteKing != null)
+            if (tracker.WhiteKing is not null)
             {
                 CheckKingInCheckMate(tracker.WhiteKing, tracker, ref game);
             }
-            else if (tracker.BlackKing != null)
+            else if (tracker.BlackKing is not null)
             {
                 CheckKingInCheckMate(tracker.BlackKing, tracker, ref game);
             }
@@ -333,7 +333,7 @@ namespace api.helperclasses.chess
             ref Game game
         )
         {
-            if (square.Piece == null || square.Piece is not King king || !king.InCheck)
+            if (square.Piece is null || square.Piece is not King king || !king.InCheck)
             {
                 return;
             }

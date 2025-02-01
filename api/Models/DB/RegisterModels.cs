@@ -1,11 +1,11 @@
-using api.helperclasses.chess;
-using api.models.api;
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace api.models.db;
+namespace ChessApi.Models.DB;
 
 public static class DatabaseInit
 {
@@ -14,10 +14,10 @@ public static class DatabaseInit
         var objectSerializer = new ObjectSerializer(type =>
             ObjectSerializer.DefaultAllowedTypes(type)
             || (
-                type.FullName != null
+                type.FullName is not null
                 && (
-                    type.FullName.StartsWith("api.pieces")
-                    || type.FullName.StartsWith("api.models.api")
+                    type.FullName.StartsWith("ChessApi.Pieces")
+                    || type.FullName.StartsWith("ChessApi.Models.API")
                 )
             )
         );

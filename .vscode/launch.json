@@ -13,7 +13,7 @@
       "request": "launch",
       "preLaunchTask": "build",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/api/bin/Debug/net8.0/PersonalWebsiteAPI.dll",
+      "program": "${workspaceFolder}/api/bin/Debug/net9.0/ChessApi.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "stopAtEntry": false,

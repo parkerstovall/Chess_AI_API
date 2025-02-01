@@ -1,9 +1,8 @@
-using api.helperclasses.chess;
-using api.models.api;
 using api.models.client;
-using api.models.db;
-using api.pieces.interfaces;
-using Microsoft.Extensions.Caching.Memory;
+using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
+using ChessApi.Pieces.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -18,7 +17,7 @@ namespace api.repository
         {
             var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
 
-            if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
+            if (gameID is not null && ObjectId.TryParse(gameID, out ObjectId oGameID))
             {
                 var game = await GetsertGame();
                 return new()
@@ -64,7 +63,7 @@ namespace api.repository
 
             if (
                 game.AvailableMoves.Count != 0
-                && game.SelectedSquare != null
+                && game.SelectedSquare is not null
                 && MoveHelper.TryMovePiece(
                     clickedSquare,
                     game.SelectedSquare,
@@ -74,7 +73,7 @@ namespace api.repository
             )
             {
                 IPiece? piece = game.Board.Rows[row].Squares[col].Piece;
-                if (piece != null && game.SelectedSquare != null)
+                if (piece is not null && game.SelectedSquare is not null)
                 {
                     var moveHistory = _connRepo.GetCollection<Move>("MoveHistory");
                     await moveHistory.InsertOneAsync(
@@ -94,7 +93,7 @@ namespace api.repository
                 game.SelectedSquare = null;
                 moved = true;
             }
-            else if (square.Piece == null
+            else if (square.Piece is null
             // || square.Piece.Color != currentTurnColor
             // || (!game.IsTwoPlayer && square.Piece.Color != playerColor)
             )
@@ -105,11 +104,12 @@ namespace api.repository
             }
             else
             {
-                game.AvailableMoves = MoveHelper.GetMovesFromPiece(
-                    game.Board,
-                    clickedSquare,
-                    game.CheckedColor
-                );
+                game.AvailableMoves =
+                [
+                    .. MoveHelper
+                        .GetMovesFromPiece(game.Board, clickedSquare, game.CheckedColor)
+                        .Select(p => p.MoveTo)
+                ];
                 game.SelectedSquare = clickedSquare;
             }
 
@@ -127,11 +127,17 @@ namespace api.repository
             }
 
             ChessAI ai = new(game.IsPlayerWhite);
-            ai.GetMove(ref game, out Move? foundMove);
+            var foundMove = await ai.GetMove(game);
 
-            if (foundMove != null)
+            if (foundMove is not null)
             {
                 await _connRepo.GetCollection<Move>("MoveHistory").InsertOneAsync(foundMove);
+
+                MoveHelper.MovePiece(
+                    [foundMove.From[0], foundMove.From[1]],
+                    [foundMove.To[0], foundMove.To[1]],
+                    ref game
+                );
             }
 
             game.IsWhiteTurn = !game.IsWhiteTurn;
@@ -144,7 +150,7 @@ namespace api.repository
         {
             var collection = _connRepo.GetCollection<Game>("Games");
             var gameID = _context?.HttpContext?.Request.Cookies["GameID"];
-            if (gameID != null && ObjectId.TryParse(gameID, out ObjectId oGameID))
+            if (gameID is not null && ObjectId.TryParse(gameID, out ObjectId oGameID))
             {
                 var filter = Builders<Game>.Filter.Eq("_id", oGameID);
                 if (forceInsert)
@@ -160,7 +166,7 @@ namespace api.repository
                 else
                 {
                     //Update and return if game is provided
-                    if (updateGame != null)
+                    if (updateGame is not null)
                     {
                         updateGame.GameID = oGameID;
                         var replaceOptions = new ReplaceOptions() { IsUpsert = true };
@@ -170,7 +176,7 @@ namespace api.repository
 
                     // Get if no game is provided
                     var dbGame = await collection.Find(filter).FirstOrDefaultAsync();
-                    if (dbGame != null)
+                    if (dbGame is not null)
                     {
                         return dbGame;
                     }
@@ -178,7 +184,7 @@ namespace api.repository
             }
 
             //Insert if no game ID in cookie and game is provided
-            if (updateGame != null)
+            if (updateGame is not null)
             {
                 await collection.InsertOneAsync(updateGame);
                 _context?.HttpContext?.Response.Cookies.Append(

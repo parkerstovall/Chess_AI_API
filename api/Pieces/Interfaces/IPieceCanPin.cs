@@ -1,8 +1,8 @@
-using api.helperclasses.chess;
-using api.models.api;
-using api.models.db;
+using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Models.DB;
 
-namespace api.pieces.interfaces
+namespace ChessApi.Pieces.Interfaces
 {
     public interface IPieceCanPin : IPiece
     {

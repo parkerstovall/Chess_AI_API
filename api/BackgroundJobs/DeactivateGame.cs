@@ -1,6 +1,6 @@
-using api.models.api;
 using api.models.client;
 using api.repository;
+using ChessApi.Models.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Swashbuckle.AspNetCore.Annotations;

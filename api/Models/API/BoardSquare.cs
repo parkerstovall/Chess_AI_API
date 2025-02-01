@@ -1,6 +1,6 @@
-using api.pieces.interfaces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.models.api
+namespace ChessApi.Models.API
 {
     public class BoardSquare
     {

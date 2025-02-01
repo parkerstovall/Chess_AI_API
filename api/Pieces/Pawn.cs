@@ -1,8 +1,8 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
-using api.pieces.interfaces;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.pieces
+namespace ChessApi.Pieces
 {
     public class Pawn : IPieceDirectAttacker, IPieceHasMoved
     {
@@ -43,9 +43,9 @@ namespace api.pieces
             this.Color = Color;
         }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check)
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
-            List<int[]> moves = new();
+            List<PossibleMove> moves = [];
             int dir = (this.Color == "black") ? 1 : -1;
 
             int col = coords[0] + dir;
@@ -72,18 +72,19 @@ namespace api.pieces
             if (col > -1 && col < board.Rows.Count)
             {
                 //Moving
-                if (board.Rows[col].Squares[row].Piece == null && (canMove))
+                if (board.Rows[col].Squares[row].Piece is null && (canMove))
                 {
-                    if (check)
+                    if (!check || board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
                     {
-                        if (board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
-                        {
-                            moves.Add(new int[] { col, row });
-                        }
-                    }
-                    else
-                    {
-                        moves.Add(new int[] { col, row });
+                        //moves.Add(new int[] { col, row });
+                        moves.Add(
+                            new()
+                            {
+                                MoveTo = [col, row],
+                                MoveFrom = [coords[0], coords[1]],
+                                PieceValue = Value
+                            }
+                        );
                     }
 
                     col += dir;
@@ -91,20 +92,21 @@ namespace api.pieces
                     if (
                         col > -1
                         && col < board.Rows.Count
-                        && !this.HasMoved
-                        && board.Rows[col].Squares[row].Piece == null
+                        && !HasMoved
+                        && board.Rows[col].Squares[row].Piece is null
                     )
                     {
-                        if (check)
+                        if (!check || board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
                         {
-                            if (board.Rows[col].Squares[row].CheckBlockingColor == this.Color)
-                            {
-                                moves.Add(new int[] { col, row });
-                            }
-                        }
-                        else
-                        {
-                            moves.Add(new int[] { col, row });
+                            //moves.Add(new int[] { col, row });
+                            moves.Add(
+                                new()
+                                {
+                                    MoveTo = [col, row],
+                                    MoveFrom = [coords[0], coords[1]],
+                                    PieceValue = this.Value
+                                }
+                            );
                         }
                     }
                 }
@@ -120,20 +122,22 @@ namespace api.pieces
                         BoardSquare left = board.Rows[col].Squares[row];
 
                         if (
-                            (left.Piece != null && left.Piece.Color != this.Color)
+                            (left.Piece is not null && left.Piece?.Color != this.Color)
                             || (left.EnPassantColor != "" && left.EnPassantColor != this.Color)
                         )
                         {
-                            if (check)
+                            if (!check || left.CheckBlockingColor == this.Color)
                             {
-                                if (left.CheckBlockingColor == this.Color)
-                                {
-                                    moves.Add(new int[] { col, row });
-                                }
-                            }
-                            else
-                            {
-                                moves.Add(new int[] { col, row });
+                                //moves.Add(new int[] { col, row });
+                                moves.Add(
+                                    new()
+                                    {
+                                        MoveTo = [col, row],
+                                        MoveFrom = [coords[0], coords[1]],
+                                        PieceValue = this.Value,
+                                        CaptureValue = left.Piece?.Value
+                                    }
+                                );
                             }
                         }
                     }
@@ -148,20 +152,22 @@ namespace api.pieces
                         BoardSquare right = board.Rows[col].Squares[row];
 
                         if (
-                            (right.Piece != null && right.Piece.Color != this.Color)
+                            (right.Piece is not null && right.Piece?.Color != this.Color)
                             || (right.EnPassantColor != "" && right.EnPassantColor != this.Color)
                         )
                         {
-                            if (check)
+                            if (!check || right.CheckBlockingColor == this.Color)
                             {
-                                if (right.CheckBlockingColor == this.Color)
-                                {
-                                    moves.Add(new int[] { col, row });
-                                }
-                            }
-                            else
-                            {
-                                moves.Add(new int[] { col, row });
+                                //moves.Add(new int[] { col, row });
+                                moves.Add(
+                                    new()
+                                    {
+                                        MoveTo = [col, row],
+                                        MoveFrom = [coords[0], coords[1]],
+                                        PieceValue = this.Value,
+                                        CaptureValue = right.Piece?.Value
+                                    }
+                                );
                             }
                         }
                     }

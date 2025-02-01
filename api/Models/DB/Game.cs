@@ -1,8 +1,8 @@
-using api.models.api;
+using ChessApi.Models.API;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace api.models.db
+namespace ChessApi.Models.DB
 {
     public class Game
     {

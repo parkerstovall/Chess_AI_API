@@ -1,7 +1,7 @@
-using api.pieces;
-using api.pieces.interfaces;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.helperclasses.chess
+namespace ChessApi.HelperClasses.Chess
 {
     internal static class PieceFactory
     {

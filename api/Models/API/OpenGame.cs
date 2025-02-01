@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace api.models.api
+namespace ChessApi.Models.API
 {
     public class OpenGame
     {

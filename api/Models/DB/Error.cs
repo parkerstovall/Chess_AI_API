@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace api.models.db;
+namespace ChessApi.Models.DB;
 
 public class Error
 {
@@ -13,15 +13,15 @@ public class Error
     public string? Source { get; set; }
     public Error? InnerException { get; set; }
 
-    public Error(Exception ex)
+    public Error(Exception ex, int? depth = null)
     {
         this.Message = ex.Message;
         this.StackTrace = ex.StackTrace;
         this.Source = ex.Source;
 
-        if (ex.InnerException != null)
+        if (depth < 3 && ex.InnerException is not null)
         {
-            this.InnerException = new Error(ex);
+            this.InnerException = new Error(ex, (depth ?? 0) + 1);
         }
     }
 }

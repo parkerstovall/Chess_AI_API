@@ -1,8 +1,8 @@
-﻿using api.helperclasses.chess;
-using api.models.api;
-using api.pieces.interfaces;
+﻿using ChessApi.HelperClasses.Chess;
+using ChessApi.Models.API;
+using ChessApi.Pieces.Interfaces;
 
-namespace api.pieces
+namespace ChessApi.Pieces
 {
     public class Knight : IPieceDirectAttacker
     {
@@ -43,9 +43,9 @@ namespace api.pieces
             this.Type = "Knight";
         }
 
-        public List<int[]> GetPaths(Board board, int[] coords, bool check)
+        public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
-            List<int[]> moves = new();
+            List<PossibleMove> moves = [];
             int col = coords[0];
             int row = coords[1];
             int[] colInc = { -2, -2, 2, 2, 1, -1, 1, -1 };
@@ -64,19 +64,21 @@ namespace api.pieces
                 if (PieceHelper.IsInBoard(col, row))
                 {
                     BoardSquare square = board.Rows[col].Squares[row];
-                    if (square.Piece == null || square.Piece.Color != this.Color)
+                    if (
+                        (!check || square.CheckBlockingColor == this.Color)
+                        && (square.Piece is null || square.Piece?.Color != this.Color)
+                    )
                     {
-                        if (check)
-                        {
-                            if (square.CheckBlockingColor == this.Color)
+                        //moves.Add(new int[] { col, row });
+                        moves.Add(
+                            new()
                             {
-                                moves.Add(new int[] { col, row });
+                                MoveTo = [col, row],
+                                MoveFrom = [coords[0], coords[1]],
+                                PieceValue = this.Value,
+                                CaptureValue = square.Piece?.Value
                             }
-                        }
-                        else
-                        {
-                            moves.Add(new int[] { col, row });
-                        }
+                        );
                     }
                 }
             }

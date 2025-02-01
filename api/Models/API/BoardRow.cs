@@ -1,7 +1,7 @@
-namespace api.models.api
+namespace ChessApi.Models.API
 {
     public class BoardRow
     {
-        public List<BoardSquare> Squares { get; set; } = new List<BoardSquare>();
+        public List<BoardSquare> Squares { get; set; } = [];
     }
 }
