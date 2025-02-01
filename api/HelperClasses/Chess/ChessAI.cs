@@ -1,23 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using ChessApi.Models.API;
 using ChessApi.Models.DB;
 using ChessApi.Pieces;
 using ChessApi.Pieces.Interfaces;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace ChessApi.HelperClasses.Chess
 {
     public class ChessAI
     {
-        internal class ThreadResources
-        {
-            internal int alpha { get; set; } = int.MinValue;
-            internal PossibleMove move { get; set; } = new();
-        }
-
         private readonly int Max_Depth;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
@@ -32,10 +29,11 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public Move GetMove(Game game)
+        public AiMoveResponse GetMove(Game game, int? prev_alpha = null)
         {
             var possibleMoves = new List<PossibleMove>();
             var threadResources = new ThreadResources();
+            var response = new AiMoveResponse();
 
             foreach (BoardRow row in game.Board.Rows)
             {
@@ -60,18 +58,25 @@ namespace ChessApi.HelperClasses.Chess
             // We run the first move to get a baseline score and hopefully
             // speed up the rest of the moves when they are run in parralel
             // (Alpha Beta Pruning uses the initial score to compare moves)
-            threadResources.move = possibleMoves[0];
-            possibleMoves.RemoveAt(0);
+            if (prev_alpha is null)
+            {
+                threadResources.move = possibleMoves[0];
+                possibleMoves.RemoveAt(0);
 
-            Game firstMove = CopyGame(game);
+                Game firstMove = CopyGame(game);
 
-            MoveHelper.MovePiece(
-                [threadResources.move.MoveFrom[0], threadResources.move.MoveFrom[1]],
-                [threadResources.move.MoveTo[0], threadResources.move.MoveTo[1]],
-                ref firstMove
-            );
+                MoveHelper.MovePiece(
+                    [threadResources.move.MoveFrom[0], threadResources.move.MoveFrom[1]],
+                    [threadResources.move.MoveTo[0], threadResources.move.MoveTo[1]],
+                    ref firstMove
+                );
 
-            threadResources.alpha = MinMax(firstMove, false, 0, int.MinValue, int.MaxValue);
+                threadResources.alpha = MinMax(firstMove, false, 0, int.MinValue, int.MaxValue);
+            }
+            else
+            {
+                threadResources.alpha = prev_alpha.Value;
+            }
 
             Parallel.ForEach(
                 possibleMoves,
@@ -117,7 +122,7 @@ namespace ChessApi.HelperClasses.Chess
                 foundMove.PieceType = piece.GetType().Name;
             }
 
-            return foundMove;
+            return new() { alpha = threadResources.alpha, foundMove = foundMove };
         }
 
         private int MinMax(Game game, bool max, int depth, double alpha, double beta)

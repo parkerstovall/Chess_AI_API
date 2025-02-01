@@ -18,6 +18,7 @@ public class ErrorMiddleware(RequestDelegate next)
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
             await connRepo.GetCollection<Error>("ErrorLog").InsertOneAsync(new Error(ex));
         }
     }

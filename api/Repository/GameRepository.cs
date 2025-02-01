@@ -126,9 +126,11 @@ namespace api.repository
                 return BoardHelper.GetBoardForDisplay(game);
             }
 
+            var prevAlpha = await GetPreviousAlpha(game.GameID);
             ChessAI ai = new(game.IsPlayerWhite);
-            var foundMove = ai.GetMove(game);
+            var aiResponse = ai.GetMove(game, prevAlpha);
 
+            var foundMove = aiResponse.foundMove;
             if (foundMove is not null)
             {
                 await _connRepo.GetCollection<Move>("MoveHistory").InsertOneAsync(foundMove);
@@ -138,6 +140,15 @@ namespace api.repository
                     [foundMove.To[0], foundMove.To[1]],
                     ref game
                 );
+            }
+
+            var alpha = aiResponse.alpha;
+            if (alpha > int.MinValue)
+            {
+                var dbPrevAlpha = new PreviousAlpha() { GameID = game.GameID, Alpha = alpha };
+                await _connRepo
+                    .GetCollection<PreviousAlpha>("PreviousAlpha")
+                    .InsertOneAsync(dbPrevAlpha);
             }
 
             game.IsWhiteTurn = !game.IsWhiteTurn;
@@ -196,6 +207,19 @@ namespace api.repository
 
             // Otherwise, bad request
             throw new InvalidOperationException("GameID or UpdateGame must be present");
+        }
+
+        private async Task<int?> GetPreviousAlpha(ObjectId gameId)
+        {
+            var collection = _connRepo.GetCollection<PreviousAlpha>("PreviousAlpha");
+            var filter = Builders<PreviousAlpha>.Filter.Eq("_id", gameId);
+            var prevAlpha = await collection.Find(filter).FirstOrDefaultAsync();
+            if (prevAlpha is not null)
+            {
+                return prevAlpha.Alpha;
+            }
+
+            return null;
         }
     }
 }

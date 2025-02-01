@@ -1,3 +1,4 @@
+using System.Reflection;
 using ChessApi.HelperClasses.Chess;
 using ChessApi.Models.API;
 using ChessApi.Pieces;
@@ -21,6 +22,23 @@ public static class DatabaseInit
                 )
             )
         );
+
+        var assembly = Assembly.GetAssembly(typeof(IPiece));
+        var types = assembly
+            ?.GetTypes()
+            .Where(type => !type.IsInterface && typeof(IPiece).IsAssignableFrom(type));
+
+        if (types is not null)
+        {
+            foreach (var t in types)
+            {
+                if (t is not null)
+                {
+                    BsonClassMap.LookupClassMap(t);
+                }
+            }
+        }
+
         BsonSerializer.RegisterSerializer(objectSerializer);
     }
 }
