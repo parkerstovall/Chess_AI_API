@@ -127,11 +127,17 @@ namespace api.repository
             }
 
             ChessAI ai = new(game.IsPlayerWhite);
-            ai.GetMove(ref game, out Move? foundMove);
+            var foundMove = await ai.GetMove(game);
 
             if (foundMove is not null)
             {
                 await _connRepo.GetCollection<Move>("MoveHistory").InsertOneAsync(foundMove);
+
+                MoveHelper.MovePiece(
+                    [foundMove.From[0], foundMove.From[1]],
+                    [foundMove.To[0], foundMove.To[1]],
+                    ref game
+                );
             }
 
             game.IsWhiteTurn = !game.IsWhiteTurn;

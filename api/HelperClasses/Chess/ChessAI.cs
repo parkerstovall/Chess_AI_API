@@ -1,20 +1,28 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using ChessApi.Models.API;
 using ChessApi.Models.DB;
 using ChessApi.Pieces;
 using ChessApi.Pieces.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ChessApi.HelperClasses.Chess
 {
     public class ChessAI
     {
+        internal class ThreadResources
+        {
+            internal int alpha { get; set; } = int.MinValue;
+            internal PossibleMove move { get; set; } = new();
+        }
+
         private readonly int Max_Depth;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
 
-        public ChessAI(bool isBlack = true, int Max_Depth = 3)
+        public ChessAI(bool isBlack = true, int Max_Depth = 4)
         {
             this.Max_Depth = Max_Depth;
             if (!isBlack)
@@ -24,12 +32,11 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public void GetMove(ref Game game, out Move? foundMove)
+        public async Task<Move> GetMove(Game game)
         {
-            int score = int.MinValue;
-            int[] move = new int[4];
-
             var possibleMoves = new List<PossibleMove>();
+            var threadResources = new ThreadResources();
+
             foreach (BoardRow row in game.Board.Rows)
             {
                 foreach (BoardSquare square in row.Squares)
@@ -49,40 +56,89 @@ namespace ChessApi.HelperClasses.Chess
 
             OrderPossibleMoves(possibleMoves);
 
-            foreach (var pMove in possibleMoves)
+            // https://www.chessprogramming.org/Young_Brothers_Wait_Concept
+            // We run the first move to get a baseline score and hopefully
+            // speed up the rest of the moves when they are run in parralel
+            // (Alpha Beta Pruning uses the initial score to compare moves)
+            threadResources.move = possibleMoves[0];
+            possibleMoves.RemoveAt(0);
+
+            Game firstMove = CopyGame(game);
+
+            MoveHelper.MovePiece(
+                [threadResources.move.MoveFrom[0], threadResources.move.MoveFrom[1]],
+                [threadResources.move.MoveTo[0], threadResources.move.MoveTo[1]],
+                ref firstMove
+            );
+
+            threadResources.alpha = MinMax(firstMove, false, 0, int.MinValue, int.MaxValue);
+
+            var len = possibleMoves.Count;
+            var numThreads = 4;
+            var interval = len / numThreads;
+            var tasks = new List<Task>();
+            for (var j = 0; j < numThreads; j++)
             {
-                Game newGame = CopyGame(game);
+                var start = j == 0 ? 0 : interval * j;
+                var end = (j + 1 == numThreads) ? len : start + interval;
+                var moveSet = possibleMoves.GetRange(start, end - start);
 
-                MoveHelper.MovePiece(
-                    [pMove.MoveFrom[0], pMove.MoveFrom[1]],
-                    [pMove.MoveTo[0], pMove.MoveTo[1]],
-                    ref newGame
-                );
-
-                int tempScore = MinMax(newGame, false, 0, int.MinValue, int.MaxValue);
-
-                if (tempScore > score)
+                var task = Task.Run(() =>
                 {
-                    score = tempScore;
-                    move = [pMove.MoveFrom[0], pMove.MoveFrom[1], pMove.MoveTo[0], pMove.MoveTo[1]];
-                }
+                    foreach (var pMove in moveSet)
+                    {
+                        var newGame = CopyGame(game);
+
+                        MoveHelper.MovePiece(
+                            [pMove.MoveFrom[0], pMove.MoveFrom[1]],
+                            [pMove.MoveTo[0], pMove.MoveTo[1]],
+                            ref newGame
+                        );
+
+                        int tempScore = MinMax(
+                            newGame,
+                            false,
+                            0,
+                            threadResources.alpha,
+                            int.MaxValue
+                        );
+                        if (tempScore > threadResources.alpha)
+                        {
+                            lock (threadResources)
+                            {
+                                threadResources.alpha = tempScore;
+                                threadResources.move = pMove;
+                            }
+                        }
+                    }
+                });
+
+                tasks.Add(task);
             }
 
-            MoveHelper.MovePiece([move[0], move[1]], [move[2], move[3]], ref game);
+            await Task.WhenAll(tasks);
 
-            foundMove = null;
-            IPiece? piece = game.Board.Rows[move[2]].Squares[move[3]].Piece;
-            if (piece is not null)
-            {
-                foundMove = new()
+            Move foundMove =
+                new()
                 {
                     GameID = game.GameID,
-                    From = [move[0], move[1]],
-                    To = [move[2], move[3]],
-                    PieceColor = piece.Color,
-                    PieceType = piece.GetType().Name
+                    From = [threadResources.move.MoveFrom[0], threadResources.move.MoveFrom[1]],
+                    To = [threadResources.move.MoveTo[0], threadResources.move.MoveTo[1]],
+                    PieceColor = "",
+                    PieceType = ""
                 };
+
+            IPiece? piece = game.Board
+                .Rows[threadResources.move.MoveTo[0]]
+                .Squares[threadResources.move.MoveTo[1]]
+                .Piece;
+            if (piece is not null)
+            {
+                foundMove.PieceColor = piece.Color;
+                foundMove.PieceType = piece.GetType().Name;
             }
+
+            return foundMove;
         }
 
         private int MinMax(Game game, bool max, int depth, double alpha, double beta)
@@ -90,7 +146,7 @@ namespace ChessApi.HelperClasses.Chess
             string color = max ? max_color : min_color;
             if (depth == Max_Depth)
             {
-                return GetBoardScore(game.Board, color);
+                return GetBoardScore(game.Board);
             }
 
             List<BoardSquare> moveSquares = new();
@@ -175,7 +231,7 @@ namespace ChessApi.HelperClasses.Chess
             return score;
         }
 
-        public int GetBoardScore(Board board, string color)
+        public int GetBoardScore(Board board)
         {
             int boardScore = 0;
 
@@ -190,7 +246,7 @@ namespace ChessApi.HelperClasses.Chess
                             piece.Color == "white" ? piece.WhiteValues : piece.BlackValues;
                         int pieceValue = piece.Value + modifier[square.Coords[0], square.Coords[1]];
 
-                        if (piece.Color == color)
+                        if (piece.Color == max_color)
                         {
                             boardScore += pieceValue;
                         }
