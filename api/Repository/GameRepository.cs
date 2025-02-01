@@ -127,7 +127,7 @@ namespace api.repository
             }
 
             ChessAI ai = new(game.IsPlayerWhite);
-            var foundMove = await ai.GetMove(game);
+            var foundMove = ai.GetMove(game);
 
             if (foundMove is not null)
             {

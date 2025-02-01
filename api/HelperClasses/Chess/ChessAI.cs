@@ -19,14 +19,12 @@ namespace ChessApi.HelperClasses.Chess
         }
 
         private readonly int Max_Depth;
-        private readonly int Max_Threads;
         private readonly string max_color = "black";
         private readonly string min_color = "white";
 
-        public ChessAI(bool isBlack = true, int Max_Depth = 4, int Max_Threads = 5)
+        public ChessAI(bool isBlack = true, int Max_Depth = 4)
         {
             this.Max_Depth = Max_Depth;
-            this.Max_Threads = Max_Threads;
             if (!isBlack)
             {
                 max_color = "white";
@@ -34,7 +32,7 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public async Task<Move> GetMove(Game game)
+        public Move GetMove(Game game)
         {
             var possibleMoves = new List<PossibleMove>();
             var threadResources = new ThreadResources();
@@ -75,49 +73,29 @@ namespace ChessApi.HelperClasses.Chess
 
             threadResources.alpha = MinMax(firstMove, false, 0, int.MinValue, int.MaxValue);
 
-            var len = possibleMoves.Count;
-            var interval = len / Max_Threads;
-            var tasks = new List<Task>();
-            for (var j = 0; j < Max_Threads; j++)
-            {
-                var start = j == 0 ? 0 : interval * j;
-                var end = (j + 1 == Max_Threads) ? len : start + interval;
-                var moveSet = possibleMoves.GetRange(start, end - start);
-
-                var task = Task.Run(() =>
+            Parallel.ForEach(
+                possibleMoves,
+                pMove =>
                 {
-                    foreach (var pMove in moveSet)
+                    var newGame = CopyGame(game);
+
+                    MoveHelper.MovePiece(
+                        [pMove.MoveFrom[0], pMove.MoveFrom[1]],
+                        [pMove.MoveTo[0], pMove.MoveTo[1]],
+                        ref newGame
+                    );
+
+                    int tempScore = MinMax(newGame, false, 0, threadResources.alpha, int.MaxValue);
+                    if (tempScore > threadResources.alpha)
                     {
-                        var newGame = CopyGame(game);
-
-                        MoveHelper.MovePiece(
-                            [pMove.MoveFrom[0], pMove.MoveFrom[1]],
-                            [pMove.MoveTo[0], pMove.MoveTo[1]],
-                            ref newGame
-                        );
-
-                        int tempScore = MinMax(
-                            newGame,
-                            false,
-                            0,
-                            threadResources.alpha,
-                            int.MaxValue
-                        );
-                        if (tempScore > threadResources.alpha)
+                        lock (threadResources)
                         {
-                            lock (threadResources)
-                            {
-                                threadResources.alpha = tempScore;
-                                threadResources.move = pMove;
-                            }
+                            threadResources.alpha = tempScore;
+                            threadResources.move = pMove;
                         }
                     }
-                });
-
-                tasks.Add(task);
-            }
-
-            await Task.WhenAll(tasks);
+                }
+            );
 
             Move foundMove =
                 new()
