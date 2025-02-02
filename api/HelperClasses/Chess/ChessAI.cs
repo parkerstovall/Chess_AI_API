@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Timers;
 using ChessApi.Models.API;
 using ChessApi.Models.DB;
 using ChessApi.Pieces;
@@ -12,7 +11,7 @@ namespace ChessApi.HelperClasses.Chess
         private int Max_Depth;
         private int Max_Time = 10000;
         private bool StopThinking = false;
-        private System.Timers.Timer timer = new System.Timers.Timer();
+        private System.Timers.Timer timer = new();
 
         //private int totalMoves = 0;
         private readonly string max_color = "black";
