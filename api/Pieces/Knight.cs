@@ -6,6 +6,7 @@ namespace ChessApi.Pieces
 {
     public class Knight : IPieceDirectAttacker
     {
+        public string HashName { get; set; } = "n";
         public string Color { get; set; }
         public string Type { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
@@ -75,8 +76,8 @@ namespace ChessApi.Pieces
                             {
                                 MoveTo = [col, row],
                                 MoveFrom = [coords[0], coords[1]],
-                                PieceValue = this.Value,
-                                CaptureValue = square.Piece?.Value
+                                MovingPiece = this,
+                                CapturedPiece = square.Piece
                             }
                         );
                     }

@@ -7,6 +7,7 @@ namespace ChessApi.Pieces
 {
     public class Queen : IPieceCanPin
     {
+        public string HashName { get; set; } = "q";
         public string Color { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
@@ -73,7 +74,7 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    PieceValue = this.Value
+                                    MovingPiece = this
                                 }
                             );
                         }
@@ -88,8 +89,8 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    CaptureValue = board.Rows[col].Squares[row].Piece?.Value,
-                                    PieceValue = this.Value
+                                    CapturedPiece = board.Rows[col].Squares[row].Piece,
+                                    MovingPiece = this
                                 }
                             );
                         }

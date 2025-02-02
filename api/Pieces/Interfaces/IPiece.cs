@@ -5,6 +5,7 @@ namespace ChessApi.Pieces.Interfaces
 {
     public interface IPiece
     {
+        public string HashName { get; set; }
         public string Color { get; set; }
         public Direction PinnedDir { get; set; }
         public int[,] WhiteValues { get; }

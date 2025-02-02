@@ -1,4 +1,7 @@
+using System.Security.Principal;
 using ChessApi.Models.DB;
+using ChessApi.Pieces;
+using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Models.API
 {
@@ -10,11 +13,29 @@ namespace ChessApi.Models.API
         {
             get
             {
-                return (this.PieceValue == 100 && (MoveTo[0] == 1 || MoveTo[0] == 6))
-                    || (MoveTo[0] == 0 || MoveTo[0] == 7);
+                if (MovingPiece is Pawn && (MoveTo[0] != 1 || MoveTo[0] != 6))
+                {
+                    return true;
+                }
+
+                return MoveTo[0] != 0 || MoveTo[0] != 7;
             }
         }
-        public int PieceValue { get; set; } = -1;
-        public int? CaptureValue { get; set; }
+        public required IPiece MovingPiece { get; set; }
+        public IPiece? CapturedPiece { get; set; }
+        public int[]? CapturedMoveToOverride { get; set; }
+        public int[]? CapturedMoveFromOverride { get; set; }
+
+        public override string ToString()
+        {
+            var msg =
+                $"{MovingPiece.Color} {MovingPiece.GetType().Name} moves from [{MoveFrom[0]}, {MoveFrom[1]}] to [{MoveTo[0]}, {MoveTo[1]}]";
+            if (CapturedPiece is not null)
+            {
+                msg += $", capturing ${CapturedPiece.Color} {CapturedPiece.GetType().Name}";
+            }
+
+            return msg;
+        }
     }
 }

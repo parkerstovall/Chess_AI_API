@@ -6,6 +6,7 @@ namespace ChessApi.Pieces
 {
     public class King : IPieceHasMoved
     {
+        public string HashName { get; set; } = "k";
         public string Color { get; set; }
         public bool HasMoved { get; set; } = false;
         public bool InCheck { get; set; } = false;
@@ -72,7 +73,8 @@ namespace ChessApi.Pieces
                             {
                                 MoveTo = [col, row],
                                 MoveFrom = [coords[0], coords[1]],
-                                PieceValue = this.Value
+                                MovingPiece = this,
+                                CapturedPiece = square.Piece
                             }
                         );
                     }
@@ -113,7 +115,7 @@ namespace ChessApi.Pieces
 
         private void CheckCastle(Board board, int[] coords, ref List<PossibleMove> moves)
         {
-            if (this.HasMoved || this.InCheck)
+            if (HasMoved || InCheck)
             {
                 return;
             }
@@ -129,7 +131,10 @@ namespace ChessApi.Pieces
                     {
                         MoveTo = [col, row - 2],
                         MoveFrom = [coords[0], coords[1]],
-                        PieceValue = this.Value
+                        MovingPiece = this,
+                        CapturedPiece = board.Rows[col].Squares[row - 4].Piece,
+                        CapturedMoveFromOverride = [col, row - 4],
+                        CapturedMoveToOverride = [col, row - 1],
                     }
                 );
             }
@@ -142,7 +147,10 @@ namespace ChessApi.Pieces
                     {
                         MoveTo = [col, row + 2],
                         MoveFrom = [coords[0], coords[1]],
-                        PieceValue = this.Value
+                        MovingPiece = this,
+                        CapturedPiece = board.Rows[col].Squares[row + 3].Piece,
+                        CapturedMoveFromOverride = [col, row + 3],
+                        CapturedMoveToOverride = [col, row + 1],
                     }
                 );
             }

@@ -7,6 +7,7 @@ namespace ChessApi.Pieces
 {
     public class Bishop : IPieceCanPin
     {
+        public string HashName { get; set; } = "b";
         public string Color { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
@@ -75,7 +76,8 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    PieceValue = this.Value
+                                    MovingPiece = this,
+                                    CapturedPiece = square.Piece
                                 }
                             );
                         }

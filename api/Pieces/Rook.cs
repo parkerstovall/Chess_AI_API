@@ -7,6 +7,7 @@ namespace ChessApi.Pieces
 {
     public class Rook : IPieceCanPin, IPieceHasMoved
     {
+        public string HashName { get; set; } = "r";
         public string Color { get; set; }
         public bool HasMoved { get; set; } = false;
         public Direction PinnedDir { get; set; } = Direction.None;
@@ -74,7 +75,7 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    PieceValue = this.Value
+                                    MovingPiece = this
                                 }
                             );
                         }
@@ -89,8 +90,8 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    CaptureValue = board.Rows[col].Squares[row].Piece?.Value,
-                                    PieceValue = this.Value
+                                    CapturedPiece = board.Rows[col].Squares[row].Piece,
+                                    MovingPiece = this
                                 }
                             );
                         }

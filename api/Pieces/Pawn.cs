@@ -6,6 +6,7 @@ namespace ChessApi.Pieces
 {
     public class Pawn : IPieceDirectAttacker, IPieceHasMoved
     {
+        public string HashName { get; set; } = "p";
         public bool HasMoved { get; set; } = false;
         public string Color { get; set; }
         public Direction PinnedDir { get; set; } = Direction.None;
@@ -82,7 +83,7 @@ namespace ChessApi.Pieces
                             {
                                 MoveTo = [col, row],
                                 MoveFrom = [coords[0], coords[1]],
-                                PieceValue = Value
+                                MovingPiece = this
                             }
                         );
                     }
@@ -104,7 +105,7 @@ namespace ChessApi.Pieces
                                 {
                                     MoveTo = [col, row],
                                     MoveFrom = [coords[0], coords[1]],
-                                    PieceValue = this.Value
+                                    MovingPiece = this
                                 }
                             );
                         }
@@ -128,14 +129,22 @@ namespace ChessApi.Pieces
                         {
                             if (!check || left.CheckBlockingColor == this.Color)
                             {
-                                //moves.Add(new int[] { col, row });
+                                var capturedPiece = left.Piece;
+                                var capturedFrom = left.Coords;
+                                if (left.EnPassantColor != "")
+                                {
+                                    capturedFrom[0]--;
+                                    capturedPiece = board.Rows[col - 1].Squares[row].Piece;
+                                }
+
                                 moves.Add(
                                     new()
                                     {
                                         MoveTo = [col, row],
                                         MoveFrom = [coords[0], coords[1]],
-                                        PieceValue = this.Value,
-                                        CaptureValue = left.Piece?.Value
+                                        MovingPiece = this,
+                                        CapturedPiece = capturedPiece,
+                                        CapturedMoveFromOverride = capturedFrom
                                     }
                                 );
                             }
@@ -158,14 +167,22 @@ namespace ChessApi.Pieces
                         {
                             if (!check || right.CheckBlockingColor == this.Color)
                             {
-                                //moves.Add(new int[] { col, row });
+                                var capturedPiece = right.Piece;
+                                var capturedFrom = right.Coords;
+                                if (right.EnPassantColor != "")
+                                {
+                                    capturedFrom[0]--;
+                                    capturedPiece = board.Rows[col - 1].Squares[row].Piece;
+                                }
+
                                 moves.Add(
                                     new()
                                     {
                                         MoveTo = [col, row],
                                         MoveFrom = [coords[0], coords[1]],
-                                        PieceValue = this.Value,
-                                        CaptureValue = right.Piece?.Value
+                                        MovingPiece = this,
+                                        CapturedPiece = capturedPiece,
+                                        CapturedMoveFromOverride = capturedFrom
                                     }
                                 );
                             }
