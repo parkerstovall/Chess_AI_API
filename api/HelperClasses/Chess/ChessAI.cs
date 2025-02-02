@@ -11,7 +11,7 @@ namespace ChessApi.HelperClasses.Chess
         private int Max_Depth;
         private const int Max_Time = 10000;
         private bool StopThinking = false;
-        private System.Timers.Timer timer = new();
+        private readonly System.Timers.Timer timer = new();
 
         //private int totalMoves = 0;
         private readonly string max_color = "black";
