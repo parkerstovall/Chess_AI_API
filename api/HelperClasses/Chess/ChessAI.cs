@@ -9,7 +9,7 @@ namespace ChessApi.HelperClasses.Chess
     public class ChessAI
     {
         private int Max_Depth;
-        private int Max_Time = 10000;
+        private const int Max_Time = 10000;
         private bool StopThinking = false;
         private System.Timers.Timer timer = new();
 
