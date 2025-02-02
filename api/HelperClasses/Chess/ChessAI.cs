@@ -9,7 +9,7 @@ namespace ChessApi.HelperClasses.Chess
 {
     public class ChessAI
     {
-        private readonly int Max_Depth = 5;
+        private int Max_Depth = 5;
 
         //private int totalMoves = 0;
         private readonly string max_color = "black";
@@ -62,6 +62,19 @@ namespace ChessApi.HelperClasses.Chess
                         possibleMoves.AddRange(moves);
                     }
                 }
+            }
+
+            if (possibleMoves.Count < 10)
+            {
+                Max_Depth = 5;
+            }
+            else if (possibleMoves.Count < 5)
+            {
+                Max_Depth = 6;
+            }
+            else
+            {
+                Max_Depth = 4;
             }
 
             OrderPossibleMoves(possibleMoves);
@@ -122,6 +135,19 @@ namespace ChessApi.HelperClasses.Chess
                         possibleMoves.AddRange(moves);
                     }
                 }
+            }
+
+            if (possibleMoves.Count < 10)
+            {
+                Max_Depth = 6;
+            }
+            else if (possibleMoves.Count < 5)
+            {
+                Max_Depth = 7;
+            }
+            else
+            {
+                Max_Depth = 8;
             }
 
             OrderPossibleMoves(possibleMoves);
