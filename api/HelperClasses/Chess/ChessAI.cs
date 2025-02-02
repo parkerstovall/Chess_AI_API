@@ -1,15 +1,18 @@
 using System.Collections;
+using System.Timers;
 using ChessApi.Models.API;
 using ChessApi.Models.DB;
 using ChessApi.Pieces;
 using ChessApi.Pieces.Interfaces;
-using ZstdSharp.Unsafe;
 
 namespace ChessApi.HelperClasses.Chess
 {
     public class ChessAI
     {
-        private int Max_Depth = 5;
+        private int Max_Depth;
+        private int Max_Time = 10000;
+        private bool StopThinking = false;
+        private System.Timers.Timer timer = new System.Timers.Timer();
 
         //private int totalMoves = 0;
         private readonly string max_color = "black";
@@ -41,10 +44,16 @@ namespace ChessApi.HelperClasses.Chess
                 max_color = "white";
                 min_color = "black";
             }
+
+            timer.Interval = Max_Time;
+            timer.Enabled = true;
+            timer.AutoReset = false;
+            timer.Elapsed += (o, e) => StopThinking = true;
         }
 
         public Move GetMove(Game game)
         {
+            timer.Start();
             var possibleMoves = new List<PossibleMove>();
 
             foreach (BoardRow row in game.Board.Rows)
@@ -117,6 +126,7 @@ namespace ChessApi.HelperClasses.Chess
 
         public Move GetMoveParallel(Game game)
         {
+            timer.Start();
             var possibleMoves = new List<PossibleMove>();
             var threadResources = new ThreadResources();
 
@@ -147,7 +157,7 @@ namespace ChessApi.HelperClasses.Chess
             }
             else
             {
-                Max_Depth = 8;
+                Max_Depth = 5;
             }
 
             OrderPossibleMoves(possibleMoves);
@@ -233,7 +243,7 @@ namespace ChessApi.HelperClasses.Chess
                 //matches++;
                 return boardScore;
             }
-            else if (depth == Max_Depth)
+            else if (depth == Max_Depth || StopThinking)
             {
                 boardScore = GetBoardScore(game.Board);
 
