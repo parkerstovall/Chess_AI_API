@@ -1,0 +1,51 @@
+
+name: Publish Docker Images to GitHub
+
+on:
+  push:
+    branches: ["master"]
+
+permissions:
+  packages:
+    write
+
+jobs:
+      push-api-image:
+        runs-on: ubuntu-latest
+        
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+  
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+  
+          - name: 'Build Api Image'
+            run: |
+              cd api
+              docker build . -t ghcr.io/parkerstovall/chess-ai_api
+              docker push ghcr.io/parkerstovall/chess-ai_api
+      
+      push-client-image:
+        runs-on: ubuntu-latest
+      
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+  
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+  
+          - name: 'Build Client Image'
+            run: |
+              cd client
+              docker build . -t ghcr.io/parkerstovall/chess-ai_client
+              docker push ghcr.io/parkerstovall/chess-ai_client

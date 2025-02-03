@@ -1,0 +1,15 @@
+name: chess_ai
+services:
+  api:
+    image: ghcr.io/parkerstovall/chess_ai-api:latest
+    ports:
+     - "3001:8080"
+  client:
+    image: ghcr.io/parkerstovall/chess_ai-client:latest
+    ports:
+     - "3000:5175"
+  database:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=r00t

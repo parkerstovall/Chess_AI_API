@@ -18,6 +18,7 @@ builder.Services.AddHttpContextAccessor();
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 var configBuilder = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environment}.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 var config = configBuilder.Build();
@@ -35,7 +36,12 @@ builder.Services.AddCors(options =>
         builder =>
         {
             builder
-                .WithOrigins("https://localhost:5173", "http://localhost:5173")
+                .WithOrigins(
+                    "https://localhost:3000",
+                    "http://localhost:3000",
+                    "https://localhost:5175",
+                    "http://localhost:5175"
+                )
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
