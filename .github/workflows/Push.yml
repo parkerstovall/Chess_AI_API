@@ -6,28 +6,42 @@ on:
     branches: ["docker"]
 
 jobs:
-    push-store-image:
-      runs-on: ubuntu-latest
+      push-api-image:
+        runs-on: ubuntu-latest
+        
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+  
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+  
+          - name: 'Build Api Image'
+            run: |
+              cd ./api
+              docker build . -t ghcr.io/parkerstovall/chess-ai_api
+              docker push ghcr.io/parkerstovall/chess-ai_api
       
-      steps:
-        - name: 'Checkout GitHub Action'
-          uses: actions/checkout@main
-
-        - name: 'Login to GitHub Container Registry'
-          uses: docker/login-action@v1
-          with:
-            registry: ghcr.io
-            username: ${{github.actor}}
-            password: ${{secrets.GITHUB_TOKEN}}
-
-        - name: 'Build Api Image'
-          run: |
-            cd Api
-            docker build . -t ghcr.io/parkerstovall/chess-ai_api
-            docker push ghcr.io/parkerstovall/chess-ai_api
-
-        - name: 'Build Client Image'
-          run: |
-            cd Client
-            docker build . -t ghcr.io/parkerstovall/chess-ai_client
-            docker push ghcr.io/parkerstovall/chess-ai_client
+      push-client-image:
+        runs-on: ubuntu-latest
+      
+        steps:
+          - name: 'Checkout GitHub Action'
+            uses: actions/checkout@main
+  
+          - name: 'Login to GitHub Container Registry'
+            uses: docker/login-action@v1
+            with:
+              registry: ghcr.io
+              username: ${{github.actor}}
+              password: ${{secrets.GITHUB_TOKEN}}
+  
+          - name: 'Build Client Image'
+            run: |
+              cd Client
+              docker build . -t ghcr.io/parkerstovall/chess-ai_client
+              docker push ghcr.io/parkerstovall/chess-ai_client
