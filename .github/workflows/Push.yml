@@ -3,7 +3,7 @@ name: Publish Docker Images to GitHub
 
 on:
   push:
-    branches: ["master"]
+    branches: ["docker"]
 
 jobs:
     push-store-image:
