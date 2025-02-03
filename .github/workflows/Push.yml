@@ -1,0 +1,13 @@
+name: Push - Publish Docker Images
+
+on:
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  Build_And_Test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      

@@ -8,7 +8,7 @@ test('Index has Title', async ({ page }) => {
 test('Can Start Game as White', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   let boardBtnCount = await page.locator('.boardBtn').count()
@@ -26,11 +26,11 @@ test('Can Start Game as White', async ({ page }) => {
 test('Can Start Game as Black', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   const compMove = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/compMove*',
+    'http://localhost:3001/api/v1/game/compMove*',
   )
 
   let boardBtnCount = await page.locator('.boardBtn').count()
@@ -52,7 +52,7 @@ test('Can Start Game as Black', async ({ page }) => {
 test('Clicking on a piece selects it', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   await page.locator('#ResetWhite').click()
@@ -61,7 +61,7 @@ test('Clicking on a piece selects it', async ({ page }) => {
   })
 
   const clickResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
   await page.locator('.whitePawn').nth(0).click()
   await clickResp.then((response) => {
@@ -75,7 +75,7 @@ test('Clicking on a piece selects it', async ({ page }) => {
 test('Clicking on a piece highlights its moves', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   await page.locator('#ResetWhite').click()
@@ -84,7 +84,7 @@ test('Clicking on a piece highlights its moves', async ({ page }) => {
   })
 
   const clickResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
   await page.locator('.whitePawn').nth(0).click()
   await clickResp.then((response) => {
@@ -98,7 +98,7 @@ test('Clicking on a piece highlights its moves', async ({ page }) => {
 test('Clicking on a highlighted square moves the piece', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   await page.locator('#ResetWhite').click()
@@ -107,7 +107,7 @@ test('Clicking on a highlighted square moves the piece', async ({ page }) => {
   })
 
   const clickResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
 
   await page.locator('.whitePawn').nth(0).click()
@@ -118,7 +118,7 @@ test('Clicking on a highlighted square moves the piece', async ({ page }) => {
   const highlightedSquare = page.locator('.highlighted').nth(0)
   const highlightedId = await highlightedSquare.getAttribute('id')
   const moveResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
   await highlightedSquare.click()
   await moveResp.then((response) => {
@@ -139,7 +139,7 @@ test('Clicking on a highlighted square moves the piece', async ({ page }) => {
 test('After moving a piece, the computer will move', async ({ page }) => {
   await page.goto('/')
   const startGame = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/startGame*',
+    'http://localhost:3001/api/v1/game/startGame*',
   )
 
   await page.locator('#ResetWhite').click()
@@ -148,7 +148,7 @@ test('After moving a piece, the computer will move', async ({ page }) => {
   })
 
   const clickResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
 
   await page.locator('.whitePawn').nth(0).click()
@@ -159,11 +159,11 @@ test('After moving a piece, the computer will move', async ({ page }) => {
   const highlightedSquare = page.locator('.highlighted').nth(0)
   const highlightedId = await highlightedSquare.getAttribute('id')
   const moveResp = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/click*',
+    'http://localhost:3001/api/v1/game/click*',
   )
 
   const compMove = page.waitForResponse(
-    'https://localhost:3001/api/v1/game/compMove*',
+    'http://localhost:3001/api/v1/game/compMove*',
   )
 
   await highlightedSquare.click()
