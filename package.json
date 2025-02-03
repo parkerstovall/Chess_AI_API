@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "A personal website to showcase my various apps and projects",
   "scripts": {
-    "start": "npm run start:app & npm run start:db",
+    "start": "docker compose up",
     "start:db": "docker compose -f Docker/MongoDB.yml up",
-    "start:app": "concurrently \"cd api && dotnet run\" \"cd client && npm run dev\"",
     "build:css": "cd client && npm run build:css",
     "verify": "concurrently \"npm run verify:api\" \"npm run verify:client\"",
     "verify:api": "cd api && dotnet build",
@@ -14,6 +13,6 @@
   "author": "Parker Stovall",
   "license": "ISC",
   "devDependencies": {
-    "vite-plugin-mkcert": "^1.17.6"
+    "concurrently": "^9.1.2"
   }
 }

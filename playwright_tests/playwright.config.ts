@@ -27,7 +27,7 @@ export default defineConfig({
   use: {
     ignoreHTTPSErrors: true,
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://localhost:5173',
+    baseURL: 'http://localhost:5175',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -75,13 +75,13 @@ export default defineConfig({
   webServer: [
     {
       command: 'cd ../client && npm run dev',
-      url: 'https://localhost:5173/',
+      url: 'http://localhost:5175/',
       ignoreHTTPSErrors: true,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'cd ../api && dotnet run',
-      url: 'https://localhost:5000/swagger/index.html',
+      url: 'http://localhost:3001/swagger/index.html',
       ignoreHTTPSErrors: true,
       reuseExistingServer: !process.env.CI,
     },

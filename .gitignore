@@ -9,5 +9,5 @@
 next-env.d.ts
 dist
 
-Docker/data
+data
 output.css
