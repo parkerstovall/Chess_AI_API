@@ -5,7 +5,7 @@ namespace ChessApi.HelperClasses.Chess
 {
     internal static class PieceFactory
     {
-        internal static IPiece? GetPiece(string color, string type)
+        internal static IPiece? GetPiece(byte color, string type)
         {
             return type switch
             {

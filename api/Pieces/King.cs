@@ -4,10 +4,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class King : IPieceHasMoved
+    public class King(byte Color) : IPieceHasMoved
     {
-        public string HashName { get; set; } = "k";
-        public string Color { get; set; }
+        public byte Color { get; set; } = Color;
         public bool HasMoved { get; set; } = false;
         public bool InCheck { get; set; } = false;
         public bool InCheckMate { get; set; } = false;
@@ -39,11 +38,6 @@ namespace ChessApi.Pieces
                 { -30, -40, -40, -50, -50, -40, -40, -30 }
             };
         public int Value { get; } = 20000;
-
-        public King(string Color)
-        {
-            this.Color = Color;
-        }
 
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
@@ -110,7 +104,7 @@ namespace ChessApi.Pieces
 
         public override string ToString()
         {
-            return Color + "King";
+            return (Color == 0 ? "white" : "black") + "King";
         }
 
         private void CheckCastle(Board board, int[] coords, ref List<PossibleMove> moves)
@@ -185,7 +179,7 @@ namespace ChessApi.Pieces
 
         private bool SafeSquare(BoardSquare square)
         {
-            if (this.Color == "white")
+            if (this.Color == 0)
             {
                 return square.BlackPressure == 0;
             }
@@ -193,6 +187,11 @@ namespace ChessApi.Pieces
             {
                 return square.WhitePressure == 0;
             }
+        }
+
+        public string GetHashKey()
+        {
+            return $"k{Color}";
         }
 
         public IPiece Copy()

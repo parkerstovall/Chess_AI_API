@@ -19,8 +19,12 @@ public class ErrorMiddleware(RequestDelegate next)
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            //Console.WriteLine(ex.StackTrace);
+            Console.WriteLine(ex.StackTrace);
             await connRepo.GetCollection<Error>("ErrorLog").InsertOneAsync(new Error(ex));
+
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "plain/text";
+            await context.Response.WriteAsync("Internal Server Error. Please try again later.");
         }
     }
 }

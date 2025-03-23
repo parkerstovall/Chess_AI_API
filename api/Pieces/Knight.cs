@@ -4,11 +4,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Knight : IPieceDirectAttacker
+    public class Knight(byte Color) : IPieceDirectAttacker
     {
-        public string HashName { get; set; } = "n";
-        public string Color { get; set; }
-        public string Type { get; set; }
+        public byte Color { get; set; } = Color;
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
             new int[,]
@@ -37,12 +35,6 @@ namespace ChessApi.Pieces
             };
 
         public int Value { get; } = 300;
-
-        public Knight(string Color)
-        {
-            this.Color = Color;
-            this.Type = "Knight";
-        }
 
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
@@ -113,9 +105,14 @@ namespace ChessApi.Pieces
             return newPiece;
         }
 
+        public string GetHashKey()
+        {
+            return $"n{Color}";
+        }
+
         public override string ToString()
         {
-            return Color + "Knight";
+            return (Color == 0 ? "white" : "black") + "Knight";
         }
     }
 }

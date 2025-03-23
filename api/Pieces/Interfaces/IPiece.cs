@@ -5,8 +5,7 @@ namespace ChessApi.Pieces.Interfaces
 {
     public interface IPiece
     {
-        public string HashName { get; set; }
-        public string Color { get; set; }
+        public byte Color { get; set; }
         public Direction PinnedDir { get; set; }
         public int[,] WhiteValues { get; }
         public int[,] BlackValues { get; }
@@ -15,5 +14,7 @@ namespace ChessApi.Pieces.Interfaces
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check);
         public List<int[]> GetPressure(Board board, int[] coords);
         public IPiece Copy();
+
+        public string GetHashKey();
     }
 }

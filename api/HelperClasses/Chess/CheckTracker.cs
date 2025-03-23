@@ -17,7 +17,7 @@ namespace ChessApi.HelperClasses.Chess
         {
             if (square.Piece is not null && square.Piece is King king)
             {
-                if (king.Color == "black")
+                if (king.Color == 1)
                 {
                     BlackKing = square;
                 }
@@ -28,14 +28,14 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public BoardSquare? GetKing(string color)
+        public BoardSquare? GetKing(byte color)
         {
-            return color == "white" ? WhiteKing : BlackKing;
+            return color == 0 ? WhiteKing : BlackKing;
         }
 
-        public List<BoardSquare> GetKingAttackers(string color)
+        public List<BoardSquare> GetKingAttackers(byte color)
         {
-            return Attackers.Where((a) => a.Piece?.Color != color).ToList();
+            return [.. Attackers.Where((a) => a.Piece?.Color != color)];
         }
 
         public void AddAttacker(BoardSquare attacker)
@@ -43,9 +43,9 @@ namespace ChessApi.HelperClasses.Chess
             Attackers.Add(attacker);
         }
 
-        public void SetHasSavingSquares(string color, bool hasSavingSquares)
+        public void SetHasSavingSquares(byte color, bool hasSavingSquares)
         {
-            if (color == "white")
+            if (color == 0)
             {
                 HasWhiteSavingSquares = hasSavingSquares;
             }
@@ -55,21 +55,21 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public string? CheckColor()
+        public byte? CheckColor()
         {
-            if (IsKingInCheck("white"))
+            if (IsKingInCheck(0))
             {
-                return "white";
+                return 0;
             }
-            else if (IsKingInCheck("black"))
+            else if (IsKingInCheck(1))
             {
-                return "black";
+                return 1;
             }
 
             return null;
         }
 
-        private bool IsKingInCheck(string color)
+        private bool IsKingInCheck(byte color)
         {
             BoardSquare? square = GetKing(color);
 

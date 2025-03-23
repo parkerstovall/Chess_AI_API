@@ -5,10 +5,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Rook : IPieceCanPin, IPieceHasMoved
+    public class Rook(byte Color) : IPieceCanPin, IPieceHasMoved
     {
-        public string HashName { get; set; } = "r";
-        public string Color { get; set; }
+        public byte Color { get; set; } = Color;
         public bool HasMoved { get; set; } = false;
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
@@ -37,11 +36,6 @@ namespace ChessApi.Pieces
                 { 0, 0, 0, 0, 0, 0, 0, 0 }
             };
         public int Value { get; } = 500;
-
-        public Rook(string Color)
-        {
-            this.Color = Color;
-        }
 
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
@@ -201,9 +195,14 @@ namespace ChessApi.Pieces
             return newPiece;
         }
 
+        public string GetHashKey()
+        {
+            return $"r{Color}";
+        }
+
         public override string ToString()
         {
-            return Color + "Rook";
+            return (Color == 0 ? "white" : "black") + "Rook";
         }
     }
 }

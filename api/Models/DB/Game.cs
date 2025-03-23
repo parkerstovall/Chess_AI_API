@@ -15,7 +15,7 @@ namespace ChessApi.Models.DB
         public string Status { get; set; } = "Open";
         public List<int[]> AvailableMoves { get; set; } = new();
         public int[]? SelectedSquare { get; set; } = null;
-        public string? CheckedColor { get; set; } = null;
+        public byte? CheckedColor { get; set; } = null;
         public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
         public void SetStatus(GameStatus status)

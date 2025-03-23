@@ -6,12 +6,12 @@ namespace ChessApi.Models.API
     {
         public IPiece? Piece = null;
         public int[] Coords { get; set; } = { -1, -1 };
-        public string CheckBlockingColor { get; set; } = "";
+        public byte? CheckBlockingColor { get; set; } = null;
+        public byte? EnPassantColor = null;
         public int BlackPressure { get; set; }
         public int WhitePressure { get; set; }
         public bool WhiteKingPressure { get; set; }
         public bool BlackKingPressure { get; set; }
-        public string EnPassantColor = "";
 
         public BoardSquare Copy()
         {

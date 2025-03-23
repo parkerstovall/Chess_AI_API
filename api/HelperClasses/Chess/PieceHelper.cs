@@ -174,13 +174,7 @@ namespace ChessApi.HelperClasses.Chess
             return inc;
         }
 
-        public static void SetPins(
-            int[] start,
-            int[] inc,
-            Direction dir,
-            string color,
-            ref Game game
-        )
+        public static void SetPins(int[] start, int[] inc, Direction dir, byte color, ref Game game)
         {
             start[0] += inc[0];
             start[1] += inc[1];
@@ -213,7 +207,7 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public static bool SetSavingSquares(int[] start, int[] inc, string color, ref Game game)
+        public static bool SetSavingSquares(int[] start, int[] inc, byte color, ref Game game)
         {
             bool canSave = false;
 
@@ -226,7 +220,7 @@ namespace ChessApi.HelperClasses.Chess
                     break;
                 }
 
-                int pawnInc = color == "white" ? -1 : 1;
+                int pawnInc = color == 0 ? -1 : 1;
 
                 if (IsInBoard(start[0] + pawnInc, start[1]))
                 {
@@ -238,7 +232,7 @@ namespace ChessApi.HelperClasses.Chess
                     )
                     {
                         canSave = true;
-                        square.CheckBlockingColor = color == "white" ? "black" : "white";
+                        square.CheckBlockingColor = (byte?)(color == 0 ? 1 : 0);
                     }
                 }
 
@@ -255,19 +249,19 @@ namespace ChessApi.HelperClasses.Chess
                     )
                     {
                         canSave = true;
-                        square.CheckBlockingColor = color == "white" ? "black" : "white";
+                        square.CheckBlockingColor = (byte?)(color == 0 ? 1 : 0);
                     }
                 }
 
                 if (GetEnemyPressure(color, square) > 1)
                 {
                     canSave = true;
-                    square.CheckBlockingColor = color == "white" ? "black" : "white";
+                    square.CheckBlockingColor = (byte?)(color == 0 ? 1 : 0);
                 }
                 else if (GetEnemyPressure(color, square) == 1 && !GetKingPressure(color, square))
                 {
                     canSave = true;
-                    square.CheckBlockingColor = color == "white" ? "black" : "white";
+                    square.CheckBlockingColor = (byte?)(color == 0 ? 1 : 0);
                 }
 
                 start[0] += inc[0];
@@ -277,9 +271,9 @@ namespace ChessApi.HelperClasses.Chess
             return canSave;
         }
 
-        private static int GetEnemyPressure(string color, BoardSquare square)
+        private static int GetEnemyPressure(byte color, BoardSquare square)
         {
-            if (color == "white")
+            if (color == 0)
             {
                 return square.BlackPressure;
             }
@@ -289,9 +283,9 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        private static bool GetKingPressure(string color, BoardSquare square)
+        private static bool GetKingPressure(byte color, BoardSquare square)
         {
-            if (color == "white")
+            if (color == 0)
             {
                 return square.BlackKingPressure;
             }
