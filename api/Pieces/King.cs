@@ -4,9 +4,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class King(byte Color) : IPieceHasMoved
+    public class King(bool Color) : IPieceHasMoved
     {
-        public byte Color { get; set; } = Color;
+        public bool Color { get; set; } = Color;
         public bool HasMoved { get; set; } = false;
         public bool InCheck { get; set; } = false;
         public bool InCheckMate { get; set; } = false;
@@ -61,7 +61,6 @@ namespace ChessApi.Pieces
                         && SafeSquare(square)
                     )
                     {
-                        //moves.Add(new int[] { col, row });
                         moves.Add(
                             new()
                             {
@@ -95,7 +94,7 @@ namespace ChessApi.Pieces
 
                 if (PieceHelper.IsInBoard(col, row))
                 {
-                    moves.Add(new int[] { col, row });
+                    moves.Add([col, row]);
                 }
             }
 
@@ -104,7 +103,7 @@ namespace ChessApi.Pieces
 
         public override string ToString()
         {
-            return (Color == 0 ? "white" : "black") + "King";
+            return (Color == false ? "white" : "black") + "King";
         }
 
         private void CheckCastle(Board board, int[] coords, ref List<PossibleMove> moves)
@@ -179,7 +178,7 @@ namespace ChessApi.Pieces
 
         private bool SafeSquare(BoardSquare square)
         {
-            if (this.Color == 0)
+            if (!Color)
             {
                 return square.BlackPressure == 0;
             }
@@ -191,7 +190,7 @@ namespace ChessApi.Pieces
 
         public string GetHashKey()
         {
-            return $"k{Color}";
+            return $"k{(Color ? 0 : 1)}";
         }
 
         public IPiece Copy()

@@ -13,13 +13,14 @@ namespace ChessApi.HelperClasses.Chess
         internal static List<PossibleMove> GetMovesFromPiece(
             Board board,
             int[] clickedSquare,
-            byte? checkColor
+            bool? checkColor
         )
         {
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
             List<PossibleMove> moves =
                 square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
                 ?? [];
+
             return moves;
         }
 
@@ -186,7 +187,7 @@ namespace ChessApi.HelperClasses.Chess
                 if (checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
                 {
                     tracker.SetHasSavingSquares(
-                        (byte)(checkSavingSquaresPiece.Color == 0 ? 1 : 0),
+                        !checkSavingSquaresPiece.Color,
                         checkSavingSquaresPiece.HasSavingSquares(
                             [checkSquare.Coords[0], checkSquare.Coords[1]],
                             kingLoc,
@@ -196,24 +197,20 @@ namespace ChessApi.HelperClasses.Chess
                 }
                 else if (checkSquare.Piece is IPieceDirectAttacker directAttacker)
                 {
-                    var color = (byte)(directAttacker.Color == 0 ? 1 : 0);
-                    var pressure =
-                        directAttacker.Color == 0
-                            ? checkSquare.WhitePressure
-                            : checkSquare.BlackPressure;
-                    var enemyPressure =
-                        directAttacker.Color == 0
-                            ? checkSquare.BlackPressure
-                            : checkSquare.WhitePressure;
-                    var isFromKing =
-                        directAttacker.Color == 0
-                            ? checkSquare.WhiteKingPressure
-                            : checkSquare.BlackKingPressure;
+                    var pressure = !directAttacker.Color
+                        ? checkSquare.WhitePressure
+                        : checkSquare.BlackPressure;
+                    var enemyPressure = !directAttacker.Color
+                        ? checkSquare.BlackPressure
+                        : checkSquare.WhitePressure;
+                    var isFromKing = !directAttacker.Color
+                        ? checkSquare.BlackKingPressure
+                        : checkSquare.WhiteKingPressure;
 
                     if (enemyPressure > 1 || (enemyPressure == 1 && (!isFromKing || pressure == 0)))
                     {
-                        checkSquare.CheckBlockingColor = color;
-                        tracker.SetHasSavingSquares(color, true);
+                        checkSquare.CheckBlockingColor = directAttacker.Color;
+                        tracker.SetHasSavingSquares(directAttacker.Color, true);
                     }
                 }
             }
@@ -273,7 +270,7 @@ namespace ChessApi.HelperClasses.Chess
                     }
                 }
 
-                if (square.Piece.Color == 0)
+                if (!square.Piece.Color)
                 {
                     if (square.Piece is King)
                     {
@@ -304,7 +301,7 @@ namespace ChessApi.HelperClasses.Chess
                 }
 
                 int[] lStart = [square.Coords[0], square.Coords[1]];
-                if (piece.Color == 0 && tracker.BlackKing is not null)
+                if (!piece.Color && tracker.BlackKing is not null)
                 {
                     piece.CheckPins(lStart, tracker.BlackKing.Coords, ref game);
                 }
@@ -342,11 +339,11 @@ namespace ChessApi.HelperClasses.Chess
             if (attackers.Count == 1)
             {
                 var attacker = attackers[0];
-                var pressure = king.Color == 0 ? attacker.WhitePressure : attacker.BlackPressure;
-                var enemyPressure =
-                    king.Color == 0 ? attacker.BlackPressure : attacker.WhitePressure;
-                var isFromKing =
-                    king.Color == 0 ? attacker.WhiteKingPressure : attacker.BlackKingPressure;
+                var pressure = !king.Color ? attacker.WhitePressure : attacker.BlackPressure;
+                var enemyPressure = !king.Color ? attacker.BlackPressure : attacker.WhitePressure;
+                var isFromKing = !king.Color
+                    ? attacker.WhiteKingPressure
+                    : attacker.BlackKingPressure;
 
                 if (pressure > 1 || (pressure == 1 && (!isFromKing || enemyPressure == 0)))
                 {
@@ -357,12 +354,13 @@ namespace ChessApi.HelperClasses.Chess
             {
                 foreach (var attacker in attackers)
                 {
-                    var pressure =
-                        king.Color == 0 ? attacker.WhitePressure : attacker.BlackPressure;
-                    var enemyPressure =
-                        king.Color == 0 ? attacker.BlackPressure : attacker.WhitePressure;
-                    var isFromKing =
-                        king.Color == 0 ? attacker.WhiteKingPressure : attacker.BlackKingPressure;
+                    var pressure = !king.Color ? attacker.WhitePressure : attacker.BlackPressure;
+                    var enemyPressure = !king.Color
+                        ? attacker.BlackPressure
+                        : attacker.WhitePressure;
+                    var isFromKing = !king.Color
+                        ? attacker.WhiteKingPressure
+                        : attacker.BlackKingPressure;
 
                     if (pressure == 1 && (!isFromKing || enemyPressure == 0))
                     {
@@ -376,13 +374,13 @@ namespace ChessApi.HelperClasses.Chess
                 return;
             }
 
-            if (king.Color == 0 ? tracker.HasWhiteSavingSquares : tracker.HasBlackSavingSquares)
+            if (!king.Color ? tracker.HasWhiteSavingSquares : tracker.HasBlackSavingSquares)
             {
                 return;
             }
 
             king.InCheckMate = true;
-            game.SetStatus(king.Color == 0 ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack);
+            game.SetStatus(!king.Color ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack);
         }
     }
 }

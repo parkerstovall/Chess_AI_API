@@ -4,9 +4,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Knight(byte Color) : IPieceDirectAttacker
+    public class Knight(bool Color) : IPieceDirectAttacker
     {
-        public byte Color { get; set; } = Color;
+        public bool Color { get; set; } = Color;
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
             new int[,]
@@ -107,12 +107,12 @@ namespace ChessApi.Pieces
 
         public string GetHashKey()
         {
-            return $"n{Color}";
+            return $"n{(Color ? 0 : 1)}";
         }
 
         public override string ToString()
         {
-            return (Color == 0 ? "white" : "black") + "Knight";
+            return (Color == false ? "white" : "black") + "Knight";
         }
     }
 }

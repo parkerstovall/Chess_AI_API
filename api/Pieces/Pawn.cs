@@ -4,10 +4,10 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Pawn(byte Color) : IPieceDirectAttacker, IPieceHasMoved
+    public class Pawn(bool Color) : IPieceDirectAttacker, IPieceHasMoved
     {
         public bool HasMoved { get; set; } = false;
-        public byte Color { get; set; } = Color;
+        public bool Color { get; set; } = Color;
         public Direction PinnedDir { get; set; } = Direction.None;
 
         public int[,] WhiteValues { get; } =
@@ -41,7 +41,7 @@ namespace ChessApi.Pieces
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
             List<PossibleMove> moves = [];
-            int dir = (this.Color == 1) ? 1 : -1;
+            int dir = Color ? 1 : -1;
 
             int col = coords[0] + dir;
             int row = coords[1];
@@ -124,11 +124,11 @@ namespace ChessApi.Pieces
                             if (!check || left.CheckBlockingColor == this.Color)
                             {
                                 var capturedPiece = left.Piece;
-                                var capturedFrom = left.Coords;
+                                var capturedFrom = new int[] { left.Coords[0], left.Coords[1] };
                                 if (left.EnPassantColor.HasValue)
                                 {
-                                    capturedFrom[0]--;
-                                    capturedPiece = board.Rows[col - 1].Squares[row].Piece;
+                                    capturedFrom[0] -= dir;
+                                    capturedPiece = board.Rows[col - dir].Squares[row].Piece;
                                 }
 
                                 moves.Add(
@@ -153,7 +153,6 @@ namespace ChessApi.Pieces
                     if (canAttackRight)
                     {
                         BoardSquare right = board.Rows[col].Squares[row];
-
                         if (
                             (right.Piece is not null && right.Piece?.Color != this.Color)
                             || (right.EnPassantColor.HasValue && right.EnPassantColor != this.Color)
@@ -162,11 +161,11 @@ namespace ChessApi.Pieces
                             if (!check || right.CheckBlockingColor == this.Color)
                             {
                                 var capturedPiece = right.Piece;
-                                var capturedFrom = right.Coords;
+                                var capturedFrom = new int[] { right.Coords[0], right.Coords[1] };
                                 if (right.EnPassantColor.HasValue)
                                 {
-                                    capturedFrom[0]--;
-                                    capturedPiece = board.Rows[col - 1].Squares[row].Piece;
+                                    capturedFrom[0] -= dir;
+                                    capturedPiece = board.Rows[col - dir].Squares[row].Piece;
                                 }
 
                                 moves.Add(
@@ -190,8 +189,8 @@ namespace ChessApi.Pieces
 
         public List<int[]> GetPressure(Board board, int[] coords)
         {
-            List<int[]> moves = new();
-            int dir = (this.Color == 1) ? 1 : -1;
+            List<int[]> moves = [];
+            int dir = Color ? 1 : -1;
 
             int i = coords[0] + dir;
             int j = coords[1] - 1;
@@ -224,12 +223,12 @@ namespace ChessApi.Pieces
 
         public string GetHashKey()
         {
-            return $"p{Color}";
+            return $"p{(Color ? 0 : 1)}";
         }
 
         public override string ToString()
         {
-            return (Color == 0 ? "white" : "black") + "Pawn";
+            return (Color == false ? "white" : "black") + "Pawn";
         }
     }
 }

@@ -33,11 +33,11 @@ namespace ChessApi.HelperClasses.Chess
                     IPiece? piece = null;
                     if (i == 0 || i == 7)
                     {
-                        piece = PieceFactory.GetPiece((byte)(whitePiece ? 0 : 1), pieceOrder[j]);
+                        piece = PieceFactory.GetPiece(!whitePiece, pieceOrder[j]);
                     }
                     else if (i == 1 || i == 6)
                     {
-                        piece = PieceFactory.GetPiece((byte)(whitePiece ? 0 : 1), "Pawn");
+                        piece = PieceFactory.GetPiece(!whitePiece, "Pawn");
                     }
 
                     board.Rows[i].Squares.Add(new() { Coords = [i, j], Piece = piece });

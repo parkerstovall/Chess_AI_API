@@ -38,17 +38,12 @@ namespace ChessApi.HelperClasses.Chess
         ///  The maximum time (in milliseconds) the engine will spend searching for a move.
         ///  If the time limit is reached, the engine will return the best move found so far.
         /// </summary>
-        public int? MaxTime { get; set; } = 1000;
+        public int? MaxTime { get; set; } = 10000;
 
         /// <summary>
-        ///  The value for the player that the engine is currently controlling
+        ///  Colors are represented as false (black) and true (black).
         ///  </summart>
-        public byte MaxPlayer { get; set; } = 1;
-
-        /// <summary>
-        ///  The value for the opponent player
-        /// </summary>
-        public byte MinPlayer { get; set; } = 0;
+        public bool MaxPlayer { get; set; } = true;
 
         /// <summary>
         ///  The size of the board.
@@ -66,8 +61,7 @@ namespace ChessApi.HelperClasses.Chess
     public class MinMaxEngine
     {
         private int Max_Depth;
-        private readonly byte Max_Player;
-        private readonly byte Min_Player;
+        private readonly bool Max_Player;
         private readonly long[,,] PositionHashes;
         private bool StopThinking = false;
         private readonly System.Timers.Timer timer = new();
@@ -79,7 +73,6 @@ namespace ChessApi.HelperClasses.Chess
         {
             Max_Depth = options.MaxDepth;
             Max_Player = options.MaxPlayer;
-            Min_Player = options.MinPlayer;
 
             for (var i = 0; i < options.PieceHashKeys.Length; i++)
             {
@@ -281,7 +274,7 @@ namespace ChessApi.HelperClasses.Chess
         private int MinMax(Game game, bool isMax, int depth, int alpha, int beta, long boardHash)
         {
             //totalMoves++;
-            var color = isMax ? Max_Player : Min_Player;
+            var color = isMax ? Max_Player : !Max_Player;
             // if (
             //     Transpositions.ContainsKey(boardHash) && Transpositions[boardHash] is int boardScore
             // )
@@ -315,7 +308,7 @@ namespace ChessApi.HelperClasses.Chess
                     {
                         if (square.Piece is King king && king.InCheckMate)
                         {
-                            return color == Max_Player ? int.MinValue : int.MaxValue;
+                            return isMax ? int.MinValue : int.MaxValue;
                         }
 
                         moveSquares.Add(square);
@@ -401,7 +394,7 @@ namespace ChessApi.HelperClasses.Chess
                     if (piece is not null)
                     {
                         int[,] modifier =
-                            piece.Color == Min_Player ? piece.WhiteValues : piece.BlackValues;
+                            piece.Color == Max_Player ? piece.BlackValues : piece.WhiteValues;
                         int pieceValue = piece.Value + modifier[square.Coords[0], square.Coords[1]];
 
                         if (piece.Color == Max_Player)
@@ -550,12 +543,12 @@ namespace ChessApi.HelperClasses.Chess
             // Account for pawn promotions
             if (pMove.MovingPiece is Pawn p)
             {
-                if (pMove.MoveTo[0] == 0 && p.Color == 0)
+                if (pMove.MoveTo[0] == 0 && !p.Color)
                 {
                     var pieceHash = PieceHashKeys["q0"];
                     tempBoardHash ^= PositionHashes[pMove.MoveTo[0], pMove.MoveTo[1], pieceHash];
                 }
-                else if (pMove.MoveTo[0] == 7 && p.Color == 1)
+                else if (pMove.MoveTo[0] == 7 && p.Color)
                 {
                     var pieceHash = PieceHashKeys["q1"];
                     tempBoardHash ^= PositionHashes[pMove.MoveTo[0], pMove.MoveTo[1], pieceHash];

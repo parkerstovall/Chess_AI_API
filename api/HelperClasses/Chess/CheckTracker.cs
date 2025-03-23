@@ -17,7 +17,7 @@ namespace ChessApi.HelperClasses.Chess
         {
             if (square.Piece is not null && square.Piece is King king)
             {
-                if (king.Color == 1)
+                if (king.Color)
                 {
                     BlackKing = square;
                 }
@@ -28,12 +28,12 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public BoardSquare? GetKing(byte color)
+        public BoardSquare? GetKing(bool color)
         {
-            return color == 0 ? WhiteKing : BlackKing;
+            return !color ? WhiteKing : BlackKing;
         }
 
-        public List<BoardSquare> GetKingAttackers(byte color)
+        public List<BoardSquare> GetKingAttackers(bool color)
         {
             return [.. Attackers.Where((a) => a.Piece?.Color != color)];
         }
@@ -43,9 +43,9 @@ namespace ChessApi.HelperClasses.Chess
             Attackers.Add(attacker);
         }
 
-        public void SetHasSavingSquares(byte color, bool hasSavingSquares)
+        public void SetHasSavingSquares(bool color, bool hasSavingSquares)
         {
-            if (color == 0)
+            if (!color)
             {
                 HasWhiteSavingSquares = hasSavingSquares;
             }
@@ -55,21 +55,21 @@ namespace ChessApi.HelperClasses.Chess
             }
         }
 
-        public byte? CheckColor()
+        public bool? CheckColor()
         {
-            if (IsKingInCheck(0))
+            if (IsKingInCheck(false))
             {
-                return 0;
+                return false;
             }
-            else if (IsKingInCheck(1))
+            else if (IsKingInCheck(true))
             {
-                return 1;
+                return true;
             }
 
             return null;
         }
 
-        private bool IsKingInCheck(byte color)
+        private bool IsKingInCheck(bool color)
         {
             BoardSquare? square = GetKing(color);
 
