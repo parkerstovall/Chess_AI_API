@@ -13,19 +13,19 @@ namespace ChessApi.HelperClasses.Chess
     ///
     public class MinMaxEngineOptions
     {
-        /// <summary>
-        ///  Whether to use parallel processing for the MinMax algorithm.
-        ///  Setting this to true can speed up the search process on multi-core systems.
-        ///  However, it may also increase memory usage and complexity.
-        /// </summary>
-        public bool UseParallel { get; set; } = false;
+        // /// <summary>
+        // ///  Whether to use parallel processing for the MinMax algorithm.
+        // ///  Setting this to true can speed up the search process on multi-core systems.
+        // ///  However, it may also increase memory usage and complexity.
+        // /// </summary>
+        // public bool UseParallel { get; set; } = false;
 
-        /// <summary>
-        ///  Whether to use transpositions to store previously evaluated positions.
-        ///  This can significantly reduce computation time by avoiding redundant calculations.
-        ///  However, it may increase memory usage.
-        /// </summary>
-        public bool UseTranspositions { get; set; } = true;
+        // /// <summary>
+        // ///  Whether to use transpositions to store previously evaluated positions.
+        // ///  This can significantly reduce computation time by avoiding redundant calculations.
+        // ///  However, it may increase memory usage.
+        // /// </summary>
+        // public bool UseTranspositions { get; set; } = true;
 
         /// <summary>
         ///  The maximum depth for the MinMax algorithm. This determines how many moves ahead the engine will evaluate.
@@ -273,19 +273,16 @@ namespace ChessApi.HelperClasses.Chess
 
         private int MinMax(Game game, bool isMax, int depth, int alpha, int beta, long boardHash)
         {
-            //totalMoves++;
             var color = isMax ? Max_Player : !Max_Player;
-            // if (
-            //     Transpositions.ContainsKey(boardHash) && Transpositions[boardHash] is int boardScore
-            // )
-            // {
-            //     //matches++;
-            //     return boardScore;
-            // }
-            // else
-            if (depth == Max_Depth || StopThinking)
+            if (
+                Transpositions.ContainsKey(boardHash) && Transpositions[boardHash] is int boardScore
+            )
             {
-                var boardScore = GetBoardScore(game.Board);
+                return boardScore;
+            }
+            else if (depth == Max_Depth || StopThinking)
+            {
+                boardScore = GetBoardScore(game.Board);
 
                 lock (Transpositions)
                 {
