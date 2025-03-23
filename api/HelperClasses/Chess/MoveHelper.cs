@@ -13,13 +13,14 @@ namespace ChessApi.HelperClasses.Chess
         internal static List<PossibleMove> GetMovesFromPiece(
             Board board,
             int[] clickedSquare,
-            string? checkColor
+            bool? checkColor
         )
         {
             BoardSquare square = board.Rows[clickedSquare[0]].Squares[clickedSquare[1]];
             List<PossibleMove> moves =
                 square.Piece?.GetPaths(board, clickedSquare, checkColor == square.Piece?.Color)
                 ?? [];
+
             return moves;
         }
 
@@ -88,7 +89,7 @@ namespace ChessApi.HelperClasses.Chess
             if (
                 from is Pawn pawn
                 && to.Piece is null
-                && to.EnPassantColor != ""
+                && to.EnPassantColor.HasValue
                 && to.EnPassantColor != pawn.Color
             )
             {
@@ -104,8 +105,8 @@ namespace ChessApi.HelperClasses.Chess
             {
                 foreach (BoardSquare square in row.Squares)
                 {
-                    square.CheckBlockingColor = "";
-                    square.EnPassantColor = "";
+                    square.CheckBlockingColor = null;
+                    square.EnPassantColor = null;
                     square.BlackPressure = 0;
                     square.WhitePressure = 0;
                     square.WhiteKingPressure = false;
@@ -186,7 +187,7 @@ namespace ChessApi.HelperClasses.Chess
                 if (checkSquare.Piece is IPieceCanPin checkSavingSquaresPiece)
                 {
                     tracker.SetHasSavingSquares(
-                        checkSavingSquaresPiece.Color == "white" ? "black" : "white",
+                        !checkSavingSquaresPiece.Color,
                         checkSavingSquaresPiece.HasSavingSquares(
                             [checkSquare.Coords[0], checkSquare.Coords[1]],
                             kingLoc,
@@ -196,24 +197,20 @@ namespace ChessApi.HelperClasses.Chess
                 }
                 else if (checkSquare.Piece is IPieceDirectAttacker directAttacker)
                 {
-                    var color = directAttacker.Color == "white" ? "black" : "white";
-                    var pressure =
-                        directAttacker.Color == "white"
-                            ? checkSquare.WhitePressure
-                            : checkSquare.BlackPressure;
-                    var enemyPressure =
-                        directAttacker.Color == "white"
-                            ? checkSquare.BlackPressure
-                            : checkSquare.WhitePressure;
-                    var isFromKing =
-                        directAttacker.Color == "white"
-                            ? checkSquare.WhiteKingPressure
-                            : checkSquare.BlackKingPressure;
+                    var pressure = !directAttacker.Color
+                        ? checkSquare.WhitePressure
+                        : checkSquare.BlackPressure;
+                    var enemyPressure = !directAttacker.Color
+                        ? checkSquare.BlackPressure
+                        : checkSquare.WhitePressure;
+                    var isFromKing = !directAttacker.Color
+                        ? checkSquare.BlackKingPressure
+                        : checkSquare.WhiteKingPressure;
 
                     if (enemyPressure > 1 || (enemyPressure == 1 && (!isFromKing || pressure == 0)))
                     {
-                        checkSquare.CheckBlockingColor = color;
-                        tracker.SetHasSavingSquares(color, true);
+                        checkSquare.CheckBlockingColor = directAttacker.Color;
+                        tracker.SetHasSavingSquares(directAttacker.Color, true);
                     }
                 }
             }
@@ -273,7 +270,7 @@ namespace ChessApi.HelperClasses.Chess
                     }
                 }
 
-                if (square.Piece.Color == "white")
+                if (!square.Piece.Color)
                 {
                     if (square.Piece is King)
                     {
@@ -304,7 +301,7 @@ namespace ChessApi.HelperClasses.Chess
                 }
 
                 int[] lStart = [square.Coords[0], square.Coords[1]];
-                if (piece.Color == "white" && tracker.BlackKing is not null)
+                if (!piece.Color && tracker.BlackKing is not null)
                 {
                     piece.CheckPins(lStart, tracker.BlackKing.Coords, ref game);
                 }
@@ -342,12 +339,11 @@ namespace ChessApi.HelperClasses.Chess
             if (attackers.Count == 1)
             {
                 var attacker = attackers[0];
-                var pressure =
-                    king.Color == "white" ? attacker.WhitePressure : attacker.BlackPressure;
-                var enemyPressure =
-                    king.Color == "white" ? attacker.BlackPressure : attacker.WhitePressure;
-                var isFromKing =
-                    king.Color == "white" ? attacker.WhiteKingPressure : attacker.BlackKingPressure;
+                var pressure = !king.Color ? attacker.WhitePressure : attacker.BlackPressure;
+                var enemyPressure = !king.Color ? attacker.BlackPressure : attacker.WhitePressure;
+                var isFromKing = !king.Color
+                    ? attacker.WhiteKingPressure
+                    : attacker.BlackKingPressure;
 
                 if (pressure > 1 || (pressure == 1 && (!isFromKing || enemyPressure == 0)))
                 {
@@ -358,14 +354,13 @@ namespace ChessApi.HelperClasses.Chess
             {
                 foreach (var attacker in attackers)
                 {
-                    var pressure =
-                        king.Color == "white" ? attacker.WhitePressure : attacker.BlackPressure;
-                    var enemyPressure =
-                        king.Color == "white" ? attacker.BlackPressure : attacker.WhitePressure;
-                    var isFromKing =
-                        king.Color == "white"
-                            ? attacker.WhiteKingPressure
-                            : attacker.BlackKingPressure;
+                    var pressure = !king.Color ? attacker.WhitePressure : attacker.BlackPressure;
+                    var enemyPressure = !king.Color
+                        ? attacker.BlackPressure
+                        : attacker.WhitePressure;
+                    var isFromKing = !king.Color
+                        ? attacker.WhiteKingPressure
+                        : attacker.BlackKingPressure;
 
                     if (pressure == 1 && (!isFromKing || enemyPressure == 0))
                     {
@@ -379,19 +374,13 @@ namespace ChessApi.HelperClasses.Chess
                 return;
             }
 
-            if (
-                king.Color == "white"
-                    ? tracker.HasWhiteSavingSquares
-                    : tracker.HasBlackSavingSquares
-            )
+            if (!king.Color ? tracker.HasWhiteSavingSquares : tracker.HasBlackSavingSquares)
             {
                 return;
             }
 
             king.InCheckMate = true;
-            game.SetStatus(
-                king.Color == "white" ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack
-            );
+            game.SetStatus(!king.Color ? GameStatus.CheckMateWhite : GameStatus.CheckMateBlack);
         }
     }
 }

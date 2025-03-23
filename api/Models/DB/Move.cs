@@ -10,6 +10,6 @@ namespace ChessApi.Models.DB
         public required int[] From { get; set; }
         public required int[] To { get; set; }
         public required string PieceType { get; set; }
-        public required string PieceColor { get; set; }
+        public required bool PieceColor { get; set; }
     }
 }

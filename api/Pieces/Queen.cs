@@ -5,10 +5,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Queen : IPieceCanPin
+    public class Queen(bool Color) : IPieceCanPin
     {
-        public string HashName { get; set; } = "q";
-        public string Color { get; set; }
+        public bool Color { get; set; } = Color;
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
             new int[,]
@@ -36,11 +35,6 @@ namespace ChessApi.Pieces
                 { -20, -10, -10, -5, -5, -10, -10, -20 }
             };
         public int Value { get; } = 900;
-
-        public Queen(string Color)
-        {
-            this.Color = Color;
-        }
 
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
@@ -196,9 +190,14 @@ namespace ChessApi.Pieces
             return newPiece;
         }
 
+        public string GetHashKey()
+        {
+            return $"q{(Color ? 0 : 1)}";
+        }
+
         public override string ToString()
         {
-            return Color + "Queen";
+            return (Color == false ? "white" : "black") + "Queen";
         }
     }
 }

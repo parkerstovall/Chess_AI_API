@@ -58,8 +58,8 @@ namespace api.repository
             bool moved = false;
             int[]? clickedSquare = [row, col];
             BoardSquare square = game.Board.Rows[row].Squares[col];
-            var currentTurnColor = game.IsWhiteTurn ? "white" : "black";
-            var playerColor = game.IsPlayerWhite ? "white" : "black";
+            var currentTurnColor = game.IsWhiteTurn ? 0 : 1;
+            var playerColor = game.IsPlayerWhite ? 0 : 1;
 
             if (
                 game.AvailableMoves.Count != 0
@@ -126,9 +126,30 @@ namespace api.repository
                 return BoardHelper.GetBoardForDisplay(game);
             }
 
-            ChessAI ai = new(game.IsPlayerWhite);
-            //var foundMove = ai.GetMove(game);
-            var foundMove = ai.GetMoveParallel(game);
+            var options = new MinMaxEngineOptions
+            {
+                MaxDepth = 3,
+                MaxTime = 10000,
+                BoardSize = 8,
+                PieceHashKeys =
+                [
+                    "r0",
+                    "n0",
+                    "b0",
+                    "q0",
+                    "k0",
+                    "p0",
+                    "r1",
+                    "n1",
+                    "b1",
+                    "q1",
+                    "k1",
+                    "p1"
+                ]
+            };
+            MinMaxEngine ai = new(options);
+            var foundMove = ai.GetMove(game);
+            //var foundMove = ai.GetMoveParallel(game);
             if (foundMove is not null)
             {
                 await _connRepo.GetCollection<Move>("MoveHistory").InsertOneAsync(foundMove);

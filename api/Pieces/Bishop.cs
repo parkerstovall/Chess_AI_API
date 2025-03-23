@@ -5,10 +5,9 @@ using ChessApi.Pieces.Interfaces;
 
 namespace ChessApi.Pieces
 {
-    public class Bishop : IPieceCanPin
+    public class Bishop(bool Color) : IPieceCanPin
     {
-        public string HashName { get; set; } = "b";
-        public string Color { get; set; }
+        public bool Color { get; set; } = Color;
         public Direction PinnedDir { get; set; } = Direction.None;
         public int[,] WhiteValues { get; } =
             new int[,]
@@ -37,11 +36,6 @@ namespace ChessApi.Pieces
             };
 
         public int Value { get; } = 330;
-
-        public Bishop(string Color)
-        {
-            this.Color = Color;
-        }
 
         public List<PossibleMove> GetPaths(Board board, int[] coords, bool check)
         {
@@ -190,9 +184,14 @@ namespace ChessApi.Pieces
             return newPiece;
         }
 
+        public string GetHashKey()
+        {
+            return $"b{(Color ? 0 : 1)}";
+        }
+
         public override string ToString()
         {
-            return Color + "Bishop";
+            return (Color == false ? "white" : "black") + "Bishop";
         }
     }
 }

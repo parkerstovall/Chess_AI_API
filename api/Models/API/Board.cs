@@ -23,8 +23,7 @@ namespace ChessApi.Models.API
                             type = "n";
                         }
 
-                        board +=
-                            square.Piece.Color == "white" ? type.ToUpper()[0] : type.ToLower()[0];
+                        board += !square.Piece.Color ? type.ToUpper()[0] : type.ToLower()[0];
                     }
                     board += " ";
                 }
