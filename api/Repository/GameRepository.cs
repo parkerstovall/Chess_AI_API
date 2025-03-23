@@ -50,16 +50,10 @@ namespace api.repository
         public async Task<ClickReturn> HandleClick(int row, int col)
         {
             Game game = await GetsertGame();
-            // if (!game.IsTwoPlayer && game.IsPlayerWhite != game.IsWhiteTurn)
-            // {
-            //     return new() { Moved = false, Board = BoardHelper.GetBoardForDisplay(game) };
-            // }
 
             bool moved = false;
             int[]? clickedSquare = [row, col];
             BoardSquare square = game.Board.Rows[row].Squares[col];
-            var currentTurnColor = game.IsWhiteTurn ? 0 : 1;
-            var playerColor = game.IsPlayerWhite ? 0 : 1;
 
             if (
                 game.AvailableMoves.Count != 0
@@ -93,10 +87,7 @@ namespace api.repository
                 game.SelectedSquare = null;
                 moved = true;
             }
-            else if (square.Piece is null
-            // || square.Piece.Color != currentTurnColor
-            // || (!game.IsTwoPlayer && square.Piece.Color != playerColor)
-            )
+            else if (square.Piece is null || square.Piece.Color == game.IsWhiteTurn)
             {
                 game.AvailableMoves.Clear();
                 game.SelectedSquare = null;
